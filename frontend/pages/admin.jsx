@@ -519,7 +519,7 @@ const ServiceModal = ({ service, onSave, onClose }) => {
 };
 
 // ── PORTFOLIO PAGE ────────────────────────────────────────────
-const PortfolioPage = ({ onBook, onAdmin }) => (
+const PortfolioPage = ({ onBook }) => (
   <div dir="rtl" style={{ minHeight: '100vh', background: '#fdf8f5', fontFamily: 'Heebo, sans-serif' }}>
     <div style={{ background: 'linear-gradient(135deg,#2d0a1e,#8b2252)', padding: '3rem 2rem', textAlign: 'center', color: 'white' }}>
       <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>💅</div>
@@ -539,11 +539,6 @@ const PortfolioPage = ({ onBook, onAdmin }) => (
       <button onClick={onBook} style={{ width: '100%', padding: '1rem', borderRadius: '14px', background: 'linear-gradient(135deg,#2d0a1e,#8b2252)', color: 'white', fontWeight: 900, fontSize: '1.1rem', border: 'none', cursor: 'pointer' }}>
         💅 קביעת תור עכשיו
       </button>
-      <div style={{ textAlign: 'center', marginTop: '2rem' }}>
-        <button onClick={onAdmin} style={{ color: '#9ca3af', fontSize: '0.75rem', background: 'none', border: 'none', cursor: 'pointer' }}>
-          כניסה לניהול
-        </button>
-      </div>
     </div>
   </div>
 );
@@ -966,7 +961,7 @@ export default function App() {
   return (
     <>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&display=swap'); * { box-sizing: border-box; margin: 0; padding: 0; } body { font-family: Heebo, sans-serif; }`}</style>
-      {view === 'portfolio' && <PortfolioPage onBook={() => setView('booking')} onAdmin={() => setView('auth')} />}
+      {view === 'portfolio' && <PortfolioPage onBook={() => setView('booking')} />}
       {view === 'booking' && <BookingPage onBack={() => setView(user ? 'dashboard' : 'portfolio')} />}
       {view === 'auth' && <AuthScreen onLogin={(u) => { setUser(u); setView('dashboard'); }} />}
       {view === 'dashboard' && user && <Dashboard user={user} onLogout={() => { setUser(null); setView('portfolio'); }} />}
