@@ -791,13 +791,21 @@ const Dashboard = ({ user, onLogout }) => {
                   {appointments.filter(a => new Date(a.appointment_time).toDateString() === selDay.toDateString() && a.status !== 'cancelled').map(appt => (
                     <div key={appt.id} style={{ padding: '0.875rem 1.25rem', borderBottom: '1px solid #fafafa' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <div>
+                        <div style={{ flex: 1 }}>
                           <p style={{ fontWeight: 700, color: '#2d0a1e', margin: 0, fontSize: '0.875rem' }}>{appt.customer_name}</p>
                           <p style={{ color: '#9ca3af', fontSize: '0.75rem', margin: '2px 0 0' }}>{fmtTime(appt.appointment_time)} · {appt.service_name}</p>
+                          <span style={{ fontSize: '0.7rem', fontWeight: 700, padding: '2px 8px', borderRadius: '999px', background: appt.status === 'completed' ? '#d1fae5' : appt.status === 'pending' ? '#fef3c7' : '#fce7f3', color: appt.status === 'completed' ? '#059669' : appt.status === 'pending' ? '#92400e' : '#be185d', display: 'inline-block', marginTop: '4px' }}>
+                            {appt.status === 'completed' ? 'הושלם' : appt.status === 'pending' ? 'ממתין' : 'מאושר'}
+                          </span>
                         </div>
-                        {appt.image && (
-                          <img src={appt.image} alt="ins" onClick={() => setViewImage(appt.image)} style={{ width: '36px', height: '36px', borderRadius: '8px', objectFit: 'cover', border: '2px solid #fce7f3', cursor: 'pointer' }} />
-                        )}
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                          {appt.image && (
+                            <img src={appt.image} alt="ins" onClick={() => setViewImage(appt.image)} style={{ width: '32px', height: '32px', borderRadius: '8px', objectFit: 'cover', border: '2px solid #fce7f3', cursor: 'pointer' }} />
+                          )}
+                          <button onClick={() => cancelAppt(appt.id)} style={{ padding: '4px 8px', borderRadius: '8px', background: '#fee2e2', color: '#991b1b', fontWeight: 700, fontSize: '0.7rem', border: 'none', cursor: 'pointer' }}>
+                            ביטול
+                          </button>
+                        </div>
                       </div>
                     </div>
                   ))}
