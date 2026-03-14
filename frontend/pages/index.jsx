@@ -117,7 +117,9 @@ const AuthScreen = ({ onLogin }) => {
   return (
     <div dir="rtl" style={{ minHeight: '100vh', display: 'flex', fontFamily: 'Heebo, sans-serif', background: '#fdf8f5' }}>
       <div style={{ width: '50%', background: 'linear-gradient(145deg,#2d0a1e,#8b2252)', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '4rem', color: 'white' }}>
-        <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>💅</div>
+        <div style={{ marginBottom: '1.5rem' }}>
+          <img src="/logo-white.png" alt="Lior Segev" style={{ height: '80px', objectFit: 'contain' }} />
+        </div>
         <h1 style={{ fontSize: '3rem', fontWeight: 900, lineHeight: 1.2, marginBottom: '1rem' }}>
           היופי שלך,<br /><span style={{ color: '#ffb6c1' }}>בקליק אחד</span>
         </h1>
@@ -288,7 +290,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
         <button onClick={onBack} style={{ padding: '0.5rem', borderRadius: '10px', background: 'none', border: 'none', cursor: 'pointer' }}>
           <Icon name="chevronR" className="w-5 h-5" />
         </button>
-        <span style={{ fontSize: '1.5rem' }}>💅</span>
+        <img src="/symbol.png" alt="LS" style={{ width: '32px', height: '32px', objectFit: 'contain' }} />
         <div>
           <p style={{ fontWeight: 900, color: '#2d0a1e', margin: 0 }}>ליאור שגב – היופי שלך</p>
           <p style={{ color: '#9ca3af', fontSize: '0.75rem', margin: 0 }}>קביעת תור</p>
@@ -598,9 +600,10 @@ const ServiceModal = ({ service, onSave, onClose }) => {
 // ── PORTFOLIO PAGE ────────────────────────────────────────────
 const PortfolioPage = ({ onBook, onAdmin }) => (
   <div dir="rtl" style={{ minHeight: '100vh', background: '#fdf8f5', fontFamily: 'Heebo, sans-serif' }}>
-    <div style={{ background: 'linear-gradient(135deg,#2d0a1e,#8b2252)', padding: '3rem 2rem', textAlign: 'center', color: 'white' }}>
-      <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>💅</div>
-      <h1 style={{ fontSize: '2.5rem', fontWeight: 900, margin: 0 }}>ליאור שגב – היופי שלך</h1>
+    <div style={{ background: 'linear-gradient(135deg,#2d0a1e,#8b2252)', backgroundImage: 'url(/pattern-pink.png)', backgroundSize: '300px', backgroundBlendMode: 'overlay', padding: '3rem 2rem', textAlign: 'center', color: 'white' }}>
+      <div style={{ marginBottom: '1rem' }}>
+        <img src="/logo-white.png" alt="Lior Segev" style={{ height: '70px', objectFit: 'contain' }} />
+      </div>
       <p style={{ opacity: 0.7, marginTop: '0.5rem' }}>תיק עבודות</p>
     </div>
     <div style={{ maxWidth: '600px', margin: '0 auto', padding: '2rem 1.5rem' }}>
@@ -674,7 +677,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
       {/* Sidebar */}
       <div style={sidebarStyle}>
         <div style={{ padding: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <span style={{ fontSize: '1.75rem' }}>💅</span>
+          <img src="/symbol.png" alt="LS" style={{ width: '36px', height: '36px', objectFit: 'contain' }} />
           <div>
             <p style={{ fontWeight: 900, color: '#ffb6c1', margin: 0, fontSize: '0.875rem' }}>ליאור שגב</p>
             <p style={{ opacity: 0.4, fontSize: '0.7rem', margin: 0 }}>היופי שלך</p>
