@@ -115,7 +115,7 @@ const AuthScreen = ({ onLogin }) => {
   };
 
   return (
-    <div dir="rtl" style={{ minHeight: '100vh', display: 'flex', fontFamily: 'Heebo, sans-serif', background: '#FDECE5' }}>
+    <div dir="rtl" style={{ minHeight: '100vh', display: 'flex', fontFamily: 'Heebo, sans-serif', background: '#FDECE5', backgroundImage: 'url(/pattern-pink.png)', backgroundSize: '150px' }}>
       <div style={{ width: '50%', background: 'linear-gradient(145deg,#A11738,#EC6A83)', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '4rem', color: 'white' }}>
         <div style={{ marginBottom: '1.5rem' }}>
           <img src="/logo-white.png" alt="Lior Segev" style={{ height: '80px', objectFit: 'contain' }} />
@@ -136,7 +136,7 @@ const AuthScreen = ({ onLogin }) => {
             {mode === 'login' ? 'ברוכה הבאה 👋' : 'יצירת חשבון'}
           </h2>
           {mode === 'login' && (
-            <div style={{ background: 'rgba(255,182,193,0.2)', border: '1px solid rgba(255,105,180,0.3)', borderRadius: '12px', padding: '0.75rem 1rem', fontSize: '0.875rem', color: '#EC6A83', marginBottom: '1.5rem' }}>
+            <div style={{ display: 'none' }}>
               <strong>דמו:</strong> lior@beauty.com / demo1234
             </div>
           )}
@@ -516,31 +516,13 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
               <strong>⚠️ שימי לב:</strong> התור יאושר רק לאחר שליאור תראה את ההעברה ותאשר ידנית.
             </div>
 
-            <a href={PAYBOX_LINK} target="_blank" rel="noreferrer"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', width: '100%', padding: '1rem', borderRadius: '12px', background: 'linear-gradient(135deg,#1a56db,#1e40af)', color: 'white', fontWeight: 700, fontSize: '1rem', textDecoration: 'none', marginBottom: '12px', boxSizing: 'border-box' }}>
-              💳 העברה דרך פייבוקס לליאור
-            </a>
+            <div style={{ background: '#F7C1C3', borderRadius: '12px', padding: '1rem', marginBottom: '1.25rem', textAlign: 'center', fontSize: '0.875rem', color: '#A11738', fontWeight: 700 }}>
+              💳 יש להעביר מקדמה דרך ביט / פייבוקס למספר:<br />
+              <span style={{ fontSize: '1.25rem', letterSpacing: '0.05em' }}>053-524-9688</span>
+            </div>
 
-            <button onClick={async () => {
-              await new Promise(r => setTimeout(r, 500));
-              if (onAppointmentBooked) {
-                onAppointmentBooked({
-                  id: `a${Date.now()}`,
-                  customer_name: sel.name,
-                  customer_phone: sel.phone,
-                  service_name: serviceNames,
-                  appointment_time: new Date(
-                    sel.date.getFullYear(), sel.date.getMonth(), sel.date.getDate(),
-                    parseInt(sel.time.split(':')[0]), parseInt(sel.time.split(':')[1])
-                  ).toISOString(),
-                  status: 'pending',
-                  price: totalPrice,
-                  image: sel.image,
-                });
-              }
-              setBooked(true);
-            }} style={{ width: '100%', padding: '0.875rem', borderRadius: '12px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, border: 'none', cursor: 'pointer', marginBottom: '12px' }}>
-              שלחתי את המקדמה ✅
+            <button disabled style={{ width: '100%', padding: '0.875rem', borderRadius: '12px', background: '#d1d5db', color: '#9ca3af', fontWeight: 700, border: 'none', cursor: 'not-allowed', marginBottom: '12px' }}>
+              ממתין לאישור ליאור ⏳
             </button>
 
             <button onClick={() => setStep(4)} style={{ width: '100%', padding: '0.875rem', borderRadius: '12px', background: '#f3f4f6', color: '#374151', fontWeight: 700, border: 'none', cursor: 'pointer' }}>חזרה</button>
@@ -620,7 +602,7 @@ const PortfolioPage = ({ onBook, onAdmin }) => (
 
     {/* Services */}
     <div style={{ maxWidth: '480px', margin: '0 auto', padding: '1.5rem 1.25rem' }}>
-      <p style={{ textAlign: 'center', fontWeight: 900, fontSize: '1.1rem', color: '#A11738', marginBottom: '1rem' }}>השירותים שלנו ✨</p>
+      <p style={{ textAlign: 'center', fontWeight: 900, fontSize: '1.1rem', color: '#A11738', marginBottom: '1rem' }}>השירותים שלי ✨</p>
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '1.5rem' }}>
         {[
           { emoji: '💅', title: "לק ג'ל", desc: 'מבנה, צורה, עיצוב' },
