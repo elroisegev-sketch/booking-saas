@@ -538,66 +538,63 @@ const ServiceModal = ({ service, onSave, onClose }) => {
 
 // ── PORTFOLIO PAGE ────────────────────────────────────────────
 const PortfolioPage = ({ onBook, onAdmin }) => (
-  <div dir="rtl" style={{ minHeight: '100vh', fontFamily: 'Varela Round, sans-serif', background: '#FDECE5' }}>
+  <div dir="rtl" style={{ minHeight: '100vh', fontFamily: 'Varela Round, sans-serif', background: '#FDECE5', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 
     {/* Hero */}
-    <div style={{ background: 'linear-gradient(170deg,#A11738 0%,#EC6A83 100%)', backgroundImage: 'url(/pattern-pink.png)', backgroundSize: '180px', backgroundBlendMode: 'soft-light', paddingTop: '2rem', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+    <div style={{ width: '100%', background: 'linear-gradient(170deg,#A11738 0%,#EC6A83 100%)', backgroundImage: 'url(/pattern-pink.png)', backgroundSize: '180px', backgroundBlendMode: 'soft-light', padding: '2rem 1rem 3rem', textAlign: 'center', position: 'relative' }}>
       <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(170deg,rgba(161,23,56,0.88),rgba(236,106,131,0.78))' }} />
-      <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-        <img src="/logo-white.png" alt="Lior Segev" style={{ height: '60px', objectFit: 'contain', marginBottom: '0.6rem', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.15))' }} />
-        <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.8rem', marginBottom: '1.25rem', letterSpacing: '0.1em' }}>יופי מקצועי • ליד הבית שלך</p>
-        {/* Photo — full width at bottom of hero, no crop */}
-        <div style={{ width: '200px', height: '200px', borderRadius: '50%', overflow: 'hidden', border: '4px solid rgba(255,255,255,0.3)', boxShadow: '0 8px 32px rgba(0,0,0,0.2)', marginBottom: '0' }}>
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <img src="/logo-white.png" alt="Lior Segev" style={{ height: '55px', objectFit: 'contain', marginBottom: '0.5rem' }} />
+        <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.78rem', marginBottom: '1.5rem', letterSpacing: '0.08em' }}>יופי מקצועי • ליד הבית שלך</p>
+        <div style={{ width: '150px', height: '150px', borderRadius: '50%', overflow: 'hidden', border: '3px solid rgba(255,255,255,0.4)', margin: '0 auto', boxShadow: '0 8px 24px rgba(0,0,0,0.2)' }}>
           <img src="/lior.png" alt="ליאור שגב" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center' }} />
         </div>
       </div>
-      {/* Wave */}
-      <svg viewBox="0 0 1440 60" style={{ display: 'block', marginTop: '-2px' }} preserveAspectRatio="none">
-        <path d="M0,40 C360,80 1080,0 1440,40 L1440,60 L0,60 Z" fill="#FDECE5"/>
-      </svg>
     </div>
 
-    {/* CTA */}
-    <div style={{ textAlign: 'center', marginTop: '-10px', paddingBottom: '1.5rem' }}>
-      <button onClick={onBook} style={{ padding: '0.9rem 2.5rem', borderRadius: '999px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 900, fontSize: '1rem', border: 'none', cursor: 'pointer', boxShadow: '0 6px 24px rgba(161,23,56,0.35)', fontFamily: 'Varela Round, sans-serif' }}>
+    {/* Content card */}
+    <div style={{ width: '100%', maxWidth: '420px', padding: '1.5rem 1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+
+      {/* CTA */}
+      <button onClick={onBook} style={{ width: '100%', padding: '0.9rem', borderRadius: '999px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 900, fontSize: '1rem', border: 'none', cursor: 'pointer', boxShadow: '0 6px 20px rgba(161,23,56,0.3)', fontFamily: 'Varela Round, sans-serif' }}>
         💅 קביעת תור עכשיו
       </button>
-    </div>
 
-    {/* Services */}
-    <div style={{ maxWidth: '460px', margin: '0 auto', padding: '0 1.25rem 1.5rem' }}>
-      <p style={{ textAlign: 'center', fontWeight: 900, fontSize: '1rem', color: '#A11738', marginBottom: '0.875rem' }}>השירותים שלי ✨</p>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.75rem', marginBottom: '1.25rem' }}>
-        {[
-          { emoji: '💅', title: "לק ג'ל", desc: 'מבנה, צורה, עיצוב' },
-          { emoji: '✨', title: 'בניה חדשה', desc: 'ציפורן מושלמת' },
-          { emoji: '🌿', title: 'עיצוב גבות', desc: 'צביעה ועיצוב' },
-          { emoji: '👁', title: 'הרמת ריסים', desc: 'מראה פתוח ורענן' },
-        ].map((item, i) => (
-          <div key={i} onClick={onBook} style={{ background: 'white', border: '1.5px solid #F7C1C3', borderRadius: '16px', padding: '1rem', textAlign: 'center', cursor: 'pointer', boxShadow: '0 2px 12px rgba(161,23,56,0.07)' }}>
-            <div style={{ fontSize: '1.75rem', marginBottom: '0.35rem' }}>{item.emoji}</div>
-            <p style={{ fontWeight: 900, color: '#A11738', margin: '0 0 2px', fontSize: '0.875rem' }}>{item.title}</p>
-            <p style={{ color: '#9ca3af', fontSize: '0.68rem', margin: 0 }}>{item.desc}</p>
-          </div>
-        ))}
+      {/* Services */}
+      <div>
+        <p style={{ textAlign: 'center', fontWeight: 900, fontSize: '0.95rem', color: '#A11738', marginBottom: '0.75rem' }}>השירותים שלי ✨</p>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.625rem' }}>
+          {[
+            { emoji: '💅', title: "לק ג'ל", desc: 'מבנה, צורה, עיצוב' },
+            { emoji: '✨', title: 'בניה חדשה', desc: 'ציפורן מושלמת' },
+            { emoji: '🌿', title: 'עיצוב גבות', desc: 'צביעה ועיצוב' },
+            { emoji: '👁', title: 'הרמת ריסים', desc: 'מראה פתוח ורענן' },
+          ].map((item, i) => (
+            <div key={i} onClick={onBook} style={{ background: 'white', border: '1.5px solid #F7C1C3', borderRadius: '14px', padding: '0.875rem', textAlign: 'center', cursor: 'pointer', boxShadow: '0 2px 8px rgba(161,23,56,0.06)' }}>
+              <div style={{ fontSize: '1.6rem', marginBottom: '0.3rem' }}>{item.emoji}</div>
+              <p style={{ fontWeight: 900, color: '#A11738', margin: '0 0 2px', fontSize: '0.82rem' }}>{item.title}</p>
+              <p style={{ color: '#9ca3af', fontSize: '0.65rem', margin: 0 }}>{item.desc}</p>
+            </div>
+          ))}
+        </div>
       </div>
 
       {/* Social */}
-      <div style={{ background: 'white', border: '1.5px solid #F7C1C3', borderRadius: '16px', padding: '1.25rem', textAlign: 'center' }}>
-        <img src="/lior-logo.png" alt="Lior Segev" style={{ height: '45px', objectFit: 'contain', marginBottom: '0.5rem' }} />
-        <p style={{ color: '#9ca3af', fontSize: '0.72rem', margin: '0 0 0.875rem' }}>Lior Segev Beauty</p>
-        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+      <div style={{ background: 'white', border: '1.5px solid #F7C1C3', borderRadius: '14px', padding: '1rem', textAlign: 'center' }}>
+        <p style={{ fontWeight: 900, color: '#A11738', fontSize: '0.9rem', margin: '0 0 0.25rem' }}>Lior Segev Beauty</p>
+        <p style={{ color: '#9ca3af', fontSize: '0.68rem', margin: '0 0 0.75rem' }}>עקבי אחרינו ברשתות</p>
+        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
           <a href="https://www.instagram.com/liors_beauty" target="_blank" rel="noreferrer">
-            <img src="/instagram.png" alt="Instagram" style={{ width: '44px', height: '44px', objectFit: 'contain' }} />
+            <img src="/instagram.png" alt="Instagram" style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
           </a>
           <a href="https://www.facebook.com/share/1DLKLrkWFb/" target="_blank" rel="noreferrer">
-            <img src="/facebook.png" alt="Facebook" style={{ width: '44px', height: '44px', objectFit: 'contain' }} />
+            <img src="/facebook.png" alt="Facebook" style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
           </a>
         </div>
       </div>
 
-      <div style={{ textAlign: 'center', marginTop: '1rem' }}>
-        <button onClick={onAdmin} style={{ color: '#d1d5db', fontSize: '0.7rem', background: 'none', border: 'none', cursor: 'pointer' }}>
+      <div style={{ textAlign: 'center' }}>
+        <button onClick={onAdmin} style={{ color: '#d1d5db', fontSize: '0.68rem', background: 'none', border: 'none', cursor: 'pointer' }}>
           כניסה לניהול
         </button>
       </div>
