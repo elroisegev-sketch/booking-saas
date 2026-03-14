@@ -604,10 +604,10 @@ const PortfolioPage = ({ onBook, onAdmin }) => (
     {/* Hero with photo */}
     <div style={{ background: 'linear-gradient(160deg,#A11738 0%,#EC6A83 100%)', backgroundImage: 'url(/pattern-pink.png)', backgroundSize: '180px', backgroundBlendMode: 'soft-light', padding: '2.5rem 1.5rem 0', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
       <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(160deg,rgba(161,23,56,0.9),rgba(236,106,131,0.8))' }} />
-      <div style={{ position: 'relative', zIndex: 1 }}>
+      <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
         <img src="/logo-white.png" alt="Lior Segev" style={{ height: '65px', objectFit: 'contain', marginBottom: '1rem', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.2))' }} />
         <p style={{ color: 'rgba(255,255,255,0.85)', fontSize: '0.85rem', marginBottom: '1.5rem', letterSpacing: '0.08em' }}>יופי מקצועי • ליד הבית שלך</p>
-        <img src="/lior.png" alt="ליאור שגב" style={{ width: '200px', height: '200px', objectFit: 'cover', objectPosition: 'top center', borderRadius: '50% 50% 0 0', display: 'block', margin: '0 auto', filter: 'drop-shadow(0 -8px 24px rgba(0,0,0,0.2))' }} />
+        <img src="/lior.png" alt="ליאור שגב" style={{ width: '210px', height: '210px', objectFit: 'cover', objectPosition: 'top center', borderRadius: '50% 50% 0 0', display: 'block', filter: 'drop-shadow(0 -8px 24px rgba(0,0,0,0.2))' }} />
       </div>
     </div>
 
@@ -636,18 +636,16 @@ const PortfolioPage = ({ onBook, onAdmin }) => (
         ))}
       </div>
 
-      {/* Social */}
+      {/* Social - clean */}
       <div style={{ background: 'white', border: '1.5px solid #F7C1C3', borderRadius: '16px', padding: '1.25rem', textAlign: 'center', marginBottom: '1.25rem' }}>
-        <p style={{ fontWeight: 900, color: '#A11738', margin: '0 0 4px', fontSize: '0.9rem' }}>עקבי אחרינו ברשתות</p>
+        <img src="/lior-logo.png" alt="Lior Segev" style={{ height: '55px', objectFit: 'contain', marginBottom: '0.75rem' }} />
         <p style={{ color: '#9ca3af', fontSize: '0.75rem', margin: '0 0 1rem' }}>Lior Segev Beauty</p>
-        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
-          <a href="https://www.instagram.com/liors_beauty" target="_blank" rel="noreferrer"
-            style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0.5rem 1.25rem', borderRadius: '999px', background: 'linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)', color: 'white', fontWeight: 700, fontSize: '0.8rem', textDecoration: 'none' }}>
-            📸 אינסטגרם
+        <div style={{ display: 'flex', gap: '16px', justifyContent: 'center' }}>
+          <a href="https://www.instagram.com/liors_beauty" target="_blank" rel="noreferrer">
+            <img src="/instagram.png" alt="Instagram" style={{ width: '52px', height: '52px', objectFit: 'contain' }} />
           </a>
-          <a href="https://www.facebook.com/share/1DLKLrkWFb/" target="_blank" rel="noreferrer"
-            style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0.5rem 1.25rem', borderRadius: '999px', background: '#1877f2', color: 'white', fontWeight: 700, fontSize: '0.8rem', textDecoration: 'none' }}>
-            👍 פייסבוק
+          <a href="https://www.facebook.com/share/1DLKLrkWFb/" target="_blank" rel="noreferrer">
+            <img src="/facebook.png" alt="Facebook" style={{ width: '52px', height: '52px', objectFit: 'contain' }} />
           </a>
         </div>
       </div>
