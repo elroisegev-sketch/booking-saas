@@ -109,7 +109,7 @@ const AuthScreen = ({ onLogin }) => {
   };
 
   return (
-    <div dir="rtl" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Heebo, sans-serif', background: '#FDECE5', backgroundImage: 'url(/pattern-pink.png)', backgroundSize: '150px' }}>
+    <div dir="rtl" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Varela Round, sans-serif', background: '#FDECE5', backgroundImage: 'url(/pattern-pink.png)', backgroundSize: '150px' }}>
       <div style={{ width: '100%', maxWidth: '380px', padding: '2rem' }}>
         <div style={{ background: 'white', borderRadius: '24px', padding: '2.5rem', boxShadow: '0 8px 32px rgba(161,23,56,0.1)' }}>
           <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
@@ -134,7 +134,7 @@ const AuthScreen = ({ onLogin }) => {
 };
 // ── TERMS SCREEN ──────────────────────────────────────────────
 const TermsScreen = ({ termsText, onAccept, onBack }) => (
-  <div dir="rtl" style={{ minHeight: '100vh', background: '#FDECE5', fontFamily: 'Heebo, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
+  <div dir="rtl" style={{ minHeight: '100vh', background: '#FDECE5', fontFamily: 'Varela Round, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
     <div style={{ width: '100%', maxWidth: '520px' }}>
       <div style={{ background: 'white', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }}>
         <div style={{ background: 'linear-gradient(135deg,#A11738,#EC6A83)', padding: '1.5rem', textAlign: 'center', color: 'white' }}>
@@ -143,7 +143,7 @@ const TermsScreen = ({ termsText, onAccept, onBack }) => (
           <p style={{ opacity: 0.7, fontSize: '0.875rem', marginTop: '4px' }}>יש לקרוא ולאשר לפני קביעת התור</p>
         </div>
         <div style={{ padding: '1.5rem', maxHeight: '380px', overflowY: 'auto' }}>
-          <pre style={{ whiteSpace: 'pre-wrap', fontSize: '0.875rem', color: '#374151', lineHeight: 1.7, fontFamily: 'Heebo, sans-serif' }}>{termsText}</pre>
+          <pre style={{ whiteSpace: 'pre-wrap', fontSize: '0.875rem', color: '#374151', lineHeight: 1.7, fontFamily: 'Varela Round, sans-serif' }}>{termsText}</pre>
         </div>
         <div style={{ padding: '1.25rem', borderTop: '1px solid #f0f0f0', display: 'flex', gap: '12px' }}>
           <button onClick={onBack} style={{ flex: 1, padding: '0.875rem', borderRadius: '12px', background: '#f3f4f6', color: '#374151', fontWeight: 700, border: 'none', cursor: 'pointer' }}>חזרה</button>
@@ -206,7 +206,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   };
 
   const cats = [...new Set(MOCK_SERVICES.map(s => s.category))];
-  const S = { fontFamily: 'Heebo, sans-serif' };
+  const S = { fontFamily: 'Varela Round, sans-serif' };
   const btn = (active) => ({ padding: '0.75rem', borderRadius: '12px', fontWeight: 700, fontSize: '0.875rem', border: `2px solid ${active ? '#EC6A83' : '#f0f0f0'}`, background: active ? 'linear-gradient(135deg,#A11738,#EC6A83)' : 'white', color: active ? 'white' : '#A11738', cursor: 'pointer' });
 
   const dateStr = sel.date?.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' });
@@ -494,7 +494,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
 const ServiceModal = ({ service, onSave, onClose }) => {
   const [form, setForm] = useState({ name: service?.name || '', duration: service?.duration || 30, price: service?.price || 0, category: service?.category || "לק ג'ל 💅" });
   return (
-    <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.5)', fontFamily: 'Heebo, sans-serif' }}>
+    <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.5)', fontFamily: 'Varela Round, sans-serif' }}>
       <div dir="rtl" style={{ background: 'white', borderRadius: '20px', padding: '1.5rem', width: '100%', maxWidth: '420px', margin: '1rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
           <h2 style={{ fontWeight: 900, color: '#A11738', fontSize: '1.25rem', margin: 0 }}>{service ? 'עריכת שירות' : 'שירות חדש'}</h2>
@@ -538,7 +538,7 @@ const ServiceModal = ({ service, onSave, onClose }) => {
 
 // ── PORTFOLIO PAGE ────────────────────────────────────────────
 const PortfolioPage = ({ onBook, onAdmin }) => (
-  <div dir="rtl" style={{ minHeight: '100vh', fontFamily: 'Heebo, sans-serif', background: '#FDECE5' }}>
+  <div dir="rtl" style={{ minHeight: '100vh', fontFamily: 'Varela Round, sans-serif', background: '#FDECE5' }}>
 
     {/* Hero with photo */}
     <div style={{ background: 'linear-gradient(160deg,#A11738 0%,#EC6A83 100%)', backgroundImage: 'url(/pattern-pink.png)', backgroundSize: '180px', backgroundBlendMode: 'soft-light', padding: '2.5rem 1.5rem 0', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
@@ -552,7 +552,7 @@ const PortfolioPage = ({ onBook, onAdmin }) => (
 
     {/* CTA */}
     <div style={{ background: 'white', padding: '1.5rem', textAlign: 'center', boxShadow: '0 4px 20px rgba(161,23,56,0.06)' }}>
-      <button onClick={onBook} style={{ padding: '0.9rem 2.5rem', borderRadius: '999px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 900, fontSize: '1rem', border: 'none', cursor: 'pointer', boxShadow: '0 6px 20px rgba(161,23,56,0.3)', fontFamily: 'Heebo, sans-serif' }}>
+      <button onClick={onBook} style={{ padding: '0.9rem 2.5rem', borderRadius: '999px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 900, fontSize: '1rem', border: 'none', cursor: 'pointer', boxShadow: '0 6px 20px rgba(161,23,56,0.3)', fontFamily: 'Varela Round, sans-serif' }}>
         💅 קביעת תור עכשיו
       </button>
     </div>
@@ -630,13 +630,13 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
     { id: 'portfolio', label: 'תיק עבודות', icon: 'portfolio' },
   ];
 
-  const sidebarStyle = { width: '240px', flexShrink: 0, display: 'flex', flexDirection: 'column', background: 'linear-gradient(180deg,#A11738,#7a0f2a)', color: 'white', fontFamily: 'Heebo, sans-serif' };
-  const mainStyle = { flex: 1, overflowY: 'auto', fontFamily: 'Heebo, sans-serif', background: '#FDECE5' };
+  const sidebarStyle = { width: '240px', flexShrink: 0, display: 'flex', flexDirection: 'column', background: 'linear-gradient(180deg,#A11738,#7a0f2a)', color: 'white', fontFamily: 'Varela Round, sans-serif' };
+  const mainStyle = { flex: 1, overflowY: 'auto', fontFamily: 'Varela Round, sans-serif', background: '#FDECE5' };
   const card = { background: 'white', border: '1px solid #f0f0f0', borderRadius: '16px' };
 
   return (
     <div dir="rtl" style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
-      {toast && <div style={{ position: 'fixed', top: '1rem', left: '50%', transform: 'translateX(-50%)', zIndex: 50, background: '#A11738', color: 'white', padding: '0.75rem 1.25rem', borderRadius: '12px', fontWeight: 700, fontSize: '0.875rem', fontFamily: 'Heebo, sans-serif' }}>{toast}</div>}
+      {toast && <div style={{ position: 'fixed', top: '1rem', left: '50%', transform: 'translateX(-50%)', zIndex: 50, background: '#A11738', color: 'white', padding: '0.75rem 1.25rem', borderRadius: '12px', fontWeight: 700, fontSize: '0.875rem', fontFamily: 'Varela Round, sans-serif' }}>{toast}</div>}
 
       {viewImage && (
         <div onClick={() => setViewImage(null)} style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
@@ -656,7 +656,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
         <nav style={{ flex: 1, padding: '1rem' }}>
           {navItems.map(item => (
             <button key={item.id} onClick={() => setTab(item.id)}
-              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.625rem 0.75rem', borderRadius: '12px', fontSize: '0.875rem', fontWeight: 700, textAlign: 'right', border: 'none', cursor: 'pointer', marginBottom: '2px', background: tab === item.id ? 'rgba(255,182,193,0.15)' : 'transparent', color: tab === item.id ? '#F7C1C3' : 'rgba(255,255,255,0.55)', fontFamily: 'Heebo, sans-serif' }}>
+              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.625rem 0.75rem', borderRadius: '12px', fontSize: '0.875rem', fontWeight: 700, textAlign: 'right', border: 'none', cursor: 'pointer', marginBottom: '2px', background: tab === item.id ? 'rgba(255,182,193,0.15)' : 'transparent', color: tab === item.id ? '#F7C1C3' : 'rgba(255,255,255,0.55)', fontFamily: 'Varela Round, sans-serif' }}>
               <Icon name={item.icon} className="w-4 h-4" />
               {item.label}
               {item.id === 'pending' && pendingAppts.length > 0 && (
@@ -667,11 +667,11 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
         </nav>
         <div style={{ padding: '1rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
           <button onClick={() => setTab('booking')}
-            style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 0.75rem', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 700, background: 'rgba(255,182,193,0.1)', color: '#F7C1C3', border: 'none', cursor: 'pointer', marginBottom: '6px', fontFamily: 'Heebo, sans-serif' }}>
+            style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 0.75rem', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 700, background: 'rgba(255,182,193,0.1)', color: '#F7C1C3', border: 'none', cursor: 'pointer', marginBottom: '6px', fontFamily: 'Varela Round, sans-serif' }}>
             <Icon name="link" className="w-3.5 h-3.5" /> דף הזמנות שלי
           </button>
           <button onClick={onLogout}
-            style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 0.75rem', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 700, color: 'rgba(255,255,255,0.3)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Heebo, sans-serif' }}>
+            style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 0.75rem', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 700, color: 'rgba(255,255,255,0.3)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Varela Round, sans-serif' }}>
             <Icon name="logout" className="w-3.5 h-3.5" /> יציאה
           </button>
         </div>
@@ -689,7 +689,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                   <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#A11738', margin: 0 }}>{new Date().getHours() < 12 ? 'בוקר טוב' : 'צהריים טובים'} ליאור ✨</h1>
                   <p style={{ color: '#9ca3af', fontSize: '0.875rem', marginTop: '4px' }}>הנה מה שקורה היום</p>
                 </div>
-                <button onClick={() => setTab('booking')} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0.625rem 1rem', borderRadius: '12px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: '#F7C1C3', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: 'pointer', fontFamily: 'Heebo, sans-serif' }}>
+                <button onClick={() => setTab('booking')} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0.625rem 1rem', borderRadius: '12px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: '#F7C1C3', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: 'pointer', fontFamily: 'Varela Round, sans-serif' }}>
                   <Icon name="link" className="w-4 h-4" /> דף הזמנות
                 </button>
               </div>
@@ -854,7 +854,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
                 <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#A11738', margin: 0 }}>שירותים 💅</h1>
                 <button onClick={() => { setEditSvc(null); setShowModal(true); }}
-                  style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0.625rem 1rem', borderRadius: '12px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: '#F7C1C3', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: 'pointer', fontFamily: 'Heebo, sans-serif' }}>
+                  style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0.625rem 1rem', borderRadius: '12px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: '#F7C1C3', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: 'pointer', fontFamily: 'Varela Round, sans-serif' }}>
                   <Icon name="plus" className="w-4 h-4" /> שירות חדש
                 </button>
               </div>
@@ -939,7 +939,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                   </div>
                 ))}
               </div>
-              <button onClick={() => showToast('שעות הפעילות נשמרו ✅')} style={{ marginTop: '1rem', padding: '0.875rem 1.5rem', borderRadius: '12px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: '#F7C1C3', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: 'pointer', fontFamily: 'Heebo, sans-serif' }}>
+              <button onClick={() => showToast('שעות הפעילות נשמרו ✅')} style={{ marginTop: '1rem', padding: '0.875rem 1.5rem', borderRadius: '12px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: '#F7C1C3', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: 'pointer', fontFamily: 'Varela Round, sans-serif' }}>
                 שמירת שינויים
               </button>
             </div>
@@ -994,7 +994,7 @@ export default function App() {
   if (typeof window === 'undefined') return null;
   return (
     <>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&display=swap'); * { box-sizing: border-box; margin: 0; padding: 0; } body { font-family: Heebo, sans-serif; }`}</style>
+      <style>{`@import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap'); * { box-sizing: border-box; margin: 0; padding: 0; } body { font-family: 'Varela Round', sans-serif; }`}</style>
       {view === 'portfolio' && <PortfolioPage onBook={() => setView('booking')} onAdmin={() => setView('auth')} />}
       {view === 'booking' && <BookingPage onBack={() => setView('portfolio')} onAppointmentBooked={(appt) => { setAppointments(prev => [...prev, appt]); }} />}
       {view === 'auth' && <AuthScreen onLogin={(u) => { setUser(u); setView('dashboard'); }} />}
