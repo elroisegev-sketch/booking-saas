@@ -115,28 +115,28 @@ const AuthScreen = ({ onLogin }) => {
   };
 
   return (
-    <div dir="rtl" style={{ minHeight: '100vh', display: 'flex', fontFamily: 'Heebo, sans-serif', background: '#fdf8f5' }}>
-      <div style={{ width: '50%', background: 'linear-gradient(145deg,#2d0a1e,#8b2252)', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '4rem', color: 'white' }}>
+    <div dir="rtl" style={{ minHeight: '100vh', display: 'flex', fontFamily: 'Heebo, sans-serif', background: '#FDECE5' }}>
+      <div style={{ width: '50%', background: 'linear-gradient(145deg,#A11738,#EC6A83)', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '4rem', color: 'white' }}>
         <div style={{ marginBottom: '1.5rem' }}>
           <img src="/logo-white.png" alt="Lior Segev" style={{ height: '80px', objectFit: 'contain' }} />
         </div>
         <h1 style={{ fontSize: '3rem', fontWeight: 900, lineHeight: 1.2, marginBottom: '1rem' }}>
-          היופי שלך,<br /><span style={{ color: '#ffb6c1' }}>בקליק אחד</span>
+          היופי שלך,<br /><span style={{ color: '#F7C1C3' }}>בקליק אחד</span>
         </h1>
         {['לק ג׳ל ועיצוב ציפורניים', 'הרמת ריסים וגבות', 'עיצוב וצביעת גבות'].map((f, i) => (
           <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
-            <span style={{ color: '#ffb6c1' }}>✨</span>
+            <span style={{ color: '#F7C1C3' }}>✨</span>
             <span style={{ opacity: 0.85 }}>{f}</span>
           </div>
         ))}
       </div>
       <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
         <div style={{ width: '100%', maxWidth: '420px' }}>
-          <h2 style={{ fontSize: '2rem', fontWeight: 900, color: '#2d0a1e', marginBottom: '0.5rem' }}>
+          <h2 style={{ fontSize: '2rem', fontWeight: 900, color: '#A11738', marginBottom: '0.5rem' }}>
             {mode === 'login' ? 'ברוכה הבאה 👋' : 'יצירת חשבון'}
           </h2>
           {mode === 'login' && (
-            <div style={{ background: 'rgba(255,182,193,0.2)', border: '1px solid rgba(255,105,180,0.3)', borderRadius: '12px', padding: '0.75rem 1rem', fontSize: '0.875rem', color: '#8b2252', marginBottom: '1.5rem' }}>
+            <div style={{ background: 'rgba(255,182,193,0.2)', border: '1px solid rgba(255,105,180,0.3)', borderRadius: '12px', padding: '0.75rem 1rem', fontSize: '0.875rem', color: '#EC6A83', marginBottom: '1.5rem' }}>
               <strong>דמו:</strong> lior@beauty.com / demo1234
             </div>
           )}
@@ -159,13 +159,13 @@ const AuthScreen = ({ onLogin }) => {
                 placeholder="••••••••" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} />
             </div>
             {error && <p style={{ color: '#ef4444', fontSize: '0.875rem', marginBottom: '0.5rem' }}>{error}</p>}
-            <button type="submit" disabled={loading} style={{ width: '100%', padding: '0.875rem', borderRadius: '12px', background: loading ? '#9ca3af' : 'linear-gradient(135deg,#2d0a1e,#8b2252)', color: 'white', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: 'pointer' }}>
+            <button type="submit" disabled={loading} style={{ width: '100%', padding: '0.875rem', borderRadius: '12px', background: loading ? '#9ca3af' : 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: 'pointer' }}>
               {loading ? 'רגע...' : mode === 'login' ? 'כניסה' : 'יצירת חשבון'}
             </button>
           </form>
           <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.875rem', color: '#6b7280' }}>
             {mode === 'login' ? 'אין לך חשבון? ' : 'יש לך חשבון? '}
-            <button onClick={() => setMode(mode === 'login' ? 'register' : 'login')} style={{ color: '#8b2252', fontWeight: 700, background: 'none', border: 'none', cursor: 'pointer' }}>
+            <button onClick={() => setMode(mode === 'login' ? 'register' : 'login')} style={{ color: '#EC6A83', fontWeight: 700, background: 'none', border: 'none', cursor: 'pointer' }}>
               {mode === 'login' ? 'הירשמי' : 'כניסה'}
             </button>
           </p>
@@ -177,10 +177,10 @@ const AuthScreen = ({ onLogin }) => {
 
 // ── TERMS SCREEN ──────────────────────────────────────────────
 const TermsScreen = ({ termsText, onAccept, onBack }) => (
-  <div dir="rtl" style={{ minHeight: '100vh', background: '#fdf8f5', fontFamily: 'Heebo, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
+  <div dir="rtl" style={{ minHeight: '100vh', background: '#FDECE5', fontFamily: 'Heebo, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
     <div style={{ width: '100%', maxWidth: '520px' }}>
       <div style={{ background: 'white', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 4px 24px rgba(0,0,0,0.06)' }}>
-        <div style={{ background: 'linear-gradient(135deg,#2d0a1e,#8b2252)', padding: '1.5rem', textAlign: 'center', color: 'white' }}>
+        <div style={{ background: 'linear-gradient(135deg,#A11738,#EC6A83)', padding: '1.5rem', textAlign: 'center', color: 'white' }}>
           <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>📋</div>
           <h2 style={{ fontWeight: 900, fontSize: '1.5rem', margin: 0 }}>תקנון</h2>
           <p style={{ opacity: 0.7, fontSize: '0.875rem', marginTop: '4px' }}>יש לקרוא ולאשר לפני קביעת התור</p>
@@ -190,7 +190,7 @@ const TermsScreen = ({ termsText, onAccept, onBack }) => (
         </div>
         <div style={{ padding: '1.25rem', borderTop: '1px solid #f0f0f0', display: 'flex', gap: '12px' }}>
           <button onClick={onBack} style={{ flex: 1, padding: '0.875rem', borderRadius: '12px', background: '#f3f4f6', color: '#374151', fontWeight: 700, border: 'none', cursor: 'pointer' }}>חזרה</button>
-          <button onClick={onAccept} style={{ flex: 2, padding: '0.875rem', borderRadius: '12px', background: 'linear-gradient(135deg,#2d0a1e,#8b2252)', color: 'white', fontWeight: 700, border: 'none', cursor: 'pointer' }}>
+          <button onClick={onAccept} style={{ flex: 2, padding: '0.875rem', borderRadius: '12px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, border: 'none', cursor: 'pointer' }}>
             קראתי ומאשרת ✅
           </button>
         </div>
@@ -250,25 +250,25 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
 
   const cats = [...new Set(MOCK_SERVICES.map(s => s.category))];
   const S = { fontFamily: 'Heebo, sans-serif' };
-  const btn = (active) => ({ padding: '0.75rem', borderRadius: '12px', fontWeight: 700, fontSize: '0.875rem', border: `2px solid ${active ? '#8b2252' : '#f0f0f0'}`, background: active ? 'linear-gradient(135deg,#2d0a1e,#8b2252)' : 'white', color: active ? 'white' : '#2d0a1e', cursor: 'pointer' });
+  const btn = (active) => ({ padding: '0.75rem', borderRadius: '12px', fontWeight: 700, fontSize: '0.875rem', border: `2px solid ${active ? '#EC6A83' : '#f0f0f0'}`, background: active ? 'linear-gradient(135deg,#A11738,#EC6A83)' : 'white', color: active ? 'white' : '#A11738', cursor: 'pointer' });
 
   const dateStr = sel.date?.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' });
   const serviceNames = selectedServices.map(s => s.name).join(', ');
   const waLink = WHATSAPP_LINK(sel.name, serviceNames, dateStr, sel.time);
 
   if (booked) return (
-    <div dir="rtl" style={{ ...S, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#fdf8f5' }}>
+    <div dir="rtl" style={{ ...S, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FDECE5' }}>
       <div style={{ textAlign: 'center', maxWidth: '420px', padding: '2rem', width: '100%' }}>
         <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>⏳</div>
-        <h2 style={{ fontSize: '2rem', fontWeight: 900, color: '#2d0a1e', marginBottom: '0.5rem' }}>הבקשה נשלחה!</h2>
+        <h2 style={{ fontSize: '2rem', fontWeight: 900, color: '#A11738', marginBottom: '0.5rem' }}>הבקשה נשלחה!</h2>
         <p style={{ color: '#6b7280', marginBottom: '1rem', fontSize: '0.875rem' }}>
           התור <strong>ממתין לאישור</strong> מאת ליאור 🌸<br />
           תקבלי הודעה בוואטסאפ ברגע שיאושר
         </p>
         <div style={{ background: 'white', border: '1px solid #f0f0f0', borderRadius: '16px', padding: '1.25rem', textAlign: 'right', marginBottom: '1.5rem' }}>
-          <p style={{ fontWeight: 700, fontSize: '1rem', color: '#2d0a1e', marginBottom: '4px' }}>{serviceNames}</p>
+          <p style={{ fontWeight: 700, fontSize: '1rem', color: '#A11738', marginBottom: '4px' }}>{serviceNames}</p>
           <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>{dateStr} | {sel.time}</p>
-          <p style={{ fontWeight: 900, fontSize: '1.5rem', color: '#8b2252', marginTop: '0.5rem' }}>{fmtPrice(totalPrice)}</p>
+          <p style={{ fontWeight: 900, fontSize: '1.5rem', color: '#EC6A83', marginTop: '0.5rem' }}>{fmtPrice(totalPrice)}</p>
         </div>
         <a href={waLink} target="_blank" rel="noreferrer"
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', padding: '0.875rem', borderRadius: '12px', background: '#25D366', color: 'white', fontWeight: 700, fontSize: '0.9rem', textDecoration: 'none', marginBottom: '12px', boxSizing: 'border-box' }}>
@@ -285,21 +285,21 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   if (step === 0) return <TermsScreen termsText={TERMS_GENERAL} onAccept={() => setStep(1)} onBack={onBack} />;
 
   return (
-    <div dir="rtl" style={{ ...S, minHeight: '100vh', background: '#fdf8f5' }}>
+    <div dir="rtl" style={{ ...S, minHeight: '100vh', background: '#FDECE5' }}>
       <div style={{ background: 'white', borderBottom: '1px solid #f0f0f0', padding: '1rem 1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
         <button onClick={onBack} style={{ padding: '0.5rem', borderRadius: '10px', background: 'none', border: 'none', cursor: 'pointer' }}>
           <Icon name="chevronR" className="w-5 h-5" />
         </button>
         <img src="/symbol.png" alt="LS" style={{ width: '32px', height: '32px', objectFit: 'contain' }} />
         <div>
-          <p style={{ fontWeight: 900, color: '#2d0a1e', margin: 0 }}>ליאור שגב – היופי שלך</p>
+          <p style={{ fontWeight: 900, color: '#A11738', margin: 0 }}>ליאור שגב – היופי שלך</p>
           <p style={{ color: '#9ca3af', fontSize: '0.75rem', margin: 0 }}>קביעת תור</p>
         </div>
         <div style={{ marginRight: 'auto', display: 'flex', alignItems: 'center', gap: '4px' }}>
           {[1,2,3,4].map(s => (
             <div key={s} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <div style={{ width: '28px', height: '28px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700, background: step >= s ? 'linear-gradient(135deg,#2d0a1e,#8b2252)' : '#f3f4f6', color: step >= s ? 'white' : '#9ca3af' }}>{s}</div>
-              {s < 4 && <div style={{ width: '12px', height: '2px', background: step > s ? '#8b2252' : '#e5e7eb' }} />}
+              <div style={{ width: '28px', height: '28px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700, background: step >= s ? 'linear-gradient(135deg,#A11738,#EC6A83)' : '#f3f4f6', color: step >= s ? 'white' : '#9ca3af' }}>{s}</div>
+              {s < 4 && <div style={{ width: '12px', height: '2px', background: step > s ? '#EC6A83' : '#e5e7eb' }} />}
             </div>
           ))}
         </div>
@@ -310,27 +310,27 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
         {/* Step 1 - Services (multi-select) */}
         {step === 1 && (
           <div>
-            <h2 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#2d0a1e', marginBottom: '0.25rem' }}>בחרי שירותים</h2>
+            <h2 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#A11738', marginBottom: '0.25rem' }}>בחרי שירותים</h2>
             <p style={{ color: '#9ca3af', fontSize: '0.875rem', marginBottom: '1.5rem' }}>ניתן לבחור מספר שירותים</p>
             {cats.map(cat => (
               <div key={cat} style={{ marginBottom: '1.25rem' }}>
-                <p style={{ fontWeight: 700, color: '#8b2252', fontSize: '0.875rem', marginBottom: '0.5rem' }}>{cat}</p>
+                <p style={{ fontWeight: 700, color: '#EC6A83', fontSize: '0.875rem', marginBottom: '0.5rem' }}>{cat}</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {MOCK_SERVICES.filter(s => s.category === cat).map(svc => {
                     const isSelected = selectedServices.find(s => s.id === svc.id);
                     return (
                       <button key={svc.id} onClick={() => toggleService(svc)}
-                        style={{ background: isSelected ? 'linear-gradient(135deg,#fdf2f8,#fce7f3)' : 'white', border: `2px solid ${isSelected ? '#8b2252' : '#f0f0f0'}`, borderRadius: '12px', padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', textAlign: 'right' }}>
+                        style={{ background: isSelected ? 'linear-gradient(135deg,#fdf2f8,#F7C1C3)' : 'white', border: `2px solid ${isSelected ? '#EC6A83' : '#f0f0f0'}`, borderRadius: '12px', padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', textAlign: 'right' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: `2px solid ${isSelected ? '#8b2252' : '#d1d5db'}`, background: isSelected ? '#8b2252' : 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                          <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: `2px solid ${isSelected ? '#EC6A83' : '#d1d5db'}`, background: isSelected ? '#EC6A83' : 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
                             {isSelected && <svg width="10" height="8" fill="none" viewBox="0 0 10 8"><path d="M1 4l3 3 5-6" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>}
                           </div>
                           <div>
-                            <p style={{ fontWeight: 700, color: '#2d0a1e', margin: 0, fontSize: '0.9rem' }}>{svc.name}</p>
+                            <p style={{ fontWeight: 700, color: '#A11738', margin: 0, fontSize: '0.9rem' }}>{svc.name}</p>
                             <p style={{ color: '#9ca3af', fontSize: '0.75rem', margin: '2px 0 0' }}>{svc.duration} דקות</p>
                           </div>
                         </div>
-                        <span style={{ fontWeight: 900, fontSize: '1.1rem', color: '#8b2252' }}>{fmtPrice(svc.price)}</span>
+                        <span style={{ fontWeight: 900, fontSize: '1.1rem', color: '#EC6A83' }}>{fmtPrice(svc.price)}</span>
                       </button>
                     );
                   })}
@@ -340,10 +340,10 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
 
             {/* Summary bar */}
             {selectedServices.length > 0 && (
-              <div style={{ position: 'sticky', bottom: '1rem', background: 'white', border: '2px solid #8b2252', borderRadius: '16px', padding: '1rem', marginTop: '1rem', boxShadow: '0 4px 20px rgba(139,34,82,0.15)' }}>
+              <div style={{ position: 'sticky', bottom: '1rem', background: 'white', border: '2px solid #EC6A83', borderRadius: '16px', padding: '1rem', marginTop: '1rem', boxShadow: '0 4px 20px rgba(139,34,82,0.15)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <span style={{ fontWeight: 700, color: '#2d0a1e', fontSize: '0.875rem' }}>{selectedServices.length} שירות{selectedServices.length > 1 ? 'ים' : ''} נבחר{selectedServices.length > 1 ? 'ו' : ''}</span>
-                  <span style={{ fontWeight: 900, color: '#8b2252', fontSize: '1.1rem' }}>סה"כ: {fmtPrice(totalPrice)}</span>
+                  <span style={{ fontWeight: 700, color: '#A11738', fontSize: '0.875rem' }}>{selectedServices.length} שירות{selectedServices.length > 1 ? 'ים' : ''} נבחר{selectedServices.length > 1 ? 'ו' : ''}</span>
+                  <span style={{ fontWeight: 900, color: '#EC6A83', fontSize: '1.1rem' }}>סה"כ: {fmtPrice(totalPrice)}</span>
                 </div>
                 <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '10px' }}>
                   {selectedServices.map(s => s.name).join(' + ')} · {totalDuration} דקות
@@ -355,7 +355,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                   } else {
                     setStep(2);
                   }
-                }} style={{ width: '100%', padding: '0.75rem', borderRadius: '12px', background: 'linear-gradient(135deg,#2d0a1e,#8b2252)', color: 'white', fontWeight: 700, border: 'none', cursor: 'pointer' }}>
+                }} style={{ width: '100%', padding: '0.75rem', borderRadius: '12px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, border: 'none', cursor: 'pointer' }}>
                   המשך לבחירת תאריך →
                 </button>
               </div>
@@ -371,12 +371,12 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
         {/* Step 2 - Date */}
         {step === 2 && (
           <div>
-            <h2 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#2d0a1e', marginBottom: '0.25rem' }}>בחרי תאריך</h2>
+            <h2 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#A11738', marginBottom: '0.25rem' }}>בחרי תאריך</h2>
             <p style={{ color: '#9ca3af', fontSize: '0.875rem', marginBottom: '1.5rem' }}>{selectedServices.map(s => s.name).join(' + ')}</p>
             <div style={{ background: 'white', border: '1px solid #f0f0f0', borderRadius: '16px', overflow: 'hidden', marginBottom: '1rem' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem 1.5rem', borderBottom: '1px solid #f0f0f0' }}>
                 <button onClick={() => setCalMonth(new Date(calMonth.getFullYear(), calMonth.getMonth() - 1))} style={{ padding: '0.4rem', background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="chevronR" className="w-4 h-4" /></button>
-                <span style={{ fontWeight: 700, color: '#2d0a1e' }}>{calMonth.toLocaleDateString('he-IL', { month: 'long', year: 'numeric' })}</span>
+                <span style={{ fontWeight: 700, color: '#A11738' }}>{calMonth.toLocaleDateString('he-IL', { month: 'long', year: 'numeric' })}</span>
                 <button onClick={() => setCalMonth(new Date(calMonth.getFullYear(), calMonth.getMonth() + 1))} style={{ padding: '0.4rem', background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="chevronL" className="w-4 h-4" /></button>
               </div>
               <div style={{ padding: '1rem' }}>
@@ -391,7 +391,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                     const isSel = sel.date && d.toDateString() === sel.date.toDateString();
                     return (
                       <button key={i} onClick={() => av && setSel({ ...sel, date: d })} disabled={!av}
-                        style={{ aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px', fontSize: '0.875rem', fontWeight: 700, border: 'none', cursor: av ? 'pointer' : 'not-allowed', background: isSel ? 'linear-gradient(135deg,#2d0a1e,#8b2252)' : av ? '#fdf8f5' : 'transparent', color: isSel ? 'white' : av ? '#2d0a1e' : '#d1d5db' }}>
+                        style={{ aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px', fontSize: '0.875rem', fontWeight: 700, border: 'none', cursor: av ? 'pointer' : 'not-allowed', background: isSel ? 'linear-gradient(135deg,#A11738,#EC6A83)' : av ? '#FDECE5' : 'transparent', color: isSel ? 'white' : av ? '#A11738' : '#d1d5db' }}>
                         {i + 1}
                       </button>
                     );
@@ -401,7 +401,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
             </div>
             <div style={{ display: 'flex', gap: '12px' }}>
               <button onClick={() => setStep(1)} style={{ flex: 1, padding: '0.875rem', borderRadius: '12px', background: '#f3f4f6', color: '#374151', fontWeight: 700, border: 'none', cursor: 'pointer' }}>חזרה</button>
-              <button onClick={() => sel.date && setStep(3)} disabled={!sel.date} style={{ flex: 1, padding: '0.875rem', borderRadius: '12px', background: sel.date ? 'linear-gradient(135deg,#2d0a1e,#8b2252)' : '#d1d5db', color: 'white', fontWeight: 700, border: 'none', cursor: sel.date ? 'pointer' : 'not-allowed' }}>המשך</button>
+              <button onClick={() => sel.date && setStep(3)} disabled={!sel.date} style={{ flex: 1, padding: '0.875rem', borderRadius: '12px', background: sel.date ? 'linear-gradient(135deg,#A11738,#EC6A83)' : '#d1d5db', color: 'white', fontWeight: 700, border: 'none', cursor: sel.date ? 'pointer' : 'not-allowed' }}>המשך</button>
             </div>
           </div>
         )}
@@ -409,7 +409,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
         {/* Step 3 - Time */}
         {step === 3 && (
           <div>
-            <h2 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#2d0a1e', marginBottom: '0.25rem' }}>בחרי שעה</h2>
+            <h2 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#A11738', marginBottom: '0.25rem' }}>בחרי שעה</h2>
             <p style={{ color: '#9ca3af', fontSize: '0.875rem', marginBottom: '1.5rem' }}>{sel.date?.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '10px', marginBottom: '1.5rem' }}>
               {slots().map(s => (
@@ -419,7 +419,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
             </div>
             <div style={{ display: 'flex', gap: '12px' }}>
               <button onClick={() => setStep(2)} style={{ flex: 1, padding: '0.875rem', borderRadius: '12px', background: '#f3f4f6', color: '#374151', fontWeight: 700, border: 'none', cursor: 'pointer' }}>חזרה</button>
-              <button onClick={() => sel.time && setStep(4)} disabled={!sel.time} style={{ flex: 1, padding: '0.875rem', borderRadius: '12px', background: sel.time ? 'linear-gradient(135deg,#2d0a1e,#8b2252)' : '#d1d5db', color: 'white', fontWeight: 700, border: 'none', cursor: sel.time ? 'pointer' : 'not-allowed' }}>המשך</button>
+              <button onClick={() => sel.time && setStep(4)} disabled={!sel.time} style={{ flex: 1, padding: '0.875rem', borderRadius: '12px', background: sel.time ? 'linear-gradient(135deg,#A11738,#EC6A83)' : '#d1d5db', color: 'white', fontWeight: 700, border: 'none', cursor: sel.time ? 'pointer' : 'not-allowed' }}>המשך</button>
             </div>
           </div>
         )}
@@ -427,7 +427,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
         {/* Step 4 - Details */}
         {step === 4 && (
           <div>
-            <h2 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#2d0a1e', marginBottom: '0.25rem' }}>פרטים אישיים</h2>
+            <h2 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#A11738', marginBottom: '0.25rem' }}>פרטים אישיים</h2>
             <p style={{ color: '#9ca3af', fontSize: '0.875rem', marginBottom: '1.5rem' }}>עוד צעד קטן 🌸</p>
             <div style={{ marginBottom: '1rem' }}>
               <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>שם מלא *</label>
@@ -441,8 +441,8 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
             </div>
 
             {hasGel && (
-              <div style={{ marginBottom: '1.25rem', background: '#fdf8f5', border: '2px dashed #f0d0e0', borderRadius: '12px', padding: '1.25rem' }}>
-                <p style={{ fontWeight: 700, fontSize: '0.875rem', color: '#8b2252', marginBottom: '4px' }}>💅 רוצה להעלות השראה?</p>
+              <div style={{ marginBottom: '1.25rem', background: '#FDECE5', border: '2px dashed #f0d0e0', borderRadius: '12px', padding: '1.25rem' }}>
+                <p style={{ fontWeight: 700, fontSize: '0.875rem', color: '#EC6A83', marginBottom: '4px' }}>💅 רוצה להעלות השראה?</p>
                 <p style={{ fontSize: '0.75rem', color: '#9ca3af', marginBottom: '0.75rem' }}>העלי תמונה שתעזור לליאור להכין את העיצוב המושלם</p>
                 <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }}
                   onChange={e => {
@@ -455,7 +455,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                   }} />
                 {sel.image ? (
                   <div style={{ position: 'relative', display: 'inline-block' }}>
-                    <img src={sel.image} alt="inspiration" style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '10px', border: '2px solid #8b2252' }} />
+                    <img src={sel.image} alt="inspiration" style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '10px', border: '2px solid #EC6A83' }} />
                     <button onClick={() => setSel({ ...sel, image: null })} style={{ position: 'absolute', top: '-8px', right: '-8px', width: '22px', height: '22px', borderRadius: '50%', background: '#ef4444', color: 'white', border: 'none', cursor: 'pointer', fontWeight: 900, fontSize: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
                   </div>
                 ) : (
@@ -467,16 +467,16 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
             )}
 
             <div style={{ background: 'white', border: '1px solid #f0f0f0', borderRadius: '16px', padding: '1.25rem', marginBottom: '1.25rem' }}>
-              <p style={{ fontWeight: 700, color: '#8b2252', fontSize: '0.875rem', marginBottom: '0.75rem' }}>סיכום הזמנה</p>
+              <p style={{ fontWeight: 700, color: '#EC6A83', fontSize: '0.875rem', marginBottom: '0.75rem' }}>סיכום הזמנה</p>
               {selectedServices.map(svc => (
                 <div key={svc.id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                   <span style={{ color: '#374151', fontSize: '0.875rem' }}>{svc.name}</span>
-                  <span style={{ color: '#8b2252', fontWeight: 700, fontSize: '0.875rem' }}>{fmtPrice(svc.price)}</span>
+                  <span style={{ color: '#EC6A83', fontWeight: 700, fontSize: '0.875rem' }}>{fmtPrice(svc.price)}</span>
                 </div>
               ))}
               <div style={{ borderTop: '1px solid #f0f0f0', marginTop: '8px', paddingTop: '8px', display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontWeight: 900, color: '#2d0a1e' }}>סה"כ</span>
-                <span style={{ fontWeight: 900, fontSize: '1.25rem', color: '#8b2252' }}>{fmtPrice(totalPrice)}</span>
+                <span style={{ fontWeight: 900, color: '#A11738' }}>סה"כ</span>
+                <span style={{ fontWeight: 900, fontSize: '1.25rem', color: '#EC6A83' }}>{fmtPrice(totalPrice)}</span>
               </div>
               <p style={{ color: '#6b7280', fontSize: '0.75rem', marginTop: '8px' }}>{dateStr} | {sel.time} · {totalDuration} דקות</p>
             </div>
@@ -485,7 +485,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
               <button onClick={() => setStep(3)} style={{ flex: 1, padding: '0.875rem', borderRadius: '12px', background: '#f3f4f6', color: '#374151', fontWeight: 700, border: 'none', cursor: 'pointer' }}>חזרה</button>
               <button onClick={() => (sel.name && sel.phone) && setStep(5)}
                 disabled={!sel.name || !sel.phone}
-                style={{ flex: 1, padding: '0.875rem', borderRadius: '12px', background: (sel.name && sel.phone) ? 'linear-gradient(135deg,#2d0a1e,#8b2252)' : '#d1d5db', color: 'white', fontWeight: 700, border: 'none', cursor: (sel.name && sel.phone) ? 'pointer' : 'not-allowed' }}>
+                style={{ flex: 1, padding: '0.875rem', borderRadius: '12px', background: (sel.name && sel.phone) ? 'linear-gradient(135deg,#A11738,#EC6A83)' : '#d1d5db', color: 'white', fontWeight: 700, border: 'none', cursor: (sel.name && sel.phone) ? 'pointer' : 'not-allowed' }}>
                 המשך לתשלום 💳
               </button>
             </div>
@@ -495,19 +495,19 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
         {/* Step 5 - Payment */}
         {step === 5 && (
           <div>
-            <h2 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#2d0a1e', marginBottom: '0.25rem' }}>תשלום מקדמה</h2>
+            <h2 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#A11738', marginBottom: '0.25rem' }}>תשלום מקדמה</h2>
             <p style={{ color: '#9ca3af', fontSize: '0.875rem', marginBottom: '1.5rem' }}>יש להעביר מקדמה לאישור התור 🌸</p>
 
             <div style={{ background: 'white', border: '1px solid #f0f0f0', borderRadius: '16px', padding: '1.25rem', marginBottom: '1rem' }}>
               {selectedServices.map(svc => (
                 <div key={svc.id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                   <span style={{ color: '#374151', fontSize: '0.875rem' }}>{svc.name}</span>
-                  <span style={{ color: '#8b2252', fontWeight: 700, fontSize: '0.875rem' }}>{fmtPrice(svc.price)}</span>
+                  <span style={{ color: '#EC6A83', fontWeight: 700, fontSize: '0.875rem' }}>{fmtPrice(svc.price)}</span>
                 </div>
               ))}
               <div style={{ borderTop: '1px solid #f0f0f0', marginTop: '8px', paddingTop: '8px', display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontWeight: 900, color: '#2d0a1e' }}>סה"כ</span>
-                <span style={{ fontWeight: 900, fontSize: '1.25rem', color: '#8b2252' }}>{fmtPrice(totalPrice)}</span>
+                <span style={{ fontWeight: 900, color: '#A11738' }}>סה"כ</span>
+                <span style={{ fontWeight: 900, fontSize: '1.25rem', color: '#EC6A83' }}>{fmtPrice(totalPrice)}</span>
               </div>
               <p style={{ color: '#6b7280', fontSize: '0.75rem', marginTop: '6px' }}>{dateStr} | {sel.time}</p>
             </div>
@@ -539,7 +539,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                 });
               }
               setBooked(true);
-            }} style={{ width: '100%', padding: '0.875rem', borderRadius: '12px', background: 'linear-gradient(135deg,#2d0a1e,#8b2252)', color: 'white', fontWeight: 700, border: 'none', cursor: 'pointer', marginBottom: '12px' }}>
+            }} style={{ width: '100%', padding: '0.875rem', borderRadius: '12px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, border: 'none', cursor: 'pointer', marginBottom: '12px' }}>
               שלחתי את המקדמה ✅
             </button>
 
@@ -558,7 +558,7 @@ const ServiceModal = ({ service, onSave, onClose }) => {
     <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.5)', fontFamily: 'Heebo, sans-serif' }}>
       <div dir="rtl" style={{ background: 'white', borderRadius: '20px', padding: '1.5rem', width: '100%', maxWidth: '420px', margin: '1rem' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
-          <h2 style={{ fontWeight: 900, color: '#2d0a1e', fontSize: '1.25rem', margin: 0 }}>{service ? 'עריכת שירות' : 'שירות חדש'}</h2>
+          <h2 style={{ fontWeight: 900, color: '#A11738', fontSize: '1.25rem', margin: 0 }}>{service ? 'עריכת שירות' : 'שירות חדש'}</h2>
           <button onClick={onClose} style={{ padding: '6px', borderRadius: '8px', background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="x" className="w-5 h-5" /></button>
         </div>
         <div style={{ marginBottom: '1rem' }}>
@@ -588,7 +588,7 @@ const ServiceModal = ({ service, onSave, onClose }) => {
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
           <button onClick={onClose} style={{ flex: 1, padding: '0.875rem', borderRadius: '12px', background: '#f3f4f6', color: '#374151', fontWeight: 700, border: 'none', cursor: 'pointer' }}>ביטול</button>
-          <button onClick={() => form.name && onSave(form)} style={{ flex: 1, padding: '0.875rem', borderRadius: '12px', background: form.name ? 'linear-gradient(135deg,#2d0a1e,#8b2252)' : '#d1d5db', color: 'white', fontWeight: 700, border: 'none', cursor: form.name ? 'pointer' : 'not-allowed' }}>
+          <button onClick={() => form.name && onSave(form)} style={{ flex: 1, padding: '0.875rem', borderRadius: '12px', background: form.name ? 'linear-gradient(135deg,#A11738,#EC6A83)' : '#d1d5db', color: 'white', fontWeight: 700, border: 'none', cursor: form.name ? 'pointer' : 'not-allowed' }}>
             {service ? 'שמירה' : 'הוספה'}
           </button>
         </div>
@@ -599,28 +599,60 @@ const ServiceModal = ({ service, onSave, onClose }) => {
 
 // ── PORTFOLIO PAGE ────────────────────────────────────────────
 const PortfolioPage = ({ onBook, onAdmin }) => (
-  <div dir="rtl" style={{ minHeight: '100vh', background: '#fdf8f5', fontFamily: 'Heebo, sans-serif' }}>
-    <div style={{ background: 'linear-gradient(135deg,#2d0a1e,#8b2252)', backgroundImage: 'url(/pattern-pink.png)', backgroundSize: '300px', backgroundBlendMode: 'overlay', padding: '3rem 2rem', textAlign: 'center', color: 'white' }}>
-      <div style={{ marginBottom: '1rem' }}>
-        <img src="/logo-white.png" alt="Lior Segev" style={{ height: '70px', objectFit: 'contain' }} />
+  <div dir="rtl" style={{ minHeight: '100vh', fontFamily: 'Heebo, sans-serif', background: '#FDECE5' }}>
+
+    {/* Hero */}
+    <div style={{ background: 'linear-gradient(160deg,#7a0f2a 0%,#EC6A83 60%,#EC6A83 100%)', backgroundImage: 'url(/pattern-pink.png)', backgroundSize: '200px', backgroundBlendMode: 'soft-light', minHeight: '60vh', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', padding: '3rem 1.5rem', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(160deg,rgba(26,6,18,0.85) 0%,rgba(139,34,82,0.7) 100%)' }} />
+      <div style={{ position: 'relative', zIndex: 1 }}>
+        <img src="/logo-white.png" alt="Lior Segev" style={{ height: '90px', objectFit: 'contain', marginBottom: '1.5rem', filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))' }} />
+        <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '1rem', marginBottom: '2rem', letterSpacing: '0.05em' }}>יופי מקצועי • ליד הבית שלך</p>
+        <button onClick={onBook} style={{ padding: '1rem 2.5rem', borderRadius: '999px', background: 'linear-gradient(135deg,#EC6A83,#EC6A83)', color: 'white', fontWeight: 900, fontSize: '1.1rem', border: 'none', cursor: 'pointer', boxShadow: '0 8px 24px rgba(233,30,140,0.4)', fontFamily: 'Heebo, sans-serif', letterSpacing: '0.02em' }}>
+          💅 קביעי תור עכשיו
+        </button>
       </div>
-      <p style={{ opacity: 0.7, marginTop: '0.5rem' }}>תיק עבודות</p>
     </div>
-    <div style={{ maxWidth: '600px', margin: '0 auto', padding: '2rem 1.5rem' }}>
-      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '2rem' }}>
-        {PORTFOLIO.map(item => (
-          <div key={item.id} style={{ background: 'white', border: '1px solid #f0f0f0', borderRadius: '16px', padding: '1.5rem', textAlign: 'center' }}>
-            <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>{item.emoji}</div>
-            <p style={{ fontWeight: 900, color: '#2d0a1e', margin: '0 0 4px' }}>{item.title}</p>
-            <p style={{ color: '#9ca3af', fontSize: '0.75rem', margin: 0 }}>{item.desc}</p>
+
+    {/* Services */}
+    <div style={{ maxWidth: '500px', margin: '0 auto', padding: '2rem 1.25rem' }}>
+      <p style={{ textAlign: 'center', fontWeight: 900, fontSize: '1.25rem', color: '#A11738', marginBottom: '1.25rem' }}>השירותים שלנו</p>
+      <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.875rem', marginBottom: '2rem' }}>
+        {[
+          { emoji: '💅', title: "לק ג'ל", desc: 'מבנה, צורה, עיצוב' },
+          { emoji: '✨', title: 'בניה חדשה', desc: 'טיפול מושלם לציפורן' },
+          { emoji: '🌿', title: 'עיצוב גבות', desc: 'צביעה ועיצוב מדויק' },
+          { emoji: '👁', title: 'הרמת ריסים', desc: 'מראה פתוח ורענן' },
+        ].map((item, i) => (
+          <div key={i} onClick={onBook} style={{ background: 'white', border: '1.5px solid #F7C1C3', borderRadius: '18px', padding: '1.25rem', textAlign: 'center', cursor: 'pointer', boxShadow: '0 2px 12px rgba(139,34,82,0.06)', transition: 'transform 0.2s' }}>
+            <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>{item.emoji}</div>
+            <p style={{ fontWeight: 900, color: '#A11738', margin: '0 0 3px', fontSize: '0.95rem' }}>{item.title}</p>
+            <p style={{ color: '#9ca3af', fontSize: '0.72rem', margin: 0 }}>{item.desc}</p>
           </div>
         ))}
       </div>
-      <button onClick={onBook} style={{ width: '100%', padding: '1rem', borderRadius: '14px', background: 'linear-gradient(135deg,#2d0a1e,#8b2252)', color: 'white', fontWeight: 900, fontSize: '1.1rem', border: 'none', cursor: 'pointer', marginBottom: '1rem' }}>
+
+      {/* Social */}
+      <div style={{ background: 'linear-gradient(135deg,#fdf2f8,#FDECE5)', border: '1.5px solid #F7C1C3', borderRadius: '18px', padding: '1.5rem', textAlign: 'center', marginBottom: '1.5rem' }}>
+        <img src="/symbol.png" alt="LS" style={{ height: '50px', objectFit: 'contain', marginBottom: '0.75rem', opacity: 0.85 }} />
+        <p style={{ fontWeight: 700, color: '#A11738', margin: '0 0 4px', fontSize: '0.95rem' }}>ליאור שגב – היופי שלך</p>
+        <p style={{ color: '#9ca3af', fontSize: '0.8rem', margin: '0 0 1rem' }}>Lior Segev Beauty</p>
+        <div style={{ display: 'flex', gap: '10px', justifyContent: 'center' }}>
+          <a href="https://www.instagram.com/liors_beauty" target="_blank" rel="noreferrer"
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0.5rem 1rem', borderRadius: '999px', background: 'linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)', color: 'white', fontWeight: 700, fontSize: '0.8rem', textDecoration: 'none' }}>
+            📸 אינסטגרם
+          </a>
+          <a href="https://www.facebook.com/share/1DLKLrkWFb/" target="_blank" rel="noreferrer"
+            style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0.5rem 1rem', borderRadius: '999px', background: '#1877f2', color: 'white', fontWeight: 700, fontSize: '0.8rem', textDecoration: 'none' }}>
+            👍 פייסבוק
+          </a>
+        </div>
+      </div>
+
+      <button onClick={onBook} style={{ width: '100%', padding: '1rem', borderRadius: '14px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 900, fontSize: '1.05rem', border: 'none', cursor: 'pointer', marginBottom: '1rem', boxShadow: '0 4px 16px rgba(139,34,82,0.25)', fontFamily: 'Heebo, sans-serif' }}>
         💅 קביעת תור עכשיו
       </button>
       <div style={{ textAlign: 'center' }}>
-        <button onClick={onAdmin} style={{ color: '#9ca3af', fontSize: '0.75rem', background: 'none', border: 'none', cursor: 'pointer' }}>
+        <button onClick={onAdmin} style={{ color: '#d1d5db', fontSize: '0.72rem', background: 'none', border: 'none', cursor: 'pointer' }}>
           כניסה לניהול
         </button>
       </div>
@@ -660,13 +692,13 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
     { id: 'portfolio', label: 'תיק עבודות', icon: 'portfolio' },
   ];
 
-  const sidebarStyle = { width: '240px', flexShrink: 0, display: 'flex', flexDirection: 'column', background: 'linear-gradient(180deg,#2d0a1e,#1a0612)', color: 'white', fontFamily: 'Heebo, sans-serif' };
-  const mainStyle = { flex: 1, overflowY: 'auto', fontFamily: 'Heebo, sans-serif', background: '#fdf8f5' };
+  const sidebarStyle = { width: '240px', flexShrink: 0, display: 'flex', flexDirection: 'column', background: 'linear-gradient(180deg,#A11738,#7a0f2a)', color: 'white', fontFamily: 'Heebo, sans-serif' };
+  const mainStyle = { flex: 1, overflowY: 'auto', fontFamily: 'Heebo, sans-serif', background: '#FDECE5' };
   const card = { background: 'white', border: '1px solid #f0f0f0', borderRadius: '16px' };
 
   return (
     <div dir="rtl" style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
-      {toast && <div style={{ position: 'fixed', top: '1rem', left: '50%', transform: 'translateX(-50%)', zIndex: 50, background: '#2d0a1e', color: 'white', padding: '0.75rem 1.25rem', borderRadius: '12px', fontWeight: 700, fontSize: '0.875rem', fontFamily: 'Heebo, sans-serif' }}>{toast}</div>}
+      {toast && <div style={{ position: 'fixed', top: '1rem', left: '50%', transform: 'translateX(-50%)', zIndex: 50, background: '#A11738', color: 'white', padding: '0.75rem 1.25rem', borderRadius: '12px', fontWeight: 700, fontSize: '0.875rem', fontFamily: 'Heebo, sans-serif' }}>{toast}</div>}
 
       {viewImage && (
         <div onClick={() => setViewImage(null)} style={{ position: 'fixed', inset: 0, zIndex: 100, background: 'rgba(0,0,0,0.8)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer' }}>
@@ -679,25 +711,25 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
         <div style={{ padding: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
           <img src="/symbol.png" alt="LS" style={{ width: '36px', height: '36px', objectFit: 'contain' }} />
           <div>
-            <p style={{ fontWeight: 900, color: '#ffb6c1', margin: 0, fontSize: '0.875rem' }}>ליאור שגב</p>
+            <p style={{ fontWeight: 900, color: '#F7C1C3', margin: 0, fontSize: '0.875rem' }}>ליאור שגב</p>
             <p style={{ opacity: 0.4, fontSize: '0.7rem', margin: 0 }}>היופי שלך</p>
           </div>
         </div>
         <nav style={{ flex: 1, padding: '1rem' }}>
           {navItems.map(item => (
             <button key={item.id} onClick={() => setTab(item.id)}
-              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.625rem 0.75rem', borderRadius: '12px', fontSize: '0.875rem', fontWeight: 700, textAlign: 'right', border: 'none', cursor: 'pointer', marginBottom: '2px', background: tab === item.id ? 'rgba(255,182,193,0.15)' : 'transparent', color: tab === item.id ? '#ffb6c1' : 'rgba(255,255,255,0.55)', fontFamily: 'Heebo, sans-serif' }}>
+              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.625rem 0.75rem', borderRadius: '12px', fontSize: '0.875rem', fontWeight: 700, textAlign: 'right', border: 'none', cursor: 'pointer', marginBottom: '2px', background: tab === item.id ? 'rgba(255,182,193,0.15)' : 'transparent', color: tab === item.id ? '#F7C1C3' : 'rgba(255,255,255,0.55)', fontFamily: 'Heebo, sans-serif' }}>
               <Icon name={item.icon} className="w-4 h-4" />
               {item.label}
               {item.id === 'pending' && pendingAppts.length > 0 && (
-                <span style={{ marginRight: 'auto', background: '#e91e8c', color: 'white', fontSize: '0.65rem', fontWeight: 900, padding: '1px 7px', borderRadius: '999px' }}>{pendingAppts.length}</span>
+                <span style={{ marginRight: 'auto', background: '#EC6A83', color: 'white', fontSize: '0.65rem', fontWeight: 900, padding: '1px 7px', borderRadius: '999px' }}>{pendingAppts.length}</span>
               )}
             </button>
           ))}
         </nav>
         <div style={{ padding: '1rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
           <button onClick={() => setTab('booking')}
-            style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 0.75rem', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 700, background: 'rgba(255,182,193,0.1)', color: '#ffb6c1', border: 'none', cursor: 'pointer', marginBottom: '6px', fontFamily: 'Heebo, sans-serif' }}>
+            style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 0.75rem', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 700, background: 'rgba(255,182,193,0.1)', color: '#F7C1C3', border: 'none', cursor: 'pointer', marginBottom: '6px', fontFamily: 'Heebo, sans-serif' }}>
             <Icon name="link" className="w-3.5 h-3.5" /> דף הזמנות שלי
           </button>
           <button onClick={onLogout}
@@ -716,10 +748,10 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
                 <div>
-                  <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#2d0a1e', margin: 0 }}>{new Date().getHours() < 12 ? 'בוקר טוב' : 'צהריים טובים'} ליאור ✨</h1>
+                  <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#A11738', margin: 0 }}>{new Date().getHours() < 12 ? 'בוקר טוב' : 'צהריים טובים'} ליאור ✨</h1>
                   <p style={{ color: '#9ca3af', fontSize: '0.875rem', marginTop: '4px' }}>הנה מה שקורה היום</p>
                 </div>
-                <button onClick={() => setTab('booking')} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0.625rem 1rem', borderRadius: '12px', background: 'linear-gradient(135deg,#2d0a1e,#8b2252)', color: '#ffb6c1', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: 'pointer', fontFamily: 'Heebo, sans-serif' }}>
+                <button onClick={() => setTab('booking')} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0.625rem 1rem', borderRadius: '12px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: '#F7C1C3', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: 'pointer', fontFamily: 'Heebo, sans-serif' }}>
                   <Icon name="link" className="w-4 h-4" /> דף הזמנות
                 </button>
               </div>
@@ -741,14 +773,14 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                       <span style={{ fontSize: '0.875rem', fontWeight: 700, color: '#6b7280' }}>{s.label}</span>
                       <span style={{ fontSize: '1.5rem' }}>{s.emoji}</span>
                     </div>
-                    <p style={{ fontSize: '1.75rem', fontWeight: 900, color: '#2d0a1e', margin: 0 }}>{s.value}</p>
+                    <p style={{ fontSize: '1.75rem', fontWeight: 900, color: '#A11738', margin: 0 }}>{s.value}</p>
                   </div>
                 ))}
               </div>
 
               <div style={card}>
                 <div style={{ padding: '1rem 1.5rem', borderBottom: '1px solid #f9fafb' }}>
-                  <h2 style={{ fontWeight: 900, color: '#2d0a1e', margin: 0 }}>תורים היום 🗓</h2>
+                  <h2 style={{ fontWeight: 900, color: '#A11738', margin: 0 }}>תורים היום 🗓</h2>
                 </div>
                 {todayAppts.length === 0 ? (
                   <div style={{ padding: '3rem', textAlign: 'center', color: '#9ca3af' }}>
@@ -757,17 +789,17 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                   </div>
                 ) : todayAppts.map(appt => (
                   <div key={appt.id} style={{ padding: '1rem 1.5rem', display: 'flex', alignItems: 'center', gap: '1rem', borderBottom: '1px solid #fafafa' }}>
-                    <p style={{ fontWeight: 900, color: '#2d0a1e', margin: 0, fontSize: '0.875rem', flexShrink: 0 }}>{fmtTime(appt.appointment_time)}</p>
-                    <div style={{ width: '3px', height: '36px', borderRadius: '999px', flexShrink: 0, background: '#fce7f3' }} />
+                    <p style={{ fontWeight: 900, color: '#A11738', margin: 0, fontSize: '0.875rem', flexShrink: 0 }}>{fmtTime(appt.appointment_time)}</p>
+                    <div style={{ width: '3px', height: '36px', borderRadius: '999px', flexShrink: 0, background: '#F7C1C3' }} />
                     <div style={{ flex: 1 }}>
-                      <p style={{ fontWeight: 700, color: '#2d0a1e', margin: 0, fontSize: '0.875rem' }}>{appt.customer_name}</p>
+                      <p style={{ fontWeight: 700, color: '#A11738', margin: 0, fontSize: '0.875rem' }}>{appt.customer_name}</p>
                       <p style={{ color: '#9ca3af', fontSize: '0.75rem', margin: '2px 0 0' }}>{appt.service_name}</p>
                     </div>
-                    {appt.image && <img src={appt.image} alt="ins" onClick={() => setViewImage(appt.image)} style={{ width: '36px', height: '36px', borderRadius: '8px', objectFit: 'cover', border: '2px solid #fce7f3', cursor: 'pointer' }} />}
-                    <span style={{ fontSize: '0.75rem', fontWeight: 700, padding: '3px 10px', borderRadius: '999px', background: appt.status === 'completed' ? '#d1fae5' : appt.status === 'pending' ? '#fef3c7' : '#fce7f3', color: appt.status === 'completed' ? '#059669' : appt.status === 'pending' ? '#92400e' : '#be185d' }}>
+                    {appt.image && <img src={appt.image} alt="ins" onClick={() => setViewImage(appt.image)} style={{ width: '36px', height: '36px', borderRadius: '8px', objectFit: 'cover', border: '2px solid #F7C1C3', cursor: 'pointer' }} />}
+                    <span style={{ fontSize: '0.75rem', fontWeight: 700, padding: '3px 10px', borderRadius: '999px', background: appt.status === 'completed' ? '#d1fae5' : appt.status === 'pending' ? '#fef3c7' : '#F7C1C3', color: appt.status === 'completed' ? '#059669' : appt.status === 'pending' ? '#92400e' : '#A11738' }}>
                       {appt.status === 'completed' ? 'הושלם' : appt.status === 'pending' ? 'ממתין' : 'מאושר'}
                     </span>
-                    <span style={{ fontWeight: 900, color: '#8b2252', fontSize: '0.9rem', flexShrink: 0 }}>{fmtPrice(appt.price)}</span>
+                    <span style={{ fontWeight: 900, color: '#EC6A83', fontSize: '0.9rem', flexShrink: 0 }}>{fmtPrice(appt.price)}</span>
                   </div>
                 ))}
               </div>
@@ -777,7 +809,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
           {/* PENDING */}
           {tab === 'pending' && (
             <div>
-              <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#2d0a1e', marginBottom: '0.5rem' }}>תורים לאישור ⏳</h1>
+              <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#A11738', marginBottom: '0.5rem' }}>תורים לאישור ⏳</h1>
               <p style={{ color: '#9ca3af', fontSize: '0.875rem', marginBottom: '1.5rem' }}>אישרי או בטלי כל תור</p>
               {pendingAppts.length === 0 ? (
                 <div style={{ ...card, padding: '3rem', textAlign: 'center', color: '#9ca3af' }}>
@@ -788,18 +820,18 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                 <div key={appt.id} style={{ ...card, padding: '1.25rem', marginBottom: '1rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
                     <div>
-                      <p style={{ fontWeight: 900, color: '#2d0a1e', margin: 0 }}>{appt.customer_name}</p>
+                      <p style={{ fontWeight: 900, color: '#A11738', margin: 0 }}>{appt.customer_name}</p>
                       <p style={{ color: '#6b7280', fontSize: '0.875rem', margin: '2px 0 0' }}>{appt.customer_phone}</p>
                     </div>
                     <span style={{ fontSize: '0.75rem', fontWeight: 700, padding: '3px 10px', borderRadius: '999px', background: '#fef3c7', color: '#92400e' }}>ממתין</span>
                   </div>
-                  <p style={{ fontWeight: 700, color: '#8b2252', margin: '0 0 4px' }}>{appt.service_name}</p>
+                  <p style={{ fontWeight: 700, color: '#EC6A83', margin: '0 0 4px' }}>{appt.service_name}</p>
                   <p style={{ color: '#6b7280', fontSize: '0.875rem', margin: '0 0 4px' }}>{fmtDate(appt.appointment_time)} | {fmtTime(appt.appointment_time)}</p>
-                  <p style={{ fontWeight: 900, color: '#8b2252', margin: '0 0 12px' }}>{fmtPrice(appt.price)}</p>
+                  <p style={{ fontWeight: 900, color: '#EC6A83', margin: '0 0 12px' }}>{fmtPrice(appt.price)}</p>
                   {appt.image && (
                     <div style={{ marginBottom: '12px' }}>
                       <p style={{ fontSize: '0.75rem', color: '#9ca3af', marginBottom: '4px' }}>השראה שהלקוחה העלתה:</p>
-                      <img src={appt.image} alt="inspiration" onClick={() => setViewImage(appt.image)} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '10px', border: '2px solid #fce7f3', cursor: 'pointer' }} />
+                      <img src={appt.image} alt="inspiration" onClick={() => setViewImage(appt.image)} style={{ width: '80px', height: '80px', objectFit: 'cover', borderRadius: '10px', border: '2px solid #F7C1C3', cursor: 'pointer' }} />
                     </div>
                   )}
                   <div style={{ display: 'flex', gap: '10px' }}>
@@ -808,7 +840,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                       style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '0.625rem', borderRadius: '10px', background: '#dcfce7', color: '#166534', fontWeight: 700, fontSize: '0.8rem', textDecoration: 'none' }}>
                       <Icon name="whatsapp" className="w-4 h-4" /> וואטסאפ
                     </a>
-                    <button onClick={() => approveAppt(appt.id)} style={{ flex: 1, padding: '0.625rem', borderRadius: '10px', background: 'linear-gradient(135deg,#2d0a1e,#8b2252)', color: 'white', fontWeight: 700, fontSize: '0.8rem', border: 'none', cursor: 'pointer' }}>✅ אישור</button>
+                    <button onClick={() => approveAppt(appt.id)} style={{ flex: 1, padding: '0.625rem', borderRadius: '10px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, fontSize: '0.8rem', border: 'none', cursor: 'pointer' }}>✅ אישור</button>
                     <button onClick={() => cancelAppt(appt.id)} style={{ flex: 1, padding: '0.625rem', borderRadius: '10px', background: '#fee2e2', color: '#991b1b', fontWeight: 700, fontSize: '0.8rem', border: 'none', cursor: 'pointer' }}>❌ ביטול</button>
                   </div>
                 </div>
@@ -819,12 +851,12 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
           {/* CALENDAR */}
           {tab === 'calendar' && (
             <div>
-              <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#2d0a1e', marginBottom: '1.5rem' }}>יומן 🗓</h1>
+              <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#A11738', marginBottom: '1.5rem' }}>יומן 🗓</h1>
               <div style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: '1.25rem' }}>
                 <div style={card}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.5rem', borderBottom: '1px solid #f9fafb' }}>
                     <button onClick={() => setCalMonth(new Date(calMonth.getFullYear(), calMonth.getMonth() - 1))} style={{ padding: '6px', background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="chevronR" className="w-4 h-4" /></button>
-                    <span style={{ fontWeight: 900, color: '#2d0a1e' }}>{calMonth.toLocaleDateString('he-IL', { month: 'long', year: 'numeric' })}</span>
+                    <span style={{ fontWeight: 900, color: '#A11738' }}>{calMonth.toLocaleDateString('he-IL', { month: 'long', year: 'numeric' })}</span>
                     <button onClick={() => setCalMonth(new Date(calMonth.getFullYear(), calMonth.getMonth() + 1))} style={{ padding: '6px', background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="chevronL" className="w-4 h-4" /></button>
                   </div>
                   <div style={{ padding: '1rem' }}>
@@ -840,9 +872,9 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                         const isToday = d.toDateString() === new Date().toDateString();
                         return (
                           <button key={i} onClick={() => setSelDay(d)}
-                            style={{ aspectRatio: '1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRadius: '10px', fontSize: '0.875rem', fontWeight: 700, border: 'none', cursor: 'pointer', position: 'relative', background: isSel ? 'linear-gradient(135deg,#2d0a1e,#8b2252)' : isToday ? '#fce7f3' : 'transparent', color: isSel ? 'white' : '#2d0a1e' }}>
+                            style={{ aspectRatio: '1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRadius: '10px', fontSize: '0.875rem', fontWeight: 700, border: 'none', cursor: 'pointer', position: 'relative', background: isSel ? 'linear-gradient(135deg,#A11738,#EC6A83)' : isToday ? '#F7C1C3' : 'transparent', color: isSel ? 'white' : '#A11738' }}>
                             {i + 1}
-                            {hasA && <div style={{ position: 'absolute', bottom: '3px', width: '6px', height: '6px', borderRadius: '50%', background: isSel ? 'rgba(255,255,255,0.7)' : '#e91e8c' }} />}
+                            {hasA && <div style={{ position: 'absolute', bottom: '3px', width: '6px', height: '6px', borderRadius: '50%', background: isSel ? 'rgba(255,255,255,0.7)' : '#EC6A83' }} />}
                           </button>
                         );
                       })}
@@ -851,15 +883,15 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                 </div>
                 <div style={card}>
                   <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid #f9fafb' }}>
-                    <p style={{ fontWeight: 900, color: '#2d0a1e', margin: 0, fontSize: '0.875rem' }}>{selDay.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'short' })}</p>
+                    <p style={{ fontWeight: 900, color: '#A11738', margin: 0, fontSize: '0.875rem' }}>{selDay.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'short' })}</p>
                   </div>
                   {appointments.filter(a => new Date(a.appointment_time).toDateString() === selDay.toDateString() && a.status !== 'cancelled').map(appt => (
                     <div key={appt.id} style={{ padding: '0.875rem 1.25rem', borderBottom: '1px solid #fafafa' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div style={{ flex: 1 }}>
-                          <p style={{ fontWeight: 700, color: '#2d0a1e', margin: 0, fontSize: '0.875rem' }}>{appt.customer_name}</p>
+                          <p style={{ fontWeight: 700, color: '#A11738', margin: 0, fontSize: '0.875rem' }}>{appt.customer_name}</p>
                           <p style={{ color: '#9ca3af', fontSize: '0.75rem', margin: '2px 0 4px' }}>{fmtTime(appt.appointment_time)} · {appt.service_name}</p>
-                          <span style={{ fontSize: '0.7rem', fontWeight: 700, padding: '2px 8px', borderRadius: '999px', background: appt.status === 'completed' ? '#d1fae5' : appt.status === 'pending' ? '#fef3c7' : '#fce7f3', color: appt.status === 'completed' ? '#059669' : appt.status === 'pending' ? '#92400e' : '#be185d', display: 'inline-block' }}>
+                          <span style={{ fontSize: '0.7rem', fontWeight: 700, padding: '2px 8px', borderRadius: '999px', background: appt.status === 'completed' ? '#d1fae5' : appt.status === 'pending' ? '#fef3c7' : '#F7C1C3', color: appt.status === 'completed' ? '#059669' : appt.status === 'pending' ? '#92400e' : '#A11738', display: 'inline-block' }}>
                             {appt.status === 'completed' ? 'הושלם' : appt.status === 'pending' ? 'ממתין' : 'מאושר'}
                           </span>
                         </div>
@@ -882,28 +914,28 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
           {tab === 'services' && (
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
-                <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#2d0a1e', margin: 0 }}>שירותים 💅</h1>
+                <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#A11738', margin: 0 }}>שירותים 💅</h1>
                 <button onClick={() => { setEditSvc(null); setShowModal(true); }}
-                  style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0.625rem 1rem', borderRadius: '12px', background: 'linear-gradient(135deg,#2d0a1e,#8b2252)', color: '#ffb6c1', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: 'pointer', fontFamily: 'Heebo, sans-serif' }}>
+                  style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0.625rem 1rem', borderRadius: '12px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: '#F7C1C3', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: 'pointer', fontFamily: 'Heebo, sans-serif' }}>
                   <Icon name="plus" className="w-4 h-4" /> שירות חדש
                 </button>
               </div>
               {[...new Set(services.filter(s => s.is_active).map(s => s.category))].map(cat => (
                 <div key={cat} style={{ marginBottom: '1.5rem' }}>
-                  <p style={{ fontWeight: 900, color: '#8b2252', fontSize: '0.875rem', marginBottom: '0.75rem' }}>{cat}</p>
+                  <p style={{ fontWeight: 900, color: '#EC6A83', fontSize: '0.875rem', marginBottom: '0.75rem' }}>{cat}</p>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '12px' }}>
                     {services.filter(s => s.is_active && s.category === cat).map(svc => (
                       <div key={svc.id} style={{ ...card, padding: '1rem' }}>
                         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.5rem' }}>
-                          <p style={{ fontWeight: 700, color: '#2d0a1e', margin: 0, fontSize: '0.9rem' }}>{svc.name}</p>
+                          <p style={{ fontWeight: 700, color: '#A11738', margin: 0, fontSize: '0.9rem' }}>{svc.name}</p>
                           <div style={{ display: 'flex', gap: '4px' }}>
                             <button onClick={() => { setEditSvc(svc); setShowModal(true); }} style={{ padding: '5px', borderRadius: '8px', background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="edit" className="w-4 h-4" /></button>
                             <button onClick={() => { setServices(services.map(s => s.id === svc.id ? { ...s, is_active: false } : s)); showToast('השירות הוסר'); }} style={{ padding: '5px', borderRadius: '8px', background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="trash" className="w-4 h-4" /></button>
                           </div>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                          <span style={{ fontSize: '0.75rem', padding: '2px 10px', borderRadius: '999px', background: '#fce7f3', color: '#be185d', fontWeight: 700 }}>{svc.duration} דק׳</span>
-                          <span style={{ fontWeight: 900, color: '#8b2252', fontSize: '1rem' }}>{fmtPrice(svc.price)}</span>
+                          <span style={{ fontSize: '0.75rem', padding: '2px 10px', borderRadius: '999px', background: '#F7C1C3', color: '#A11738', fontWeight: 700 }}>{svc.duration} דק׳</span>
+                          <span style={{ fontWeight: 900, color: '#EC6A83', fontSize: '1rem' }}>{fmtPrice(svc.price)}</span>
                         </div>
                       </div>
                     ))}
@@ -917,7 +949,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
           {/* CUSTOMERS */}
           {tab === 'customers' && (
             <div>
-              <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#2d0a1e', marginBottom: '1.5rem' }}>לקוחות 👥</h1>
+              <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#A11738', marginBottom: '1.5rem' }}>לקוחות 👥</h1>
               {appointments.filter(a => a.status !== 'cancelled').length === 0 ? (
                 <div style={{ ...card, padding: '3rem', textAlign: 'center', color: '#9ca3af' }}>
                   <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>👥</div>
@@ -931,12 +963,12 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                   {[...new Map(appointments.filter(a => a.status !== 'cancelled').map(a => [a.customer_phone, a])).values()].map((appt, i) => (
                     <div key={i} style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', padding: '1rem 1.5rem', alignItems: 'center', borderBottom: '1px solid #fafafa' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div style={{ width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.875rem', fontWeight: 900, background: '#fce7f3', color: '#be185d', flexShrink: 0 }}>{appt.customer_name[0]}</div>
-                        <span style={{ fontWeight: 700, color: '#2d0a1e', fontSize: '0.875rem' }}>{appt.customer_name}</span>
+                        <div style={{ width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.875rem', fontWeight: 900, background: '#F7C1C3', color: '#A11738', flexShrink: 0 }}>{appt.customer_name[0]}</div>
+                        <span style={{ fontWeight: 700, color: '#A11738', fontSize: '0.875rem' }}>{appt.customer_name}</span>
                       </div>
                       <span style={{ color: '#6b7280', fontSize: '0.875rem' }}>{appt.customer_phone}</span>
                       <span style={{ color: '#6b7280', fontSize: '0.875rem' }}>{fmtDate(appt.appointment_time)}</span>
-                      <span style={{ fontWeight: 900, color: '#8b2252', fontSize: '0.875rem' }}>{appointments.filter(a => a.customer_phone === appt.customer_phone).length}</span>
+                      <span style={{ fontWeight: 900, color: '#EC6A83', fontSize: '0.875rem' }}>{appointments.filter(a => a.customer_phone === appt.customer_phone).length}</span>
                     </div>
                   ))}
                 </div>
@@ -947,16 +979,16 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
           {/* AVAILABILITY */}
           {tab === 'availability' && (
             <div>
-              <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#2d0a1e', marginBottom: '0.25rem' }}>שעות פעילות 🕐</h1>
+              <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#A11738', marginBottom: '0.25rem' }}>שעות פעילות 🕐</h1>
               <p style={{ color: '#9ca3af', fontSize: '0.875rem', marginBottom: '1.5rem' }}>הגדרי את הימים והשעות שבהם את עובדת</p>
               <div style={card}>
                 {availability.map((day, i) => (
                   <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '1rem', padding: '1rem 1.5rem', borderBottom: i < 6 ? '1px solid #f9fafb' : 'none' }}>
                     <div style={{ width: '80px', textAlign: 'right' }}>
-                      <span style={{ fontWeight: 700, fontSize: '0.875rem', color: day.is_active ? '#2d0a1e' : '#9ca3af' }}>יום {DAY_NAMES[day.day_of_week]}</span>
+                      <span style={{ fontWeight: 700, fontSize: '0.875rem', color: day.is_active ? '#A11738' : '#9ca3af' }}>יום {DAY_NAMES[day.day_of_week]}</span>
                     </div>
                     <button onClick={() => setAvailability(availability.map((d, j) => j === i ? { ...d, is_active: !d.is_active } : d))}
-                      style={{ width: '40px', height: '20px', borderRadius: '999px', border: 'none', cursor: 'pointer', background: day.is_active ? '#8b2252' : '#d1d5db', position: 'relative', flexShrink: 0 }}>
+                      style={{ width: '40px', height: '20px', borderRadius: '999px', border: 'none', cursor: 'pointer', background: day.is_active ? '#EC6A83' : '#d1d5db', position: 'relative', flexShrink: 0 }}>
                       <div style={{ width: '16px', height: '16px', background: 'white', borderRadius: '50%', position: 'absolute', top: '2px', transition: 'left 0.2s', left: day.is_active ? '22px' : '2px', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }} />
                     </button>
                     {day.is_active ? (
@@ -969,7 +1001,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                   </div>
                 ))}
               </div>
-              <button onClick={() => showToast('שעות הפעילות נשמרו ✅')} style={{ marginTop: '1rem', padding: '0.875rem 1.5rem', borderRadius: '12px', background: 'linear-gradient(135deg,#2d0a1e,#8b2252)', color: '#ffb6c1', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: 'pointer', fontFamily: 'Heebo, sans-serif' }}>
+              <button onClick={() => showToast('שעות הפעילות נשמרו ✅')} style={{ marginTop: '1rem', padding: '0.875rem 1.5rem', borderRadius: '12px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: '#F7C1C3', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: 'pointer', fontFamily: 'Heebo, sans-serif' }}>
                 שמירת שינויים
               </button>
             </div>
@@ -978,13 +1010,13 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
           {/* PORTFOLIO */}
           {tab === 'portfolio' && (
             <div>
-              <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#2d0a1e', marginBottom: '0.5rem' }}>תיק עבודות 🖼</h1>
+              <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#A11738', marginBottom: '0.5rem' }}>תיק עבודות 🖼</h1>
               <p style={{ color: '#9ca3af', fontSize: '0.875rem', marginBottom: '1.5rem' }}>תמונות שמוצגות ללקוחות</p>
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '1rem' }}>
                 {PORTFOLIO.map(item => (
                   <div key={item.id} style={{ ...card, padding: '1.5rem', textAlign: 'center' }}>
                     <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>{item.emoji}</div>
-                    <p style={{ fontWeight: 900, color: '#2d0a1e', margin: '0 0 4px' }}>{item.title}</p>
+                    <p style={{ fontWeight: 900, color: '#A11738', margin: '0 0 4px' }}>{item.title}</p>
                     <p style={{ color: '#9ca3af', fontSize: '0.75rem', margin: 0 }}>{item.desc}</p>
                   </div>
                 ))}
@@ -999,7 +1031,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1.5rem' }}>
                 <button onClick={() => setTab('overview')} style={{ padding: '8px', borderRadius: '10px', background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="chevronR" className="w-5 h-5" /></button>
                 <div>
-                  <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#2d0a1e', margin: 0 }}>דף ההזמנות שלך</h1>
+                  <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#A11738', margin: 0 }}>דף ההזמנות שלך</h1>
                   <p style={{ color: '#9ca3af', fontSize: '0.875rem', margin: '2px 0 0' }}>authentic-wisdom-production.up.railway.app</p>
                 </div>
               </div>
