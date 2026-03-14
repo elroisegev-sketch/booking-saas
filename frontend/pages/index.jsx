@@ -560,20 +560,14 @@ const PortfolioPage = ({ onBook, onAdmin }) => (
         💅 קביעת תור עכשיו
       </button>
 
-      {/* Services */}
+      {/* Gallery */}
       <div>
-        <p style={{ textAlign: 'center', fontWeight: 900, fontSize: '0.95rem', color: '#A11738', marginBottom: '0.75rem' }}>השירותים שלי ✨</p>
-        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.625rem' }}>
-          {[
-            { emoji: '💅', title: "לק ג'ל", desc: 'מבנה, צורה, עיצוב' },
-            { emoji: '✨', title: 'בניה חדשה', desc: 'ציפורן מושלמת' },
-            { emoji: '🌿', title: 'עיצוב גבות', desc: 'צביעה ועיצוב' },
-            { emoji: '👁', title: 'הרמת ריסים', desc: 'מראה פתוח ורענן' },
-          ].map((item, i) => (
-            <div key={i} onClick={onBook} style={{ background: 'white', border: '1.5px solid #F7C1C3', borderRadius: '14px', padding: '0.875rem', textAlign: 'center', cursor: 'pointer', boxShadow: '0 2px 8px rgba(161,23,56,0.06)' }}>
-              <div style={{ fontSize: '1.6rem', marginBottom: '0.3rem' }}>{item.emoji}</div>
-              <p style={{ fontWeight: 900, color: '#A11738', margin: '0 0 2px', fontSize: '0.82rem' }}>{item.title}</p>
-              <p style={{ color: '#9ca3af', fontSize: '0.65rem', margin: 0 }}>{item.desc}</p>
+        <p style={{ textAlign: 'center', fontWeight: 900, fontSize: '0.95rem', color: '#A11738', marginBottom: '0.75rem' }}>תיק עבודות ✨</p>
+        <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory', display: 'flex', gap: '0.625rem', paddingBottom: '0.5rem', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+          <style>{`.gallery-scroll::-webkit-scrollbar { display: none; }`}</style>
+          {Array.from({length: 21}, (_, i) => i + 1).map(n => (
+            <div key={n} style={{ flexShrink: 0, width: '140px', height: '170px', borderRadius: '14px', overflow: 'hidden', scrollSnapAlign: 'start', boxShadow: '0 2px 12px rgba(161,23,56,0.1)' }}>
+              <img src={`/gallery/1 - ${n}.jpeg`} alt={`עבודה ${n}`} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
             </div>
           ))}
         </div>
