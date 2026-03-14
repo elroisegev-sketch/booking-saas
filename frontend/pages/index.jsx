@@ -608,6 +608,24 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
   const [toast, setToast] = useState(null);
   const [viewImage, setViewImage] = useState(null);
 
+  const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'https://booking-saas-production-b9fd.up.railway.app';
+  const VAPID_PUBLIC = 'BJruLIZOsClN97fYdg9i5G52FyTQGEVD_5pSAW6BWQNPKO5lecZhhOn58DCnS1aEkPX1qWQIKcA9INApaRiW1X0';
+
+  React.useEffect(() => {
+    if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
+    const registerPush = async () => {
+      try {
+        const reg = await navigator.serviceWorker.register("/sw.js");
+        const perm = await Notification.requestPermission();
+        if (perm !== "granted") return;
+        const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: VAPID_PUBLIC });
+        await fetch(BACKEND + "/api/push/subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(sub) });
+        console.log("✅ Push registered");
+      } catch(e) { console.log("Push setup failed", e); }
+    };
+    registerPush();
+  }, []);
+
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
   const todayAppts = appointments.filter(a => new Date(a.appointment_time).toDateString() === new Date().toDateString() && a.status !== 'cancelled');
   const pendingAppts = appointments.filter(a => a.status === 'pending');
