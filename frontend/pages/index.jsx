@@ -96,85 +96,42 @@ const Icon = ({ name, className = 'w-5 h-5' }) => {
 
 // ── AUTH ──────────────────────────────────────────────────────
 const AuthScreen = ({ onLogin }) => {
-  const [mode, setMode] = useState('login');
-  const [form, setForm] = useState({ email: '', password: '', business_name: '' });
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handle = async (e) => {
     e.preventDefault(); setError(''); setLoading(true);
-    await new Promise(r => setTimeout(r, 600));
-    if (mode === 'login') {
-      if (form.email === 'lior@beauty.com' && form.password === 'demo1234') onLogin(MOCK_USER);
-      else setError('פרטים שגויים. נסי: lior@beauty.com / demo1234');
-    } else {
-      if (!form.business_name || !form.email || !form.password) setError('יש למלא את כל השדות');
-      else onLogin({ ...MOCK_USER, email: form.email, business_name: form.business_name });
-    }
+    await new Promise(r => setTimeout(r, 400));
+    if (password === 'elroi7163') onLogin(MOCK_USER);
+    else setError('סיסמה שגויה');
     setLoading(false);
   };
 
   return (
-    <div dir="rtl" style={{ minHeight: '100vh', display: 'flex', fontFamily: 'Heebo, sans-serif', background: '#FDECE5', backgroundImage: 'url(/pattern-pink.png)', backgroundSize: '150px' }}>
-      <div style={{ width: '50%', background: 'linear-gradient(145deg,#A11738,#EC6A83)', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: '4rem', color: 'white' }}>
-        <div style={{ marginBottom: '1.5rem' }}>
-          <img src="/logo-white.png" alt="Lior Segev" style={{ height: '80px', objectFit: 'contain' }} />
-        </div>
-        <h1 style={{ fontSize: '3rem', fontWeight: 900, lineHeight: 1.2, marginBottom: '1rem' }}>
-          היופי שלך,<br /><span style={{ color: '#F7C1C3' }}>בקליק אחד</span>
-        </h1>
-        {['לק ג׳ל ועיצוב ציפורניים', 'הרמת ריסים וגבות', 'עיצוב וצביעת גבות'].map((f, i) => (
-          <div key={i} style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '0.5rem' }}>
-            <span style={{ color: '#F7C1C3' }}>✨</span>
-            <span style={{ opacity: 0.85 }}>{f}</span>
+    <div dir="rtl" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Heebo, sans-serif', background: '#FDECE5', backgroundImage: 'url(/pattern-pink.png)', backgroundSize: '150px' }}>
+      <div style={{ width: '100%', maxWidth: '380px', padding: '2rem' }}>
+        <div style={{ background: 'white', borderRadius: '24px', padding: '2.5rem', boxShadow: '0 8px 32px rgba(161,23,56,0.1)' }}>
+          <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
+            <img src="/logo-pink.png" alt="Lior Segev" style={{ height: '60px', objectFit: 'contain', marginBottom: '1rem' }} />
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 900, color: '#A11738', margin: 0 }}>כניסה לניהול 🎀</h2>
           </div>
-        ))}
-      </div>
-      <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '2rem' }}>
-        <div style={{ width: '100%', maxWidth: '420px' }}>
-          <h2 style={{ fontSize: '2rem', fontWeight: 900, color: '#A11738', marginBottom: '0.5rem' }}>
-            {mode === 'login' ? 'ברוכה הבאה 👋' : 'יצירת חשבון'}
-          </h2>
-          {mode === 'login' && (
-            <div style={{ display: 'none' }}>
-              <strong>דמו:</strong> lior@beauty.com / demo1234
-            </div>
-          )}
           <form onSubmit={handle}>
-            {mode === 'register' && (
-              <div style={{ marginBottom: '1rem' }}>
-                <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 700, color: '#374151', marginBottom: '0.25rem' }}>שם העסק</label>
-                <input style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '12px', border: '1.5px solid #e5e7eb', outline: 'none', fontSize: '0.875rem', direction: 'rtl', boxSizing: 'border-box' }}
-                  value={form.business_name} onChange={e => setForm({ ...form, business_name: e.target.value })} />
-              </div>
-            )}
             <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 700, color: '#374151', marginBottom: '0.25rem' }}>אימייל</label>
-              <input type="email" style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '12px', border: '1.5px solid #e5e7eb', outline: 'none', fontSize: '0.875rem', direction: 'ltr', boxSizing: 'border-box' }}
-                placeholder="lior@beauty.com" value={form.email} onChange={e => setForm({ ...form, email: e.target.value })} />
-            </div>
-            <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 700, color: '#374151', marginBottom: '0.25rem' }}>סיסמה</label>
-              <input type="password" style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '12px', border: '1.5px solid #e5e7eb', outline: 'none', fontSize: '0.875rem', direction: 'ltr', boxSizing: 'border-box' }}
-                placeholder="••••••••" value={form.password} onChange={e => setForm({ ...form, password: e.target.value })} />
+              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 700, color: '#374151', marginBottom: '4px' }}>סיסמה</label>
+              <input type="password" style={{ width: '100%', padding: '0.875rem 1rem', borderRadius: '12px', border: '1.5px solid #F7C1C3', outline: 'none', fontSize: '0.875rem', direction: 'ltr', boxSizing: 'border-box' }}
+                placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} autoFocus />
             </div>
             {error && <p style={{ color: '#ef4444', fontSize: '0.875rem', marginBottom: '0.5rem' }}>{error}</p>}
-            <button type="submit" disabled={loading} style={{ width: '100%', padding: '0.875rem', borderRadius: '12px', background: loading ? '#9ca3af' : 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: 'pointer' }}>
-              {loading ? 'רגע...' : mode === 'login' ? 'כניסה' : 'יצירת חשבון'}
+            <button type="submit" disabled={loading} style={{ width: '100%', padding: '0.875rem', borderRadius: '12px', background: loading ? '#d1d5db' : 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: loading ? 'not-allowed' : 'pointer' }}>
+              {loading ? 'רגע...' : 'כניסה'}
             </button>
           </form>
-          <p style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.875rem', color: '#6b7280' }}>
-            {mode === 'login' ? 'אין לך חשבון? ' : 'יש לך חשבון? '}
-            <button onClick={() => setMode(mode === 'login' ? 'register' : 'login')} style={{ color: '#EC6A83', fontWeight: 700, background: 'none', border: 'none', cursor: 'pointer' }}>
-              {mode === 'login' ? 'הירשמי' : 'כניסה'}
-            </button>
-          </p>
         </div>
       </div>
     </div>
   );
 };
-
 // ── TERMS SCREEN ──────────────────────────────────────────────
 const TermsScreen = ({ termsText, onAccept, onBack }) => (
   <div dir="rtl" style={{ minHeight: '100vh', background: '#FDECE5', fontFamily: 'Heebo, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
