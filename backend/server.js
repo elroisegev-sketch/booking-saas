@@ -7,11 +7,11 @@ const app = express();
 app.use(cors({ origin: process.env.FRONTEND_URL || '*' }));
 app.use(express.json());
 
-// Routes
 app.use('/api', require('./routes/auth'));
 app.use('/api/services', require('./routes/services'));
 app.use('/api/appointments', require('./routes/appointments'));
 app.use('/api/availability', require('./routes/availability'));
+app.use('/api/push', require('./routes/push').router);
 
 app.get('/health', (_, res) => res.json({ status: 'ok', service: 'BookSlot API' }));
 
