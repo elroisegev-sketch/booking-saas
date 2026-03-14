@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 
 const MOCK_USER = { id: '1', email: 'lior@beauty.com', business_name: 'ליאור שגב – היופי שלך', slug: 'lior-segev' };
 
@@ -611,7 +611,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
   const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'https://booking-saas-production-b9fd.up.railway.app';
   const VAPID_PUBLIC = 'BJruLIZOsClN97fYdg9i5G52FyTQGEVD_5pSAW6BWQNPKO5lecZhhOn58DCnS1aEkPX1qWQIKcA9INApaRiW1X0';
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
     const registerPush = async () => {
       try {
