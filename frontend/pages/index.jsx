@@ -225,10 +225,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
       .then(r => r.json())
       .then(data => {
         if (data.slots) {
-          const times = data.slots.map(iso => {
-            const d = new Date(iso);
-            return d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit', hour12: false });
-          });
+          const times = data.slots.map(iso => iso.substring(11, 16));
           setAvailableSlots(times);
         }
         setLoadingSlots(false);
