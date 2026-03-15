@@ -111,6 +111,7 @@ const AuthScreen = ({ onLogin }) => {
       const data = await res.json();
       if (data.token) {
         localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
         onLogin(data.user);
       } else {
         setError('סיסמה שגויה');
