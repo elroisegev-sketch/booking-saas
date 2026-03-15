@@ -78,7 +78,7 @@ router.get('/slots/:slug/:serviceId/:date', async (req, res) => {
         const be = new Date(b.end_time);
         return slotStart < be && slotEnd > bs;
       });
-      if (!conflict) slots.push(slotStart.toISOString());
+      if (!conflict) slots.push(`${hh}:${mm}`);
     }
     res.json({ slots });
   } catch (err) {

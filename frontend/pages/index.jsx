@@ -69,7 +69,7 @@ const WHATSAPP_LINK = (name, services, date, time, total) =>
 
 const fmtTime = (iso) => new Date(iso).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
 const fmtDate = (iso) => new Date(iso).toLocaleDateString('he-IL', { weekday: 'short', month: 'short', day: 'numeric' });
-const fmtPrice = (n) => `₪${parseFloat(n).toFixed(0)}`;
+const fmtPrice = (n) => `₪${parseFloat(n || 0).toFixed(0)}`;
 
 const Icon = ({ name, className = 'w-5 h-5' }) => {
   const icons = {
@@ -190,7 +190,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   const displayServices = realServices.length > 0 ? realServices : MOCK_SERVICES;
 
   const hasGel = selectedServices.some(s => s.category && s.category.includes("לק ג'ל"));
-  const totalPrice = selectedServices.reduce((s, svc) => s + svc.price, 0);
+  const totalPrice = selectedServices.reduce((s, svc) => s + parseFloat(svc.price || 0), 0);
   const totalDuration = selectedServices.reduce((s, svc) => s + svc.duration, 0);
 
   // Determine which terms to show
@@ -225,7 +225,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
       .then(r => r.json())
       .then(data => {
         if (data.slots) {
-          const times = data.slots.map(iso => iso.substring(11, 16));
+          const times = data.slots;
           setAvailableSlots(times);
         }
         setLoadingSlots(false);
