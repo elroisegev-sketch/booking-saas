@@ -519,8 +519,8 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
             <a href={waLink} target="_blank" rel="noreferrer" onClick={async () => {
               // חישוב appointment_time ו-end_time לפי הסלוט הקבוע
               const SLOT_ENDS = { '10:00': '11:30', '11:30': '13:00', '13:00': '14:30', '14:30': '16:00', '16:00': '17:30' };
-              const rawTime = sel.time.split(' – ')[0] || sel.time.split(' - ')[0] || sel.time;
-              const slotEnd = SLOT_ENDS[rawTime] || rawTime;
+              const rawTime = sel.time.includes('–') ? sel.time.split('–')[0].trim() : sel.time.includes('-') ? sel.time.split('-')[0].trim() : sel.time.trim();
+              const slotEnd = SLOT_ENDS[rawTime];
               const dateStr2 = `${sel.date.getFullYear()}-${String(sel.date.getMonth()+1).padStart(2,'0')}-${String(sel.date.getDate()).padStart(2,'0')}`;
               const appointmentTime = new Date(`${dateStr2}T${rawTime}:00`).toISOString();
               const endTime = new Date(`${dateStr2}T${slotEnd}:00`).toISOString();
