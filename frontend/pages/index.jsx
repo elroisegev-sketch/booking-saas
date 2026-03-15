@@ -178,6 +178,16 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   const [calMonth, setCalMonth] = useState(new Date());
   const [booked, setBooked] = useState(false);
   const fileRef = useRef();
+  const [realServices, setRealServices] = useState([]);
+
+  useEffect(() => {
+    fetch('https://booking-saas-production-b9fd.up.railway.app/api/services/public/lior-segev')
+      .then(r => r.json())
+      .then(data => { if (Array.isArray(data)) setRealServices(data); })
+      .catch(() => {});
+  }, []);
+
+  const displayServices = realServices.length > 0 ? realServices : MOCK_SERVICES;
 
   const hasGel = selectedServices.some(s => s.category && s.category.includes("לק ג'ל"));
   const totalPrice = selectedServices.reduce((s, svc) => s + svc.price, 0);
@@ -228,7 +238,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
 
   const slots = () => availableSlots;
 
-  const cats = [...new Set(MOCK_SERVICES.map(s => s.category))];
+  const cats = [...new Set(displayServices.map(s => s.category))];
   const S = { fontFamily: 'Varela Round, sans-serif' };
   const btn = (active) => ({ padding: '0.75rem', borderRadius: '12px', fontWeight: 700, fontSize: '0.875rem', border: `2px solid ${active ? '#EC6A83' : '#f0f0f0'}`, background: active ? 'linear-gradient(135deg,#A11738,#EC6A83)' : 'white', color: active ? 'white' : '#A11738', cursor: 'pointer' });
 
@@ -297,7 +307,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
               <div key={cat} style={{ marginBottom: '1.25rem' }}>
                 <p style={{ fontWeight: 700, color: '#EC6A83', fontSize: '0.875rem', marginBottom: '0.5rem' }}>{cat}</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  {MOCK_SERVICES.filter(s => s.category === cat).map(svc => {
+                  {displayServices.filter(s => s.category === cat).map(svc => {
                     const isSelected = selectedServices.find(s => s.id === svc.id);
                     return (
                       <button key={svc.id} onClick={() => toggleService(svc)}
