@@ -606,6 +606,8 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
   const [selDay, setSelDay] = useState(new Date());
   const [toast, setToast] = useState(null);
   const [viewImage, setViewImage] = useState(null);
+  const [showAddAppt, setShowAddAppt] = useState(false);
+  const [newAppt, setNewAppt] = useState({ customer_name: '', service_name: '', date: '', time: '', deposit: '', price: '' });
 
   const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'https://booking-saas-production-b9fd.up.railway.app';
   const VAPID_PUBLIC = 'BJruLIZOsClN97fYdg9i5G52FyTQGEVD_5pSAW6BWQNPKO5lecZhhOn58DCnS1aEkPX1qWQIKcA9INApaRiW1X0';
@@ -646,6 +648,24 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
 
   const approveAppt = (id) => { setAppointments(appointments.map(a => a.id === id ? { ...a, status: 'confirmed' } : a)); showToast('התור אושר ✅'); };
   const cancelAppt = (id) => { setAppointments(appointments.map(a => a.id === id ? { ...a, status: 'cancelled' } : a)); showToast('התור בוטל'); };
+
+  const addManualAppt = () => {
+    if (!newAppt.customer_name || !newAppt.date || !newAppt.time) return;
+    const dt = new Date(newAppt.date + 'T' + newAppt.time);
+    const appt = {
+      id: 'manual_' + Date.now(),
+      customer_name: newAppt.customer_name,
+      service_name: newAppt.service_name || 'טיפול',
+      appointment_time: dt.toISOString(),
+      status: 'confirmed',
+      price: parseFloat(newAppt.price) || 0,
+      deposit: parseFloat(newAppt.deposit) || 0,
+    };
+    setAppointments([...appointments, appt]);
+    setNewAppt({ customer_name: '', service_name: '', date: '', time: '', deposit: '', price: '' });
+    setShowAddAppt(false);
+    showToast('התור נוסף ✅');
+  };
 
   const navItems = [
     { id: 'overview', label: 'סקירה', icon: 'home' },
@@ -815,9 +835,65 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
           )}
 
           {/* CALENDAR */}
+          {showAddAppt && (
+            <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.5)', fontFamily: 'Varela Round, sans-serif' }}>
+              <div dir="rtl" style={{ background: 'white', borderRadius: '20px', padding: '1.5rem', width: '100%', maxWidth: '420px', margin: '1rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+                  <h2 style={{ fontWeight: 900, color: '#A11738', fontSize: '1.25rem', margin: 0 }}>הוסף תור ידני</h2>
+                  <button onClick={() => setShowAddAppt(false)} style={{ padding: '6px', background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="x" className="w-5 h-5" /></button>
+                </div>
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>שם לקוחה *</label>
+                  <input style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '12px', border: '1.5px solid #F7C1C3', outline: 'none', fontSize: '0.875rem', direction: 'rtl', boxSizing: 'border-box' }}
+                    placeholder="שם מלא" value={newAppt.customer_name} onChange={e => setNewAppt({...newAppt, customer_name: e.target.value})} />
+                </div>
+                <div style={{ marginBottom: '1rem' }}>
+                  <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>שירות</label>
+                  <input style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '12px', border: '1.5px solid #F7C1C3', outline: 'none', fontSize: '0.875rem', direction: 'rtl', boxSizing: 'border-box' }}
+                    placeholder="מבנה אנטומי, הרמת ריסים..." value={newAppt.service_name} onChange={e => setNewAppt({...newAppt, service_name: e.target.value})} />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '1rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>תאריך *</label>
+                    <input type="date" style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '12px', border: '1.5px solid #F7C1C3', outline: 'none', fontSize: '0.875rem', boxSizing: 'border-box' }}
+                      value={newAppt.date} onChange={e => setNewAppt({...newAppt, date: e.target.value})} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>שעה *</label>
+                    <input type="time" style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '12px', border: '1.5px solid #F7C1C3', outline: 'none', fontSize: '0.875rem', boxSizing: 'border-box' }}
+                      value={newAppt.time} onChange={e => setNewAppt({...newAppt, time: e.target.value})} />
+                  </div>
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '1.25rem' }}>
+                  <div>
+                    <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>מחיר כולל (₪)</label>
+                    <input type="number" style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '12px', border: '1.5px solid #F7C1C3', outline: 'none', fontSize: '0.875rem', boxSizing: 'border-box' }}
+                      placeholder="0" value={newAppt.price} onChange={e => setNewAppt({...newAppt, price: e.target.value})} />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>מקדמה (₪)</label>
+                    <input type="number" style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '12px', border: '1.5px solid #F7C1C3', outline: 'none', fontSize: '0.875rem', boxSizing: 'border-box' }}
+                      placeholder="0" value={newAppt.deposit} onChange={e => setNewAppt({...newAppt, deposit: e.target.value})} />
+                  </div>
+                </div>
+                <div style={{ display: 'flex', gap: '12px' }}>
+                  <button onClick={() => setShowAddAppt(false)} style={{ flex: 1, padding: '0.875rem', borderRadius: '12px', background: '#f3f4f6', color: '#374151', fontWeight: 700, border: 'none', cursor: 'pointer' }}>ביטול</button>
+                  <button onClick={addManualAppt} disabled={!newAppt.customer_name || !newAppt.date || !newAppt.time} style={{ flex: 1, padding: '0.875rem', borderRadius: '12px', background: (!newAppt.customer_name || !newAppt.date || !newAppt.time) ? '#d1d5db' : 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, border: 'none', cursor: (!newAppt.customer_name || !newAppt.date || !newAppt.time) ? 'not-allowed' : 'pointer' }}>
+                    הוסף תור ✅
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {tab === 'calendar' && (
             <div>
-              <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#A11738', marginBottom: '1.5rem' }}>יומן 🗓</h1>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
+                <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#A11738', margin: 0 }}>יומן 🗓</h1>
+                <button onClick={() => setShowAddAppt(true)} style={{ display: 'flex', alignItems: 'center', gap: '6px', padding: '0.625rem 1rem', borderRadius: '12px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: 'pointer', fontFamily: 'Varela Round, sans-serif' }}>
+                  <Icon name="plus" className="w-4 h-4" /> הוסף תור
+                </button>
+              </div>
               <div style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: '1.25rem' }}>
                 <div style={card}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.5rem', borderBottom: '1px solid #f9fafb' }}>
@@ -857,6 +933,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                         <div style={{ flex: 1 }}>
                           <p style={{ fontWeight: 700, color: '#A11738', margin: 0, fontSize: '0.875rem' }}>{appt.customer_name}</p>
                           <p style={{ color: '#9ca3af', fontSize: '0.75rem', margin: '2px 0 4px' }}>{fmtTime(appt.appointment_time)} · {appt.service_name}</p>
+                          {appt.deposit > 0 && <p style={{ color: '#EC6A83', fontSize: '0.7rem', margin: '0 0 4px', fontWeight: 700 }}>מקדמה: ₪{appt.deposit}</p>}
                           <span style={{ fontSize: '0.7rem', fontWeight: 700, padding: '2px 8px', borderRadius: '999px', background: appt.status === 'completed' ? '#d1fae5' : appt.status === 'pending' ? '#fef3c7' : '#F7C1C3', color: appt.status === 'completed' ? '#059669' : appt.status === 'pending' ? '#92400e' : '#A11738', display: 'inline-block' }}>
                             {appt.status === 'completed' ? 'הושלם' : appt.status === 'pending' ? 'ממתין' : 'מאושר'}
                           </span>
