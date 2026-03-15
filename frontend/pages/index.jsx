@@ -485,6 +485,20 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
           </div>
         )}
       </div>
+
+      {/* Bottom Navigation */}
+      <div style={{ position: 'fixed', bottom: 0, right: 0, left: 0, background: 'white', borderTop: '2px solid #F7C1C3', display: 'flex', justifyContent: 'space-around', padding: '8px 0 12px', zIndex: 50, fontFamily: 'Varela Round, sans-serif' }}>
+        {navItems.map(item => (
+          <button key={item.id} onClick={() => setTab(item.id)}
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', padding: '6px 10px', background: 'none', border: 'none', cursor: 'pointer', color: tab === item.id ? '#A11738' : '#9ca3af', fontFamily: 'Varela Round, sans-serif', position: 'relative' }}>
+            <Icon name={item.icon} className="w-5 h-5" />
+            <span style={{ fontSize: '0.65rem', fontWeight: tab === item.id ? 900 : 500 }}>{item.label}</span>
+            {item.id === 'pending' && pendingAppts.length > 0 && (
+              <span style={{ position: 'absolute', top: '2px', right: '4px', background: '#EC6A83', color: 'white', fontSize: '0.55rem', fontWeight: 900, padding: '1px 5px', borderRadius: '999px' }}>{pendingAppts.length}</span>
+            )}
+          </button>
+        ))}
+      </div>
     </div>
   );
 };
@@ -689,12 +703,11 @@ const Dashboard = ({ user, onLogout, appointments: initialAppointments, setAppoi
     { id: 'portfolio', label: 'תיק עבודות', icon: 'portfolio' },
   ];
 
-  const sidebarStyle = { width: '240px', flexShrink: 0, display: 'flex', flexDirection: 'column', background: 'linear-gradient(180deg,#A11738,#7a0f2a)', color: 'white', fontFamily: 'Varela Round, sans-serif' };
-  const mainStyle = { flex: 1, overflowY: 'auto', fontFamily: 'Varela Round, sans-serif', background: '#FDECE5' };
+  const mainStyle = { flex: 1, overflowY: 'auto', fontFamily: 'Varela Round, sans-serif', background: '#FDECE5', paddingBottom: '80px' };
   const card = { background: 'white', border: '1px solid #f0f0f0', borderRadius: '16px' };
 
   return (
-    <div dir="rtl" style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
+    <div dir="rtl" style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
       {toast && <div style={{ position: 'fixed', top: '1rem', left: '50%', transform: 'translateX(-50%)', zIndex: 50, background: '#A11738', color: 'white', padding: '0.75rem 1.25rem', borderRadius: '12px', fontWeight: 700, fontSize: '0.875rem', fontFamily: 'Varela Round, sans-serif' }}>{toast}</div>}
 
       {viewImage && (
@@ -703,42 +716,21 @@ const Dashboard = ({ user, onLogout, appointments: initialAppointments, setAppoi
         </div>
       )}
 
-      {/* Sidebar */}
-      <div style={sidebarStyle}>
-        <div style={{ padding: '1.5rem', borderBottom: '1px solid rgba(255,255,255,0.08)', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-          <img src="/symbol.png" alt="LS" style={{ width: '36px', height: '36px', objectFit: 'contain' }} />
-          <div>
-            <p style={{ fontWeight: 900, color: '#F7C1C3', margin: 0, fontSize: '0.875rem' }}>ליאור שגב</p>
-            <p style={{ opacity: 0.4, fontSize: '0.7rem', margin: 0 }}>היופי שלך</p>
-          </div>
+      {/* Top Header */}
+      <div style={{ background: 'linear-gradient(135deg,#A11738,#EC6A83)', padding: '0.875rem 1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <img src="/symbol.png" alt="LS" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
+          <span style={{ fontWeight: 900, color: 'white', fontSize: '0.9rem', fontFamily: 'Varela Round, sans-serif' }}>ליאור שגב</span>
         </div>
-        <nav style={{ flex: 1, padding: '1rem' }}>
-          {navItems.map(item => (
-            <button key={item.id} onClick={() => setTab(item.id)}
-              style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.75rem', padding: '0.625rem 0.75rem', borderRadius: '12px', fontSize: '0.875rem', fontWeight: 700, textAlign: 'right', border: 'none', cursor: 'pointer', marginBottom: '2px', background: tab === item.id ? 'rgba(255,182,193,0.15)' : 'transparent', color: tab === item.id ? '#F7C1C3' : 'rgba(255,255,255,0.55)', fontFamily: 'Varela Round, sans-serif' }}>
-              <Icon name={item.icon} className="w-4 h-4" />
-              {item.label}
-              {item.id === 'pending' && pendingAppts.length > 0 && (
-                <span style={{ marginRight: 'auto', background: '#EC6A83', color: 'white', fontSize: '0.65rem', fontWeight: 900, padding: '1px 7px', borderRadius: '999px' }}>{pendingAppts.length}</span>
-              )}
-            </button>
-          ))}
-        </nav>
-        <div style={{ padding: '1rem', borderTop: '1px solid rgba(255,255,255,0.08)' }}>
-          <button onClick={() => setTab('booking')}
-            style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 0.75rem', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 700, background: 'rgba(255,182,193,0.1)', color: '#F7C1C3', border: 'none', cursor: 'pointer', marginBottom: '6px', fontFamily: 'Varela Round, sans-serif' }}>
-            <Icon name="link" className="w-3.5 h-3.5" /> דף הזמנות שלי
-          </button>
-          <button onClick={onLogout}
-            style={{ width: '100%', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.5rem 0.75rem', borderRadius: '10px', fontSize: '0.75rem', fontWeight: 700, color: 'rgba(255,255,255,0.3)', background: 'none', border: 'none', cursor: 'pointer', fontFamily: 'Varela Round, sans-serif' }}>
-            <Icon name="logout" className="w-3.5 h-3.5" /> יציאה
-          </button>
+        <div style={{ display: 'flex', gap: '8px' }}>
+          <button onClick={() => setTab('booking')} style={{ padding: '6px 12px', borderRadius: '10px', background: 'rgba(255,255,255,0.2)', color: 'white', fontWeight: 700, fontSize: '0.75rem', border: 'none', cursor: 'pointer', fontFamily: 'Varela Round, sans-serif' }}>🔗 הזמנות</button>
+          <button onClick={onLogout} style={{ padding: '6px 10px', borderRadius: '10px', background: 'rgba(255,255,255,0.15)', color: 'rgba(255,255,255,0.8)', fontWeight: 700, fontSize: '0.75rem', border: 'none', cursor: 'pointer', fontFamily: 'Varela Round, sans-serif' }}>יציאה</button>
         </div>
       </div>
 
       {/* Main */}
       <div style={mainStyle}>
-        <div style={{ maxWidth: '900px', margin: '0 auto', padding: '2rem' }}>
+        <div style={{ maxWidth: '900px', margin: '0 auto', padding: '1rem' }}>
 
           {/* OVERVIEW */}
           {tab === 'overview' && (
