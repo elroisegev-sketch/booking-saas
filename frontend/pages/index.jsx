@@ -516,7 +516,30 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
               <span style={{ fontSize: '1.25rem', letterSpacing: '0.05em' }}>053-524-9688</span>
             </div>
 
-            <a href={waLink} target="_blank" rel="noreferrer" onClick={() => setBooked(true)} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", width: "100%", padding: "0.875rem", borderRadius: "12px", background: "#25D366", color: "white", fontWeight: 700, fontSize: "0.9rem", textDecoration: "none", marginBottom: "12px", boxSizing: "border-box" }}><Icon name="whatsapp" className="w-5 h-5" />שלחי הודעה לליאור לאישור התור</a>
+            <a href={waLink} target="_blank" rel="noreferrer" onClick={async () => {
+              // חישוב appointment_time ו-end_time לפי הסלוט הקבוע
+              const SLOT_ENDS = { '10:00': '11:30', '11:30': '13:00', '13:00': '14:30', '14:30': '16:00', '16:00': '17:30' };
+              const rawTime = sel.time.split(' – ')[0] || sel.time.split(' - ')[0] || sel.time;
+              const slotEnd = SLOT_ENDS[rawTime] || rawTime;
+              const dateStr2 = `${sel.date.getFullYear()}-${String(sel.date.getMonth()+1).padStart(2,'0')}-${String(sel.date.getDate()).padStart(2,'0')}`;
+              const appointmentTime = new Date(`${dateStr2}T${rawTime}:00`).toISOString();
+              const endTime = new Date(`${dateStr2}T${slotEnd}:00`).toISOString();
+              try {
+                await fetch('https://booking-saas-production-b9fd.up.railway.app/api/appointments', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    business_slug: 'lior-segev',
+                    service_id: selectedServices[0]?.id,
+                    customer_name: sel.name,
+                    customer_phone: sel.phone,
+                    appointment_time: appointmentTime,
+                    end_time: endTime,
+                  })
+                });
+              } catch(e) { console.error('booking failed', e); }
+              setBooked(true);
+            }} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", width: "100%", padding: "0.875rem", borderRadius: "12px", background: "#25D366", color: "white", fontWeight: 700, fontSize: "0.9rem", textDecoration: "none", marginBottom: "12px", boxSizing: "border-box" }}><Icon name="whatsapp" className="w-5 h-5" />שלחי הודעה לליאור לאישור התור</a>
 
             <button onClick={() => setStep(4)} style={{ width: '100%', padding: '0.875rem', borderRadius: '12px', background: '#f3f4f6', color: '#374151', fontWeight: 700, border: 'none', cursor: 'pointer' }}>חזרה</button>
           </div>
