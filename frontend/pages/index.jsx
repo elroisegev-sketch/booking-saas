@@ -843,43 +843,57 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                   <button onClick={() => setShowAddAppt(false)} style={{ padding: '6px', background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="x" className="w-5 h-5" /></button>
                 </div>
                 <div style={{ marginBottom: '1rem' }}>
-                  <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>שם לקוחה *</label>
-                  <input style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '12px', border: '1.5px solid #F7C1C3', outline: 'none', fontSize: '0.875rem', direction: 'rtl', boxSizing: 'border-box' }}
-                    placeholder="שם מלא" value={newAppt.customer_name} onChange={e => setNewAppt({...newAppt, customer_name: e.target.value})} />
+                  <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>הדביקי את הודעת הוואטסאפ של הלקוחה 📋</label>
+                  <textarea
+                    style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '12px', border: '1.5px solid #F7C1C3', outline: 'none', fontSize: '0.8rem', direction: 'rtl', boxSizing: 'border-box', minHeight: '160px', resize: 'vertical', fontFamily: 'Varela Round, sans-serif', lineHeight: 1.6 }}
+                    placeholder={"היי ליאור 🌸\nקבעתי תור!\nשם: ...\nשירותים: ...\nתאריך: ... בשעה ...\nסה״כ: ₪...\nמקדמה לשריין: ₪..."}
+                    value={newAppt.rawText || ''}
+                    onChange={e => {
+                      const text = e.target.value;
+                      const nameMatch = text.match(/שם[:\s]+([^\n]+)/);
+                      const serviceMatch = text.match(/שירותים[:\s]+([^\n]+)/);
+                      const dateMatch = text.match(/תאריך[:\s]+([^\n]+)\s+בשעה\s+(\d{1,2}:\d{2})/);
+                      const totalMatch = text.match(/סה[״"]כ[:\s]*₪?(\d+)/);
+                      const depositMatch = text.match(/מקדמה[^:]*[:\s]*₪?(\d+)/);
+                      
+                      let parsedDate = '';
+                      if (dateMatch) {
+                        const hebrewDate = dateMatch[1].trim();
+                        const months = { 'ינואר': '01', 'פברואר': '02', 'מרץ': '03', 'אפריל': '04', 'מאי': '05', 'יוני': '06', 'יולי': '07', 'אוגוסט': '08', 'ספטמבר': '09', 'אוקטובר': '10', 'נובמבר': '11', 'דצמבר': '12' };
+                        const dayMonthMatch = hebrewDate.match(/(\d{1,2})\s+ב?(\S+)/);
+                        if (dayMonthMatch) {
+                          const day = dayMonthMatch[1].padStart(2, '0');
+                          const monthName = dayMonthMatch[2].replace('ב','');
+                          const monthNum = months[monthName] || months[Object.keys(months).find(k => monthName.includes(k))];
+                          if (monthNum) parsedDate = `${new Date().getFullYear()}-${monthNum}-${day}`;
+                        }
+                      }
+                      
+                      setNewAppt({
+                        ...newAppt,
+                        rawText: text,
+                        customer_name: nameMatch ? nameMatch[1].trim() : newAppt.customer_name,
+                        service_name: serviceMatch ? serviceMatch[1].trim() : newAppt.service_name,
+                        date: parsedDate || newAppt.date,
+                        time: dateMatch ? dateMatch[2] : newAppt.time,
+                        price: totalMatch ? totalMatch[1] : newAppt.price,
+                        deposit: depositMatch ? depositMatch[1] : newAppt.deposit,
+                      });
+                    }}
+                  />
                 </div>
-                <div style={{ marginBottom: '1rem' }}>
-                  <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>שירות</label>
-                  <input style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '12px', border: '1.5px solid #F7C1C3', outline: 'none', fontSize: '0.875rem', direction: 'rtl', boxSizing: 'border-box' }}
-                    placeholder="מבנה אנטומי, הרמת ריסים..." value={newAppt.service_name} onChange={e => setNewAppt({...newAppt, service_name: e.target.value})} />
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '1rem' }}>
-                  <div>
-                    <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>תאריך *</label>
-                    <input type="date" style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '12px', border: '1.5px solid #F7C1C3', outline: 'none', fontSize: '0.875rem', boxSizing: 'border-box' }}
-                      value={newAppt.date} onChange={e => setNewAppt({...newAppt, date: e.target.value})} />
+                {(newAppt.customer_name || newAppt.date) && (
+                  <div style={{ background: '#F7C1C3', borderRadius: '12px', padding: '0.75rem 1rem', marginBottom: '1rem', fontSize: '0.8rem', color: '#A11738' }}>
+                    {newAppt.customer_name && <p style={{ margin: '2px 0', fontWeight: 700 }}>👤 {newAppt.customer_name}</p>}
+                    {newAppt.service_name && <p style={{ margin: '2px 0' }}>💅 {newAppt.service_name}</p>}
+                    {newAppt.date && <p style={{ margin: '2px 0' }}>📅 {newAppt.date} בשעה {newAppt.time}</p>}
+                    {newAppt.price && <p style={{ margin: '2px 0' }}>💰 סה״כ: ₪{newAppt.price} | מקדמה: ₪{newAppt.deposit}</p>}
                   </div>
-                  <div>
-                    <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>שעה *</label>
-                    <input type="time" style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '12px', border: '1.5px solid #F7C1C3', outline: 'none', fontSize: '0.875rem', boxSizing: 'border-box' }}
-                      value={newAppt.time} onChange={e => setNewAppt({...newAppt, time: e.target.value})} />
-                  </div>
-                </div>
-                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '1.25rem' }}>
-                  <div>
-                    <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>מחיר כולל (₪)</label>
-                    <input type="number" style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '12px', border: '1.5px solid #F7C1C3', outline: 'none', fontSize: '0.875rem', boxSizing: 'border-box' }}
-                      placeholder="0" value={newAppt.price} onChange={e => setNewAppt({...newAppt, price: e.target.value})} />
-                  </div>
-                  <div>
-                    <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>מקדמה (₪)</label>
-                    <input type="number" style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '12px', border: '1.5px solid #F7C1C3', outline: 'none', fontSize: '0.875rem', boxSizing: 'border-box' }}
-                      placeholder="0" value={newAppt.deposit} onChange={e => setNewAppt({...newAppt, deposit: e.target.value})} />
-                  </div>
-                </div>
+                )}
                 <div style={{ display: 'flex', gap: '12px' }}>
-                  <button onClick={() => setShowAddAppt(false)} style={{ flex: 1, padding: '0.875rem', borderRadius: '12px', background: '#f3f4f6', color: '#374151', fontWeight: 700, border: 'none', cursor: 'pointer' }}>ביטול</button>
+                  <button onClick={() => { setShowAddAppt(false); setNewAppt({ customer_name: '', service_name: '', date: '', time: '', deposit: '', price: '', rawText: '' }); }} style={{ flex: 1, padding: '0.875rem', borderRadius: '12px', background: '#f3f4f6', color: '#374151', fontWeight: 700, border: 'none', cursor: 'pointer' }}>ביטול</button>
                   <button onClick={addManualAppt} disabled={!newAppt.customer_name || !newAppt.date || !newAppt.time} style={{ flex: 1, padding: '0.875rem', borderRadius: '12px', background: (!newAppt.customer_name || !newAppt.date || !newAppt.time) ? '#d1d5db' : 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, border: 'none', cursor: (!newAppt.customer_name || !newAppt.date || !newAppt.time) ? 'not-allowed' : 'pointer' }}>
-                    הוסף תור ✅
+                    שריין ביומן ✅
                   </button>
                 </div>
               </div>
