@@ -64,8 +64,8 @@ const TERMS_GENERAL = `תקנון כללי – ליאור שגב יופי
 
 const LIOR_PHONE = '0535249688';
 const PAYBOX_LINK = `https://payboxapp.page.link/pay?to=${LIOR_PHONE}`;
-const WHATSAPP_LINK = (name, services, date, time) =>
-  `https://wa.me/972${LIOR_PHONE.slice(1)}?text=${encodeURIComponent(`היי ליאור 🌸\nקבעתי תור!\nשם: ${name}\nשירותים: ${services}\nתאריך: ${date} בשעה ${time}\nמחכה לאישורך 💅`)}`;
+const WHATSAPP_LINK = (name, services, date, time, total) =>
+  `https://wa.me/972${LIOR_PHONE.slice(1)}?text=${encodeURIComponent(`היי ליאור 🌸\nקבעתי תור!\nשם: ${name}\nשירותים: ${services}\nתאריך: ${date} בשעה ${time}\nסה״כ: ₪${total}\nמקדמה לשריין: ₪${Math.ceil(total/2)}\nמחכה לאישורך 💅`)}`;
 
 const fmtTime = (iso) => new Date(iso).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
 const fmtDate = (iso) => new Date(iso).toLocaleDateString('he-IL', { weekday: 'short', month: 'short', day: 'numeric' });
@@ -211,7 +211,8 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
 
   const dateStr = sel.date?.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' });
   const serviceNames = selectedServices.map(s => s.name).join(', ');
-  const waLink = WHATSAPP_LINK(sel.name, serviceNames, dateStr, sel.time);
+  const deposit = Math.ceil(totalPrice / 2);
+  const waLink = WHATSAPP_LINK(sel.name, serviceNames, dateStr, sel.time, totalPrice);
 
   if (booked) return (
     <div dir="rtl" style={{ ...S, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FDECE5' }}>
@@ -478,9 +479,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
               <span style={{ fontSize: '1.25rem', letterSpacing: '0.05em' }}>053-524-9688</span>
             </div>
 
-            <button disabled style={{ width: '100%', padding: '0.875rem', borderRadius: '12px', background: '#d1d5db', color: '#9ca3af', fontWeight: 700, border: 'none', cursor: 'not-allowed', marginBottom: '12px' }}>
-              ממתין לאישור ליאור ⏳
-            </button>
+            <a href={waLink} target="_blank" rel="noreferrer" onClick={() => setBooked(true)} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", width: "100%", padding: "0.875rem", borderRadius: "12px", background: "#25D366", color: "white", fontWeight: 700, fontSize: "0.9rem", textDecoration: "none", marginBottom: "12px", boxSizing: "border-box" }}><Icon name="whatsapp" className="w-5 h-5" />שלחי הודעה לליאור לאישור התור</a>
 
             <button onClick={() => setStep(4)} style={{ width: '100%', padding: '0.875rem', borderRadius: '12px', background: '#f3f4f6', color: '#374151', fontWeight: 700, border: 'none', cursor: 'pointer' }}>חזרה</button>
           </div>
