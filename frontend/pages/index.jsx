@@ -485,17 +485,6 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
           </div>
         )}
       </div>
-
-      {/* Bottom Navigation */}
-      <div style={{ position: 'fixed', bottom: 0, right: 0, left: 0, background: 'white', borderTop: '1px solid #f0f0f0', display: 'flex', justifyContent: 'space-around', padding: '0.5rem 0', zIndex: 50, fontFamily: 'Varela Round, sans-serif' }}>
-        {navItems.map(item => (
-          <button key={item.id} onClick={() => setTab(item.id)}
-            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', padding: '6px 12px', background: 'none', border: 'none', cursor: 'pointer', color: tab === item.id ? '#A11738' : '#9ca3af', fontFamily: 'Varela Round, sans-serif' }}>
-            <Icon name={item.icon} className="w-5 h-5" />
-            <span style={{ fontSize: '0.65rem', fontWeight: tab === item.id ? 900 : 500 }}>{item.label}</span>
-          </button>
-        ))}
-      </div>
     </div>
   );
 };
@@ -700,8 +689,8 @@ const Dashboard = ({ user, onLogout, appointments: initialAppointments, setAppoi
     { id: 'portfolio', label: 'תיק עבודות', icon: 'portfolio' },
   ];
 
-  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
-  const mainStyle = { flex: 1, overflowY: 'auto', fontFamily: 'Varela Round, sans-serif', background: '#FDECE5', paddingBottom: '80px' };
+  const sidebarStyle = { width: '240px', flexShrink: 0, display: 'flex', flexDirection: 'column', background: 'linear-gradient(180deg,#A11738,#7a0f2a)', color: 'white', fontFamily: 'Varela Round, sans-serif' };
+  const mainStyle = { flex: 1, overflowY: 'auto', fontFamily: 'Varela Round, sans-serif', background: '#FDECE5' };
   const card = { background: 'white', border: '1px solid #f0f0f0', borderRadius: '16px' };
 
   return (
