@@ -61,24 +61,31 @@ router.get('/slots/:slug/:serviceId/:date', async (req, res) => {
     if (!availResult.rows.length) return res.json({ slots: [] });
     const { start_time, end_time } = availResult.rows[0];
     const bookedResult = await db.query(`SELECT appointment_time, end_time FROM appointments WHERE business_id=$1 AND status != 'cancelled' AND DATE(appointment_time) = $2::date`, [businessId, date]);
-    const [sh, sm] = start_time.split(':').map(Number);
-    const [eh, em] = end_time.split(':').map(Number);
-    const startMins = sh * 60 + sm;
-    const endMins = eh * 60 + em;
-    const slots = [];
+    // סלוטים קבועים
+    const FIXED_SLOTS = [
+      { start: '10:00', end: '11:30' },
+      { start: '11:30', end: '13:00' },
+      { start: '13:00', end: '14:30' },
+      { start: '14:30', end: '16:00' },
+      { start: '16:00', end: '17:30' },
+    ];
+
     const now = new Date();
-    for (let m = startMins; m + duration <= endMins; m += 30) {
-      const hh = String(Math.floor(m / 60)).padStart(2, '0');
-      const mm = String(m % 60).padStart(2, '0');
-      const slotStart = new Date(`${date}T${hh}:${mm}:00`);
-      const slotEnd = new Date(slotStart.getTime() + duration * 60000);
+    const slots = [];
+
+    for (const slot of FIXED_SLOTS) {
+      const slotStart = new Date(`${date}T${slot.start}:00`);
+      const slotEnd = new Date(`${date}T${slot.end}:00`);
+
       if (slotStart <= now) continue;
+
       const conflict = bookedResult.rows.some(b => {
         const bs = new Date(b.appointment_time);
         const be = new Date(b.end_time);
         return slotStart < be && slotEnd > bs;
       });
-      if (!conflict) slots.push(`${hh}:${mm}`);
+
+      if (!conflict) slots.push(slot.start);
     }
     res.json({ slots });
   } catch (err) {

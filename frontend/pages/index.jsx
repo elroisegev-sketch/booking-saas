@@ -225,7 +225,14 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
       .then(r => r.json())
       .then(data => {
         if (data.slots) {
-          const times = data.slots;
+          const SLOT_LABELS = {
+            '10:00': '10:00 – 11:30',
+            '11:30': '11:30 – 13:00',
+            '13:00': '13:00 – 14:30',
+            '14:30': '14:30 – 16:00',
+            '16:00': '16:00 – 17:30',
+          };
+          const times = data.slots.map(s => SLOT_LABELS[s] || s);
           setAvailableSlots(times);
         }
         setLoadingSlots(false);
