@@ -203,20 +203,30 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
     return a && a.is_active && date >= new Date(new Date().setHours(0, 0, 0, 0));
   };
 
-  const slots = () => {
-    if (!sel.date || selectedServices.length === 0) return [];
-    const a = MOCK_AVAILABILITY.find(x => x.day_of_week === sel.date.getDay());
-    if (!a || !a.is_active) return [];
-    const [sh, sm] = a.start_time.split(':').map(Number);
-    const [eh, em] = a.end_time.split(':').map(Number);
-    const dur = totalDuration || 60;
-    const res = [];
-    for (let m = sh * 60 + sm; m + dur <= eh * 60 + em; m += 30) {
-      const d = new Date(sel.date.getFullYear(), sel.date.getMonth(), sel.date.getDate(), Math.floor(m / 60), m % 60);
-      if (d > new Date()) res.push(`${String(Math.floor(m/60)).padStart(2,'0')}:${String(m%60).padStart(2,'0')}`);
-    }
-    return res;
-  };
+  const [availableSlots, setAvailableSlots] = useState([]);
+  const [loadingSlots, setLoadingSlots] = useState(false);
+
+  useEffect(() => {
+    if (!sel.date || selectedServices.length === 0) { setAvailableSlots([]); return; }
+    const firstService = selectedServices[0];
+    const dateStr = `${sel.date.getFullYear()}-${String(sel.date.getMonth()+1).padStart(2,'0')}-${String(sel.date.getDate()).padStart(2,'0')}`;
+    setLoadingSlots(true);
+    fetch(`https://booking-saas-production-b9fd.up.railway.app/api/appointments/slots/lior-segev/${firstService.id}/${dateStr}?totalDuration=${totalDuration}`)
+      .then(r => r.json())
+      .then(data => {
+        if (data.slots) {
+          const times = data.slots.map(iso => {
+            const d = new Date(iso);
+            return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+          });
+          setAvailableSlots(times);
+        }
+        setLoadingSlots(false);
+      })
+      .catch(() => setLoadingSlots(false));
+  }, [sel.date, selectedServices.length, totalDuration]);
+
+  const slots = () => availableSlots;
 
   const cats = [...new Set(MOCK_SERVICES.map(s => s.category))];
   const S = { fontFamily: 'Varela Round, sans-serif' };

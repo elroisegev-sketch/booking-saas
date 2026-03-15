@@ -46,13 +46,14 @@ router.get('/customers', auth, async (req, res) => {
 
 router.get('/slots/:slug/:serviceId/:date', async (req, res) => {
   const { slug, serviceId, date } = req.params;
+  const totalDuration = parseInt(req.query.totalDuration) || null;
   try {
     const businessResult = await db.query('SELECT id FROM users WHERE slug=$1', [slug]);
     if (!businessResult.rows.length) return res.status(404).json({ error: 'Business not found' });
     const businessId = businessResult.rows[0].id;
     const serviceResult = await db.query('SELECT duration FROM services WHERE id=$1 AND business_id=$2', [serviceId, businessId]);
     if (!serviceResult.rows.length) return res.status(404).json({ error: 'Service not found' });
-    const duration = serviceResult.rows[0].duration;
+    const duration = totalDuration || serviceResult.rows[0].duration;
     const dateParts = date.split('-').map(Number);
     const dateObj = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
     const dayOfWeek = dateObj.getDay();
@@ -66,7 +67,7 @@ router.get('/slots/:slug/:serviceId/:date', async (req, res) => {
     const endMins = eh * 60 + em;
     const slots = [];
     const now = new Date();
-    for (let m = startMins; m + duration <= endMins; m += duration) {
+    for (let m = startMins; m + duration <= endMins; m += 30) {
       const hh = String(Math.floor(m / 60)).padStart(2, '0');
       const mm = String(m % 60).padStart(2, '0');
       const slotStart = new Date(`${date}T${hh}:${mm}:00`);
