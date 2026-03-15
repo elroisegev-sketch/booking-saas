@@ -102,9 +102,22 @@ const AuthScreen = ({ onLogin }) => {
 
   const handle = async (e) => {
     e.preventDefault(); setError(''); setLoading(true);
-    await new Promise(r => setTimeout(r, 400));
-    if (password === 'elroi7163') onLogin(MOCK_USER);
-    else setError('סיסמה שגויה');
+    try {
+      const res = await fetch('https://booking-saas-production-b9fd.up.railway.app/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: 'lior@beauty.com', password })
+      });
+      const data = await res.json();
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+        onLogin(data.user);
+      } else {
+        setError('סיסמה שגויה');
+      }
+    } catch(e) {
+      setError('שגיאת חיבור');
+    }
     setLoading(false);
   };
 
@@ -661,6 +674,19 @@ const Dashboard = ({ user, onLogout, appointments: initialAppointments, setAppoi
 
   const approveAppt = (id) => { setAppointments(appointments.map(a => a.id === id ? { ...a, status: 'confirmed' } : a)); showToast('התור אושר ✅'); };
   const cancelAppt = (id) => { setAppointments(appointments.map(a => a.id === id ? { ...a, status: 'cancelled' } : a)); showToast('התור בוטל'); };
+
+  const BACKEND = 'https://booking-saas-production-b9fd.up.railway.app';
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+
+  useEffect(() => {
+    if (!token) return;
+    // טען שירותים
+    fetch(BACKEND + '/api/services', { headers: { 'Authorization': 'Bearer ' + token } })
+      .then(r => r.json()).then(data => { if (Array.isArray(data)) setServices(data); });
+    // טען תורים
+    fetch(BACKEND + '/api/appointments', { headers: { 'Authorization': 'Bearer ' + token } })
+      .then(r => r.json()).then(data => { if (Array.isArray(data)) setAppointments(data); });
+  }, [token]);
 
   const addManualAppt = () => {
     if (!newAppt.customer_name || !newAppt.date || !newAppt.time) return;
