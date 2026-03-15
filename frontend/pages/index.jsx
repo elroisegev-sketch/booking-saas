@@ -183,7 +183,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   useEffect(() => {
     fetch('https://booking-saas-production-b9fd.up.railway.app/api/services/public/lior-segev')
       .then(r => r.json())
-      .then(data => { if (Array.isArray(data)) setRealServices(data); })
+      .then(data => { if (Array.isArray(data)) setRealServices(data); else if (data.services) setRealServices(data.services); })
       .catch(() => {});
   }, []);
 
