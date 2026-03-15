@@ -227,7 +227,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
         if (data.slots) {
           const times = data.slots.map(iso => {
             const d = new Date(iso);
-            return `${String(d.getHours()).padStart(2,'0')}:${String(d.getMinutes()).padStart(2,'0')}`;
+            return d.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit', hour12: false });
           });
           setAvailableSlots(times);
         }
