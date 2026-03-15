@@ -596,7 +596,19 @@ const PortfolioPage = ({ onBook, onAdmin }) => (
 );
 
 // ── DASHBOARD ─────────────────────────────────────────────────
-const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
+const Dashboard = ({ user, onLogout, appointments: initialAppointments, setAppointments: setParentAppointments }) => {
+  const [appointments, setAppointmentsState] = useState(() => {
+    try {
+      const saved = localStorage.getItem('lior_appointments');
+      return saved ? JSON.parse(saved) : initialAppointments;
+    } catch { return initialAppointments; }
+  });
+
+  const setAppointments = (val) => {
+    const next = typeof val === 'function' ? val(appointments) : val;
+    setAppointmentsState(next);
+    try { localStorage.setItem('lior_appointments', JSON.stringify(next)); } catch {}
+  };
   const [tab, setTab] = useState('overview');
   const [services, setServices] = useState(MOCK_SERVICES);
   const [availability, setAvailability] = useState(MOCK_AVAILABILITY);
