@@ -1173,6 +1173,14 @@ export default function App() {
   const [view, setView] = useState('portfolio');
   const [appointments, setAppointments] = useState([]);
 
+  useEffect(() => {
+    const token = localStorage.getItem('token');
+    if (!token) return;
+    fetch('https://booking-saas-production-b9fd.up.railway.app/api/appointments', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    }).then(r => r.json()).then(data => { if (Array.isArray(data)) setAppointments(data); });
+  }, [view]);
+
   if (typeof window === 'undefined') return null;
   return (
     <>
