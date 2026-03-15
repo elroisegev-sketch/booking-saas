@@ -1091,6 +1091,20 @@ const Dashboard = ({ user, onLogout, appointments: initialAppointments, setAppoi
 
         </div>
       </div>
+
+      {/* Bottom Navigation */}
+      <div style={{ position: 'fixed', bottom: 0, right: 0, left: 0, background: 'white', borderTop: '2px solid #F7C1C3', display: 'flex', justifyContent: 'space-around', padding: '8px 0 12px', zIndex: 50, fontFamily: 'Varela Round, sans-serif' }}>
+        {navItems.map(item => (
+          <button key={item.id} onClick={() => setTab(item.id)}
+            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', padding: '6px 10px', background: 'none', border: 'none', cursor: 'pointer', color: tab === item.id ? '#A11738' : '#9ca3af', fontFamily: 'Varela Round, sans-serif', position: 'relative' }}>
+            <Icon name={item.icon} className="w-5 h-5" />
+            <span style={{ fontSize: '0.65rem', fontWeight: tab === item.id ? 900 : 500 }}>{item.label}</span>
+            {item.id === 'pending' && pendingAppts.length > 0 && (
+              <span style={{ position: 'absolute', top: '2px', right: '4px', background: '#EC6A83', color: 'white', fontSize: '0.55rem', fontWeight: 900, padding: '1px 5px', borderRadius: '999px' }}>{pendingAppts.length}</span>
+            )}
+          </button>
+        ))}
+      </div>
     </div>
   );
 };
