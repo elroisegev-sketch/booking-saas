@@ -638,6 +638,16 @@ const Dashboard = ({ user, onLogout, appointments: initialAppointments, setAppoi
   const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'https://booking-saas-production-b9fd.up.railway.app';
   const VAPID_PUBLIC = 'BJruLIZOsClN97fYdg9i5G52FyTQGEVD_5pSAW6BWQNPKO5lecZhhOn58DCnS1aEkPX1qWQIKcA9INApaRiW1X0';
 
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+
+  useEffect(() => {
+    if (!token) return;
+    fetch(BACKEND + '/api/services', { headers: { 'Authorization': 'Bearer ' + token } })
+      .then(r => r.json()).then(data => { if (Array.isArray(data)) setServices(data); });
+    fetch(BACKEND + '/api/appointments', { headers: { 'Authorization': 'Bearer ' + token } })
+      .then(r => r.json()).then(data => { if (Array.isArray(data)) setAppointments(data); });
+  }, [token]);
+
   useEffect(() => {
     if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
     const registerPush = async () => {
@@ -674,19 +684,6 @@ const Dashboard = ({ user, onLogout, appointments: initialAppointments, setAppoi
 
   const approveAppt = (id) => { setAppointments(appointments.map(a => a.id === id ? { ...a, status: 'confirmed' } : a)); showToast('התור אושר ✅'); };
   const cancelAppt = (id) => { setAppointments(appointments.map(a => a.id === id ? { ...a, status: 'cancelled' } : a)); showToast('התור בוטל'); };
-
-  const BACKEND = 'https://booking-saas-production-b9fd.up.railway.app';
-  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
-
-  useEffect(() => {
-    if (!token) return;
-    // טען שירותים
-    fetch(BACKEND + '/api/services', { headers: { 'Authorization': 'Bearer ' + token } })
-      .then(r => r.json()).then(data => { if (Array.isArray(data)) setServices(data); });
-    // טען תורים
-    fetch(BACKEND + '/api/appointments', { headers: { 'Authorization': 'Bearer ' + token } })
-      .then(r => r.json()).then(data => { if (Array.isArray(data)) setAppointments(data); });
-  }, [token]);
 
   const addManualAppt = () => {
     if (!newAppt.customer_name || !newAppt.date || !newAppt.time) return;
