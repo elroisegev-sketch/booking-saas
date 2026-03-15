@@ -61,21 +61,21 @@ router.get('/slots/:slug/:serviceId/:date', async (req, res) => {
     if (!availResult.rows.length) return res.json({ slots: [] });
     const { start_time, end_time } = availResult.rows[0];
     const bookedResult = await db.query(`SELECT appointment_time, end_time FROM appointments WHERE business_id=$1 AND status != 'cancelled' AND DATE(appointment_time) = $2::date`, [businessId, date]);
-    // סלוטים קבועים
+    // סלוטים קבועים — UTC (ישראל UTC+2)
     const FIXED_SLOTS = [
-      { start: '10:00', end: '11:30' },
-      { start: '11:30', end: '13:00' },
-      { start: '13:00', end: '14:30' },
-      { start: '14:30', end: '16:00' },
-      { start: '16:00', end: '17:30' },
+      { start: '08:00', end: '09:30', label: '10:00' },
+      { start: '09:30', end: '11:00', label: '11:30' },
+      { start: '11:00', end: '12:30', label: '13:00' },
+      { start: '12:30', end: '14:00', label: '14:30' },
+      { start: '14:00', end: '15:30', label: '16:00' },
     ];
 
     const now = new Date();
     const slots = [];
 
     for (const slot of FIXED_SLOTS) {
-      const slotStart = new Date(`${date}T${slot.start}:00`);
-      const slotEnd = new Date(`${date}T${slot.end}:00`);
+      const slotStart = new Date(`${date}T${slot.start}:00Z`);
+      const slotEnd = new Date(`${date}T${slot.end}:00Z`);
 
       if (slotStart <= now) continue;
 
@@ -85,7 +85,7 @@ router.get('/slots/:slug/:serviceId/:date', async (req, res) => {
         return slotStart < be && slotEnd > bs;
       });
 
-      if (!conflict) slots.push(slot.start);
+      if (!conflict) slots.push(slot.label);
     }
     res.json({ slots });
   } catch (err) {
