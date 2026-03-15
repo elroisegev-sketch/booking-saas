@@ -627,6 +627,18 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
   }, []);
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
+
+  const enablePush = async () => {
+    try {
+      const reg = await navigator.serviceWorker.register("/sw.js");
+      const perm = await Notification.requestPermission();
+      if (perm !== "granted") { showToast("לא אושרו התראות"); return; }
+      const VAPID = "BJruLIZOsClN97fYdg9i5G52FyTQGEVD_5pSAW6BWQNPKO5lecZhhOn58DCnS1aEkPX1qWQIKcA9INApaRiW1X0";
+      const sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: VAPID });
+      await fetch("https://booking-saas-production-b9fd.up.railway.app/api/push/subscribe", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(sub) });
+      showToast("התראות הופעלו ✅");
+    } catch(e) { showToast("שגיאה בהפעלת התראות"); }
+  };
   const todayAppts = appointments.filter(a => new Date(a.appointment_time).toDateString() === new Date().toDateString() && a.status !== 'cancelled');
   const pendingAppts = appointments.filter(a => a.status === 'pending');
   const revenue = todayAppts.filter(a => a.status === 'confirmed' || a.status === 'completed').reduce((s, a) => s + (a.price || 0), 0);
@@ -702,7 +714,8 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
                 <div>
-                  <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#A11738', margin: 0 }}>{new Date().getHours() < 12 ? 'בוקר טוב' : 'צהריים טובים'} ליאור ✨</h1>
+                  <h1 style={{ fontSize: "1.75rem", fontWeight: 900, color: "#A11738", margin: 0 }}>{new Date().getHours() < 12 ? "בוקר טוב" : "צהריים טובים"} ליאור ✨</h1>
+                  <button onClick={enablePush} style={{ marginTop: "8px", fontSize: "0.75rem", padding: "4px 12px", borderRadius: "8px", background: "#F7C1C3", color: "#A11738", border: "none", cursor: "pointer", fontWeight: 700 }}>🔔 הפעל התראות</button>
                   <p style={{ color: '#9ca3af', fontSize: '0.875rem', marginTop: '4px' }}>הנה מה שקורה היום</p>
                 </div>
                 <button onClick={() => setTab('booking')} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0.625rem 1rem', borderRadius: '12px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: '#F7C1C3', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: 'pointer', fontFamily: 'Varela Round, sans-serif' }}>
