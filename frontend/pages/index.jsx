@@ -701,7 +701,7 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
   <div dir="rtl" style={{ minHeight: '100vh', fontFamily: 'Varela Round, sans-serif', background: '#FDECE5', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 
     {/* Hero Apple-style scroll */}
-    <div ref={containerRef} style={{ width: '100%', height: '250vh', position: 'relative' }}>
+    <div ref={containerRef} style={{ width: '100%', height: '150vh', position: 'relative' }}>
       <div ref={heroRef} style={{ position: 'sticky', top: 0, width: '100%', height: '100vh', background: 'radial-gradient(ellipse at 50% 40%, #fce8e0 0%, #f5c8b8 45%, #ebb0a0 100%)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
 
         {/* ניצוצות */}
