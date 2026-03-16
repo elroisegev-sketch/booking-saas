@@ -599,58 +599,6 @@ const ServiceModal = ({ service, onSave, onClose }) => {
 
 // ── PORTFOLIO PAGE ────────────────────────────────────────────
 const PortfolioPage = ({ onBook, onAdmin }) => {
-  const canvasRef = useRef(null);
-  const containerRef = useRef(null);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
-    const frameCount = 152;
-    const frames = [];
-    let currentFrame = 0;
-    let loaded = 0;
-
-    canvas.width = 390;
-    canvas.height = 701;
-
-    const preload = () => {
-      for (let i = 1; i <= frameCount; i++) {
-        const img = new Image();
-        const num = String(i).padStart(4, '0');
-        img.src = `/frames/frame${num}.jpg`;
-        img.onload = () => {
-          loaded++;
-          if (loaded === 1) render(0);
-        };
-        frames[i - 1] = img;
-      }
-    };
-
-    const render = (index) => {
-      const img = frames[index];
-      if (img && img.complete) {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-      }
-    };
-
-    const onScroll = () => {
-      if (!containerRef.current) return;
-      const rect = containerRef.current.getBoundingClientRect();
-      const scrollTop = -rect.top;
-      const scrollHeight = rect.height - window.innerHeight;
-      const progress = Math.max(0, Math.min(1, scrollTop / scrollHeight));
-      const frameIndex = Math.min(frameCount - 1, Math.floor(progress * frameCount));
-      if (frameIndex !== currentFrame) {
-        currentFrame = frameIndex;
-        render(currentFrame);
-      }
-    };
-
-    preload();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
   const heroRef = useRef(null);
   const bottleRef = useRef(null);
   const bottleOpenRef = useRef(null);
@@ -712,7 +660,7 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
   <div dir="rtl" style={{ minHeight: '100vh', fontFamily: 'Varela Round, sans-serif', background: '#FDECE5', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 
     {/* Hero עם וידאו */}
-    <div style={{ width: '100%', minHeight: '100vh', background: '#FDECE5', position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+    <div ref={heroRef} style={{ width: '100%', minHeight: '100vh', background: '#FDECE5', position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
 
       {/* ribbons */}
       <div style={{ position: 'absolute', top: '-60px', right: '-80px', width: '300px', height: '200px', background: 'rgba(240,185,165,0.35)', borderRadius: '50%', transform: 'rotate(-25deg)', zIndex: 1, pointerEvents: 'none' }} />
