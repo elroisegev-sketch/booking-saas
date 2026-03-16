@@ -173,7 +173,7 @@ const TermsScreen = ({ termsText, onAccept, onBack }) => (
 // ── BOOKING PAGE ──────────────────────────────────────────────
 const BookingPage = ({ onBack, onAppointmentBooked }) => {
   // steps: 0=terms, 1=services, 2=date, 3=time, 4=details, 5=payment
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(1);
   const [selectedServices, setSelectedServices] = useState([]);
   const [sel, setSel] = useState({ date: null, time: null, name: '', phone: '', image: null });
   const [calMonth, setCalMonth] = useState(new Date());
@@ -278,7 +278,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
     </div>
   );
 
-  if (step === 0) return <TermsScreen termsText={TERMS_GENERAL} onAccept={() => setStep(1)} onBack={onBack} />;
+  if (step === 0) setStep(1);
 
   return (
     <div dir="rtl" style={{ ...S, minHeight: '100vh', background: '#FDECE5' }}>
