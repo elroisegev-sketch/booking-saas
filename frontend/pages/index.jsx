@@ -720,7 +720,7 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
         <img src="/logo-pink.png" alt="Lior Segev" style={{ height: '32px', objectFit: 'contain', marginBottom: '0.5rem', position: 'relative', zIndex: 2 }} />
 
         {/* Canvas פריימים */}
-        <canvas ref={canvasRef} width={480} height={863} style={{ width: '100%', maxWidth: '320px', height: 'auto', maxHeight: '55vh', objectFit: 'contain', position: 'relative', zIndex: 2 }} />
+        <canvas ref={canvasRef} width={480} height={863} style={{ width: '100%', maxWidth: '100%', height: 'auto', maxHeight: '60vh', objectFit: 'contain', position: 'relative', zIndex: 2, display: 'block' }} />
 
         {/* כותרת */}
         <div ref={headlineRef} style={{ marginTop: '0.5rem', textAlign: 'center', opacity: 1, position: 'relative', zIndex: 2, padding: '0 1rem', direction: 'rtl' }}>
@@ -748,7 +748,7 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
     </div>
 
         {/* Content card */}
-    <div style={{ width: '100%', maxWidth: '420px', padding: '1.5rem 1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+    <div style={{ width: '100%', maxWidth: '420px', padding: '0.75rem 1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 
       {/* Gallery */}
       <div>
