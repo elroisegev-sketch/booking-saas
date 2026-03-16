@@ -666,8 +666,8 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
       <div style={{ position: 'absolute', top: '-60px', right: '-80px', width: '300px', height: '200px', background: 'rgba(240,185,165,0.35)', borderRadius: '50%', transform: 'rotate(-25deg)', zIndex: 1, pointerEvents: 'none' }} />
       <div style={{ position: 'absolute', bottom: '5%', left: '-50px', width: '250px', height: '160px', background: 'rgba(245,200,180,0.3)', borderRadius: '50%', transform: 'rotate(15deg)', zIndex: 1, pointerEvents: 'none' }} />
 
-      {/* וידאו */}
-      <video autoPlay muted loop playsInline style={{ position: 'relative', zIndex: 2, width: '100%', maxWidth: '420px', height: '65vh', objectFit: 'contain' }}>
+      {/* וידאו רקע מלא */}
+      <video autoPlay muted loop playsInline webkit-playsinline="true" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 2 }}>
         <source src="/hero-video.mp4" type="video/mp4" />
       </video>
 
