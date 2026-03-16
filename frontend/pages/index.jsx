@@ -598,19 +598,142 @@ const ServiceModal = ({ service, onSave, onClose }) => {
 };
 
 // ── PORTFOLIO PAGE ────────────────────────────────────────────
-const PortfolioPage = ({ onBook, onAdmin }) => (
+const PortfolioPage = ({ onBook, onAdmin }) => {
+  const heroRef = useRef(null);
+  const bottleRef = useRef(null);
+  const brushRef = useRef(null);
+  const dripRef = useRef(null);
+  const headlineRef = useRef(null);
+  const ctaRef = useRef(null);
+  const sparklesRef = useRef([]);
+
+  useEffect(() => {
+    let gsap, ScrollTrigger;
+    const initGSAP = async () => {
+      try {
+        const gsapModule = await import('gsap');
+        const stModule = await import('gsap/ScrollTrigger');
+        gsap = gsapModule.gsap || gsapModule.default;
+        ScrollTrigger = stModule.ScrollTrigger;
+        gsap.registerPlugin(ScrollTrigger);
+
+        const tl = gsap.timeline({
+          scrollTrigger: {
+            trigger: heroRef.current,
+            start: 'top top',
+            end: 'bottom top',
+            scrub: 1.5,
+            pin: true,
+          }
+        });
+
+        // בקבוק מתרחב מעט
+        tl.to(bottleRef.current, { scale: 1.12, duration: 1, ease: 'power2.out' }, 0);
+
+        // ברשה יורדת מהבקבוק
+        tl.to(brushRef.current, { y: 80, opacity: 1, duration: 1.2, ease: 'power2.inOut' }, 0.1);
+
+        // טיפת לק מתארכת
+        tl.to(dripRef.current, { scaleY: 3.5, opacity: 1, transformOrigin: 'top center', duration: 1.4, ease: 'power1.inOut' }, 0.3);
+
+        // כותרת נכנסת
+        tl.to(headlineRef.current, { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }, 0.5);
+
+        // כפתור נכנס
+        tl.to(ctaRef.current, { opacity: 1, y: 0, duration: 0.6, ease: 'back.out(1.7)' }, 0.8);
+
+        // ניצוצות
+        sparklesRef.current.forEach((el, i) => {
+          if (!el) return;
+          tl.to(el, {
+            y: -30 - i * 15,
+            x: (i % 2 === 0 ? 1 : -1) * (20 + i * 10),
+            opacity: 0,
+            scale: 0.3,
+            duration: 1,
+            ease: 'power1.out'
+          }, i * 0.12);
+        });
+
+      } catch(e) { console.log('GSAP load failed:', e); }
+    };
+    initGSAP();
+    return () => { if(ScrollTrigger) ScrollTrigger.getAll().forEach(t => t.kill()); };
+  }, []);
+
+  return (
   <div dir="rtl" style={{ minHeight: '100vh', fontFamily: 'Varela Round, sans-serif', background: '#FDECE5', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 
-    {/* Hero */}
-    <div style={{ width: '100%', background: 'linear-gradient(170deg,#A11738 0%,#EC6A83 100%)', backgroundImage: 'url(/pattern-pink.png)', backgroundSize: '180px', backgroundBlendMode: 'soft-light', padding: '2rem 1rem 3rem', textAlign: 'center', position: 'relative' }}>
-      <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(170deg,rgba(161,23,56,0.88),rgba(236,106,131,0.78))' }} />
-      <div style={{ position: 'relative', zIndex: 1 }}>
-        <img src="/logo-white.png" alt="Lior Segev" style={{ height: '55px', objectFit: 'contain', marginBottom: '0.5rem' }} />
-        <p style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.78rem', marginBottom: '1.5rem', letterSpacing: '0.08em' }}>יופי מקצועי • ליד הבית שלך</p>
-        <div style={{ width: '150px', height: '150px', borderRadius: '50%', overflow: 'hidden', border: '3px solid rgba(255,255,255,0.4)', margin: '0 auto', boxShadow: '0 8px 24px rgba(0,0,0,0.2)' }}>
-          <img src="/lior.png" alt="ליאור שגב" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'top center' }} />
+    {/* Hero עם ScrollTrigger */}
+    <div ref={heroRef} style={{ width: '100%', minHeight: '100vh', background: 'linear-gradient(160deg,#A11738 0%,#EC6A83 60%,#f5a0b0 100%)', position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+
+      {/* אורבים ברקע */}
+      <div style={{ position: 'absolute', top: '-80px', right: '-80px', width: '320px', height: '320px', borderRadius: '50%', background: 'rgba(255,200,180,0.2)', pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', bottom: '60px', left: '-60px', width: '240px', height: '240px', borderRadius: '50%', background: 'rgba(255,255,255,0.08)', pointerEvents: 'none' }} />
+
+      {/* ניצוצות */}
+      {[
+        { top:'18%', left:'12%', size:14, delay:0 },
+        { top:'30%', right:'10%', size:10, delay:0.3 },
+        { top:'60%', left:'8%', size:12, delay:0.6 },
+        { top:'55%', right:'15%', size:8, delay:0.9 },
+        { top:'75%', left:'25%', size:10, delay:0.2 },
+        { top:'20%', right:'22%', size:16, delay:0.5 },
+      ].map((s, i) => (
+        <div key={i} ref={el => sparklesRef.current[i] = el}
+          style={{ position: 'absolute', top: s.top, left: s.left, right: s.right, width: s.size, height: s.size, opacity: 0.7, pointerEvents: 'none', animation: `sparkle ${1.5 + i*0.3}s ease-in-out infinite alternate` }}>
+          <svg viewBox="0 0 24 24" fill="rgba(255,255,255,0.8)" width={s.size} height={s.size}><path d="M12 2l1.5 7.5L21 12l-7.5 1.5L12 21l-1.5-7.5L3 12l7.5-1.5z"/></svg>
         </div>
+      ))}
+
+      {/* לוגו */}
+      <img src="/logo-white.png" alt="Lior Segev" style={{ height: '48px', objectFit: 'contain', marginBottom: '2rem', position: 'relative', zIndex: 2 }} />
+
+      {/* בקבוק לק */}
+      <div ref={bottleRef} style={{ position: 'relative', zIndex: 3, display: 'flex', flexDirection: 'column', alignItems: 'center', willChange: 'transform' }}>
+
+        {/* ברשה */}
+        <div ref={brushRef} style={{ width: '6px', height: '60px', background: 'linear-gradient(180deg,rgba(255,255,255,0.9),rgba(236,106,131,0.8))', borderRadius: '3px', marginBottom: '-4px', opacity: 0.3, willChange: 'transform,opacity' }} />
+
+        {/* גוף הבקבוק */}
+        <div style={{ width: '90px', height: '130px', background: 'linear-gradient(135deg,rgba(255,255,255,0.15) 0%,rgba(255,255,255,0.05) 100%)', border: '1.5px solid rgba(255,255,255,0.4)', borderRadius: '8px 8px 20px 20px', backdropFilter: 'blur(10px)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', boxShadow: '0 20px 60px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.3)', position: 'relative', overflow: 'hidden' }}>
+          {/* מילוי לק בפנים */}
+          <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: '65%', background: 'linear-gradient(180deg,rgba(161,23,56,0.6),rgba(161,23,56,0.9))', borderRadius: '0 0 18px 18px' }} />
+          {/* שיני */}
+          <div style={{ position: 'absolute', top: 8, right: 10, width: '12px', height: '60px', background: 'rgba(255,255,255,0.15)', borderRadius: '6px', transform: 'rotate(5deg)' }} />
+          {/* טקסט על הבקבוק */}
+          <div style={{ position: 'relative', zIndex: 2, textAlign: 'center' }}>
+            <p style={{ color: 'rgba(255,255,255,0.95)', fontSize: '0.6rem', fontWeight: 900, letterSpacing: '0.15em' }}>LIOR SEGEV</p>
+            <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.45rem', letterSpacing: '0.2em', marginTop: '2px' }}>BEAUTY</p>
+          </div>
+        </div>
+
+        {/* טיפת לק */}
+        <div ref={dripRef} style={{ width: '14px', height: '30px', background: 'linear-gradient(180deg,#EC6A83,#A11738)', borderRadius: '0 0 50% 50%', marginTop: '-2px', opacity: 0.2, willChange: 'transform,opacity', boxShadow: '0 4px 12px rgba(161,23,56,0.4)' }} />
       </div>
+
+      {/* כותרת */}
+      <div ref={headlineRef} style={{ marginTop: '2.5rem', textAlign: 'center', opacity: 0, transform: 'translateY(30px)', willChange: 'transform,opacity', position: 'relative', zIndex: 2, padding: '0 1.5rem' }}>
+        <p style={{ color: 'rgba(255,255,255,0.7)', fontSize: '0.7rem', letterSpacing: '0.25em', marginBottom: '0.5rem' }}>גלול לגלות את הקסם</p>
+        <h1 style={{ color: 'white', fontSize: '1.8rem', fontWeight: 900, lineHeight: 1.2 }}>היופי שלך<br/>מתחיל כאן ✨</h1>
+      </div>
+
+      {/* כפתור */}
+      <div ref={ctaRef} style={{ marginTop: '1.5rem', opacity: 0, transform: 'translateY(20px)', willChange: 'transform,opacity', position: 'relative', zIndex: 2 }}>
+        <button onClick={onBook} style={{ padding: '0.85rem 2.5rem', borderRadius: '999px', background: 'rgba(255,255,255,0.15)', border: '1.5px solid rgba(255,255,255,0.5)', color: 'white', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', fontFamily: 'Varela Round, sans-serif', backdropFilter: 'blur(10px)', letterSpacing: '0.05em' }}>
+          💅 קביעת תור
+        </button>
+      </div>
+
+      {/* חץ גלילה */}
+      <div style={{ position: 'absolute', bottom: '2rem', left: '50%', transform: 'translateX(-50%)', animation: 'bounce 2s ease-in-out infinite', zIndex: 2 }}>
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.6)" strokeWidth="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
+      </div>
+
+      <style>{`
+        @keyframes sparkle { from { transform: scale(1) rotate(0deg); } to { transform: scale(1.3) rotate(20deg); } }
+        @keyframes bounce { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(8px); } }
+      `}</style>
     </div>
 
     {/* Content card */}
@@ -655,7 +778,8 @@ const PortfolioPage = ({ onBook, onAdmin }) => (
       </div>
     </div>
   </div>
-);
+  );
+};
 
 // ── DASHBOARD ─────────────────────────────────────────────────
 const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
