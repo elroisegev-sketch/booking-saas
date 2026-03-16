@@ -613,7 +613,7 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    const frameCount = 152;
+    const frameCount = 60;
     const frames = new Array(frameCount);
     let loaded = 0;
 
@@ -628,7 +628,7 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
     for (let i = 0; i < frameCount; i++) {
       const img = new Image();
       img.src = `/frames/frame${String(i+1).padStart(4,'0')}.jpg`;
-      img.onload = () => { loaded++; if (loaded === 1) render(0); };
+      img.onload = () => { loaded++; render(0); };
       frames[i] = img;
     }
 
@@ -701,7 +701,7 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
   <div dir="rtl" style={{ minHeight: '100vh', fontFamily: 'Varela Round, sans-serif', background: '#FDECE5', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 
     {/* Hero Apple-style scroll */}
-    <div ref={containerRef} style={{ width: '100%', height: '500vh', position: 'relative' }}>
+    <div ref={containerRef} style={{ width: '100%', height: '250vh', position: 'relative' }}>
       <div ref={heroRef} style={{ position: 'sticky', top: 0, width: '100%', height: '100vh', background: 'radial-gradient(ellipse at 50% 40%, #fce8e0 0%, #f5c8b8 45%, #ebb0a0 100%)', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', overflow: 'hidden' }}>
 
         {/* ניצוצות */}
@@ -720,7 +720,7 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
         <img src="/logo-pink.png" alt="Lior Segev" style={{ height: '40px', objectFit: 'contain', marginBottom: '1rem', position: 'relative', zIndex: 2 }} />
 
         {/* Canvas פריימים */}
-        <canvas ref={canvasRef} width={390} height={701} style={{ width: '100%', maxWidth: '390px', height: 'auto', position: 'relative', zIndex: 2 }} />
+        <canvas ref={canvasRef} width={480} height={863} style={{ width: '100%', maxWidth: '390px', height: 'auto', position: 'relative', zIndex: 2 }} />
 
         {/* כותרת */}
         <div ref={headlineRef} style={{ marginTop: '1.5rem', textAlign: 'center', opacity: 0, transform: 'translateY(20px)', position: 'relative', zIndex: 2, padding: '0 1.5rem', direction: 'rtl' }}>
