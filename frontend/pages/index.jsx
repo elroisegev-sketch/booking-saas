@@ -659,74 +659,19 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
   return (
   <div dir="rtl" style={{ minHeight: '100vh', fontFamily: 'Varela Round, sans-serif', background: '#FDECE5', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 
-    {/* Hero עם וידאו */}
-    <div ref={heroRef} style={{ width: '100%', minHeight: '100vh', background: '#FDECE5', position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
-
-      {/* ribbons */}
-      <div style={{ position: 'absolute', top: '-60px', right: '-80px', width: '300px', height: '200px', background: 'rgba(240,185,165,0.35)', borderRadius: '50%', transform: 'rotate(-25deg)', zIndex: 1, pointerEvents: 'none' }} />
-      <div style={{ position: 'absolute', bottom: '5%', left: '-50px', width: '250px', height: '160px', background: 'rgba(245,200,180,0.3)', borderRadius: '50%', transform: 'rotate(15deg)', zIndex: 1, pointerEvents: 'none' }} />
-
-      {/* וידאו רקע מלא */}
-      <video autoPlay muted loop playsInline webkit-playsinline="true" style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', objectFit: 'cover', zIndex: 2 }}>
-        <source src="/hero-video.mp4" type="video/mp4" />
-      </video>
-
-      {/* ribbons ברקע */}
-      <div style={{ position: 'absolute', top: '-40px', right: '-60px', width: '280px', height: '180px', background: 'rgba(240,195,175,0.5)', borderRadius: '50%', transform: 'rotate(-30deg)', pointerEvents: 'none' }} />
-      <div style={{ position: 'absolute', bottom: '10%', left: '-40px', width: '220px', height: '140px', background: 'rgba(245,205,185,0.4)', borderRadius: '50%', transform: 'rotate(20deg)', pointerEvents: 'none' }} />
-      <div style={{ position: 'absolute', top: '40%', right: '-20px', width: '160px', height: '100px', background: 'rgba(235,185,165,0.35)', borderRadius: '50%', transform: 'rotate(-15deg)', pointerEvents: 'none' }} />
-
-      {/* ניצוצות */}
-      {[
-        { top:'15%', left:'10%', size:16 },
-        { top:'25%', right:'8%', size:11 },
-        { top:'65%', left:'6%', size:13 },
-        { top:'50%', right:'12%', size:9 },
-        { top:'78%', left:'22%', size:11 },
-        { top:'18%', right:'20%', size:18 },
-      ].map((s, i) => (
-        <div key={i} ref={el => sparklesRef.current[i] = el}
-          style={{ position: 'absolute', top: s.top, left: s.left, right: s.right, pointerEvents: 'none', animation: `sparkle ${1.5+i*0.3}s ease-in-out infinite alternate` }}>
-          <svg viewBox="0 0 24 24" fill="rgba(161,23,56,0.4)" width={s.size} height={s.size}><path d="M12 2l1.5 7.5L21 12l-7.5 1.5L12 21l-1.5-7.5L3 12l7.5-1.5z"/></svg>
-        </div>
-      ))}
-
-      {/* לוגו */}
-      <img src="/logo-pink.png" alt="Lior Segev" style={{ height: '44px', objectFit: 'contain', marginBottom: '1.5rem', position: 'relative', zIndex: 2 }} />
-
-      {/* בקבוק סגור */}
-
-
-      {/* כותרת */}
-      <div ref={headlineRef} style={{ marginTop: '2rem', textAlign: 'center', opacity: 0, transform: 'translateY(30px)', willChange: 'transform,opacity', position: 'relative', zIndex: 5, padding: '0 1.5rem', direction: 'rtl' }}>
-        <p style={{ color: 'rgba(161,23,56,0.6)', fontSize: '0.68rem', letterSpacing: '0.28em', marginBottom: '0.5rem', fontWeight: 300 }}>גלול לגלות את הקסם</p>
-        <h1 style={{ color: '#5a1020', fontSize: '1.9rem', fontWeight: 900, lineHeight: 1.25 }}>היופי שלך<br/>מתחיל כאן ✨</h1>
-      </div>
-
-      {/* כפתור */}
-      <div ref={ctaRef} style={{ marginTop: '1.5rem', opacity: 0, transform: 'translateY(20px)', willChange: 'transform,opacity', position: 'relative', zIndex: 5 }}>
-        <button onClick={onBook} style={{ padding: '0.9rem 2.8rem', borderRadius: '999px', background: 'rgba(161,23,56,0.1)', border: '1.5px solid rgba(161,23,56,0.35)', color: '#5a1020', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', fontFamily: 'Varela Round, sans-serif', letterSpacing: '0.06em', backdropFilter: 'blur(8px)' }}>
+    {/* Hero */}
+    <div style={{ width: '100%', position: 'relative', overflow: 'hidden' }}>
+      <img src="/bottle-open.png" alt="hero" style={{ width: '100%', maxHeight: '100vh', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
+      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '2rem 1.5rem', background: 'linear-gradient(to top, rgba(253,236,229,0.98) 0%, rgba(253,236,229,0.7) 60%, transparent 100%)', textAlign: 'center', direction: 'rtl' }}>
+        <p style={{ color: 'rgba(161,23,56,0.6)', fontSize: '0.7rem', letterSpacing: '0.25em', marginBottom: '0.5rem' }}>גלול לגלות את הקסם</p>
+        <h1 style={{ color: '#5a1020', fontSize: '1.9rem', fontWeight: 900, lineHeight: 1.2, marginBottom: '1rem' }}>היופי שלך<br/>מתחיל כאן ✨</h1>
+        <button onClick={onBook} style={{ padding: '0.9rem 2.5rem', borderRadius: '999px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, fontSize: '0.95rem', border: 'none', cursor: 'pointer', fontFamily: 'Varela Round, sans-serif', boxShadow: '0 6px 20px rgba(161,23,56,0.3)' }}>
           💅 קביעת תור עכשיו
         </button>
       </div>
-
-      {/* חץ גלילה */}
-      <div style={{ position: 'absolute', bottom: '2rem', left: '50%', transform: 'translateX(-50%)', animation: 'bounce 2s ease-in-out infinite', zIndex: 5 }}>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(161,23,56,0.5)" strokeWidth="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
-      </div>
-
-      {/* כוכב */}
-      <div style={{ position: 'absolute', bottom: '1.5rem', right: '1.5rem', zIndex: 5, animation: 'sparkle 2s ease-in-out infinite alternate' }}>
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="rgba(161,23,56,0.5)"><path d="M12 2l1.5 7.5L21 12l-7.5 1.5L12 21l-1.5-7.5L3 12l7.5-1.5z"/></svg>
-      </div>
-
-      <style>{`
-        @keyframes sparkle { from { transform: scale(1) rotate(0deg); opacity:0.5; } to { transform: scale(1.3) rotate(20deg); opacity:1; } }
-        @keyframes bounce { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(8px); } }
-      `}</style>
     </div>
 
-    {/* Content card */}
+        {/* Content card */}
     <div style={{ width: '100%', maxWidth: '420px', padding: '1.5rem 1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
 
       {/* CTA */}
