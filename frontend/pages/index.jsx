@@ -660,7 +660,7 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
   <div dir="rtl" style={{ minHeight: '100vh', fontFamily: 'Varela Round, sans-serif', background: '#FDECE5', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 
     {/* Hero עם וידאו */}
-    <div ref={heroRef} style={{ width: '100%', minHeight: '100vh', background: 'radial-gradient(ellipse at 50% 40%, #fce8e0 0%, #f5c8b8 45%, #ebb0a0 100%)', position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+    <div ref={heroRef} style={{ width: '100%', minHeight: '100vh', background: '#FDECE5', position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
 
       {/* ribbons */}
       <div style={{ position: 'absolute', top: '-60px', right: '-80px', width: '300px', height: '200px', background: 'rgba(240,185,165,0.35)', borderRadius: '50%', transform: 'rotate(-25deg)', zIndex: 1, pointerEvents: 'none' }} />
