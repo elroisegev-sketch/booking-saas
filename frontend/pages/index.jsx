@@ -243,7 +243,9 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
 
   const slots = () => availableSlots;
 
-  const cats = [...new Set(displayServices.map(s => s.category))];
+  const CAT_ORDER = ["לק ג'ל 💅", 'פנים 💆'];
+  const allCats = [...new Set(displayServices.map(s => s.category))];
+  const cats = [...CAT_ORDER.filter(c => allCats.includes(c)), ...allCats.filter(c => !CAT_ORDER.includes(c))];
   const S = { fontFamily: 'Varela Round, sans-serif' };
   const btn = (active) => ({ padding: '0.75rem', borderRadius: '12px', fontWeight: 700, fontSize: '0.875rem', border: `2px solid ${active ? '#EC6A83' : '#f0f0f0'}`, background: active ? 'linear-gradient(135deg,#A11738,#EC6A83)' : 'white', color: active ? 'white' : '#A11738', cursor: 'pointer' });
 
