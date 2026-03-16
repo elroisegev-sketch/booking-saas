@@ -661,7 +661,7 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
 
     {/* Hero */}
     <div style={{ width: '100%', position: 'relative', overflow: 'hidden' }}>
-      <img src="/bottle-open.png" alt="hero" style={{ width: '100%', maxHeight: '100vh', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
+      <img src="/bottle-closed.png" alt="hero" style={{ width: '100%', maxHeight: '100vh', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
       <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '2rem 1.5rem', background: 'linear-gradient(to top, rgba(253,236,229,0.98) 0%, rgba(253,236,229,0.7) 60%, transparent 100%)', textAlign: 'center', direction: 'rtl' }}>
         <p style={{ color: 'rgba(161,23,56,0.6)', fontSize: '0.7rem', letterSpacing: '0.25em', marginBottom: '0.5rem' }}>גלול לגלות את הקסם</p>
         <h1 style={{ color: '#5a1020', fontSize: '1.9rem', fontWeight: 900, lineHeight: 1.2, marginBottom: '1rem' }}>היופי שלך<br/>מתחיל כאן ✨</h1>
@@ -673,11 +673,6 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
 
         {/* Content card */}
     <div style={{ width: '100%', maxWidth: '420px', padding: '1.5rem 1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-
-      {/* CTA */}
-      <button onClick={onBook} style={{ width: '100%', padding: '0.9rem', borderRadius: '999px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 900, fontSize: '1rem', border: 'none', cursor: 'pointer', boxShadow: '0 6px 20px rgba(161,23,56,0.3)', fontFamily: 'Varela Round, sans-serif' }}>
-        💅 קביעת תור עכשיו
-      </button>
 
       {/* Gallery */}
       <div>
