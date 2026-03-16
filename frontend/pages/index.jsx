@@ -740,10 +740,10 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="rgba(161,23,56,0.5)" strokeWidth="2"><path d="M12 5v14M5 12l7 7 7-7"/></svg>
         </div>
 
-        <style>{\`
+        <style>{`
           @keyframes sparkle { from { transform: scale(1) rotate(0deg); opacity:0.5; } to { transform: scale(1.3) rotate(20deg); opacity:1; } }
           @keyframes bounce { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(8px); } }
-        \`}</style>
+        `}</style>
       </div>
     </div>
 
