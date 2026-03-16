@@ -717,19 +717,19 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
         ))}
 
         {/* לוגו */}
-        <img src="/logo-pink.png" alt="Lior Segev" style={{ height: '40px', objectFit: 'contain', marginBottom: '1rem', position: 'relative', zIndex: 2 }} />
+        <img src="/logo-pink.png" alt="Lior Segev" style={{ height: '32px', objectFit: 'contain', marginBottom: '0.5rem', position: 'relative', zIndex: 2 }} />
 
         {/* Canvas פריימים */}
-        <canvas ref={canvasRef} width={480} height={863} style={{ width: '100%', maxWidth: '390px', height: 'auto', position: 'relative', zIndex: 2 }} />
+        <canvas ref={canvasRef} width={480} height={863} style={{ width: '100%', maxWidth: '320px', height: 'auto', maxHeight: '55vh', objectFit: 'contain', position: 'relative', zIndex: 2 }} />
 
         {/* כותרת */}
-        <div ref={headlineRef} style={{ marginTop: '1.5rem', textAlign: 'center', opacity: 1, position: 'relative', zIndex: 2, padding: '0 1.5rem', direction: 'rtl' }}>
+        <div ref={headlineRef} style={{ marginTop: '0.5rem', textAlign: 'center', opacity: 1, position: 'relative', zIndex: 2, padding: '0 1rem', direction: 'rtl' }}>
           <p style={{ color: 'rgba(161,23,56,0.6)', fontSize: '0.68rem', letterSpacing: '0.28em', marginBottom: '0.4rem' }}>גלול לגלות את הקסם</p>
-          <h1 style={{ color: '#5a1020', fontSize: '1.8rem', fontWeight: 900, lineHeight: 1.25 }}>היופי שלך מתחיל כאן ✨</h1>
+          <h1 style={{ color: '#5a1020', fontSize: '1.4rem', fontWeight: 900, lineHeight: 1.2 }}>היופי שלך מתחיל כאן ✨</h1>
         </div>
 
         {/* כפתור */}
-        <div ref={ctaRef} style={{ marginTop: '1.2rem', opacity: 1, position: 'relative', zIndex: 2 }}>
+        <div ref={ctaRef} style={{ marginTop: '0.75rem', opacity: 1, position: 'relative', zIndex: 2 }}>
           <button onClick={onBook} style={{ padding: '0.9rem 2.5rem', borderRadius: '999px', background: 'rgba(161,23,56,0.1)', border: '1.5px solid rgba(161,23,56,0.35)', color: '#5a1020', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', fontFamily: 'Varela Round, sans-serif' }}>
             💅 קביעת תור עכשיו
           </button>
