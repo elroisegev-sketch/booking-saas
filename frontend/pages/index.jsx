@@ -605,6 +605,47 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
   const headlineRef = useRef(null);
   const ctaRef = useRef(null);
   const sparklesRef = useRef([]);
+  const canvasRef = useRef(null);
+  const containerRef = useRef(null);
+
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const frameCount = 152;
+    const frames = new Array(frameCount);
+    let loaded = 0;
+
+    const render = (index) => {
+      const img = frames[index];
+      if (img && img.complete) {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      }
+    };
+
+    for (let i = 0; i < frameCount; i++) {
+      const img = new Image();
+      img.src = `/frames/frame${String(i+1).padStart(4,'0')}.jpg`;
+      img.onload = () => { loaded++; if (loaded === 1) render(0); };
+      frames[i] = img;
+    }
+
+    const onScroll = () => {
+      const container = containerRef.current;
+      if (!container) return;
+      const rect = container.getBoundingClientRect();
+      const scrollTop = -rect.top;
+      const scrollHeight = rect.height - window.innerHeight;
+      const progress = Math.max(0, Math.min(1, scrollTop / scrollHeight));
+      const idx = Math.min(frameCount - 1, Math.floor(progress * frameCount));
+      render(idx);
+    };
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return () => window.removeEventListener('scroll', onScroll);
+  }, []);
 
   useEffect(() => {
     const initGSAP = async () => {
@@ -724,6 +765,7 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
         @keyframes sparkle { from { transform: scale(1) rotate(0deg); opacity:0.5; } to { transform: scale(1.3) rotate(20deg); opacity:1; } }
         @keyframes bounce { 0%,100% { transform: translateX(-50%) translateY(0); } 50% { transform: translateX(-50%) translateY(8px); } }
       `}</style>
+      </div>
     </div>
 
     {/* Content card */}
