@@ -659,8 +659,17 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
   return (
   <div dir="rtl" style={{ minHeight: '100vh', fontFamily: 'Varela Round, sans-serif', background: '#FDECE5', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
 
-    {/* Hero עם ScrollTrigger + תמונות אמיתיות */}
-    <div ref={heroRef} style={{ width: '100%', minHeight: '100vh', background: 'linear-gradient(160deg,#fad8cc 0%,#f2c0b0 50%,#e8a898 100%)', position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+    {/* Hero עם וידאו */}
+    <div ref={heroRef} style={{ width: '100%', minHeight: '100vh', background: 'radial-gradient(ellipse at 50% 40%, #fce8e0 0%, #f5c8b8 45%, #ebb0a0 100%)', position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
+
+      {/* ribbons */}
+      <div style={{ position: 'absolute', top: '-60px', right: '-80px', width: '300px', height: '200px', background: 'rgba(240,185,165,0.35)', borderRadius: '50%', transform: 'rotate(-25deg)', zIndex: 1, pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', bottom: '5%', left: '-50px', width: '250px', height: '160px', background: 'rgba(245,200,180,0.3)', borderRadius: '50%', transform: 'rotate(15deg)', zIndex: 1, pointerEvents: 'none' }} />
+
+      {/* וידאו */}
+      <video autoPlay muted loop playsInline style={{ position: 'relative', zIndex: 2, width: '100%', maxWidth: '420px', height: '65vh', objectFit: 'contain' }}>
+        <source src="/hero-video.mp4" type="video/mp4" />
+      </video>
 
       {/* ribbons ברקע */}
       <div style={{ position: 'absolute', top: '-40px', right: '-60px', width: '280px', height: '180px', background: 'rgba(240,195,175,0.5)', borderRadius: '50%', transform: 'rotate(-30deg)', pointerEvents: 'none' }} />
@@ -686,10 +695,7 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
       <img src="/logo-pink.png" alt="Lior Segev" style={{ height: '44px', objectFit: 'contain', marginBottom: '1.5rem', position: 'relative', zIndex: 2 }} />
 
       {/* בקבוק סגור */}
-      <img ref={bottleRef} src="/bottle-closed.png" alt="בקבוק לק" style={{ width: '220px', maxWidth: '60vw', objectFit: 'contain', position: 'relative', zIndex: 3, willChange: 'transform,opacity', filter: 'drop-shadow(0 30px 40px rgba(120,20,40,0.25))' }} />
 
-      {/* בקבוק פתוח — מוסתר בהתחלה */}
-      <img ref={bottleOpenRef} src="/bottle-open.png" alt="בקבוק פתוח" style={{ width: '220px', maxWidth: '60vw', objectFit: 'contain', position: 'absolute', zIndex: 4, opacity: 0, willChange: 'transform,opacity', filter: 'drop-shadow(0 30px 50px rgba(120,20,40,0.3))' }} />
 
       {/* כותרת */}
       <div ref={headlineRef} style={{ marginTop: '2rem', textAlign: 'center', opacity: 0, transform: 'translateY(30px)', willChange: 'transform,opacity', position: 'relative', zIndex: 5, padding: '0 1.5rem', direction: 'rtl' }}>
