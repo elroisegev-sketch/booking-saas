@@ -723,13 +723,13 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
         <canvas ref={canvasRef} width={480} height={863} style={{ width: '100%', maxWidth: '390px', height: 'auto', position: 'relative', zIndex: 2 }} />
 
         {/* כותרת */}
-        <div ref={headlineRef} style={{ marginTop: '1.5rem', textAlign: 'center', opacity: 0, transform: 'translateY(20px)', position: 'relative', zIndex: 2, padding: '0 1.5rem', direction: 'rtl' }}>
+        <div ref={headlineRef} style={{ marginTop: '1.5rem', textAlign: 'center', opacity: 1, position: 'relative', zIndex: 2, padding: '0 1.5rem', direction: 'rtl' }}>
           <p style={{ color: 'rgba(161,23,56,0.6)', fontSize: '0.68rem', letterSpacing: '0.28em', marginBottom: '0.4rem' }}>גלול לגלות את הקסם</p>
           <h1 style={{ color: '#5a1020', fontSize: '1.8rem', fontWeight: 900, lineHeight: 1.25 }}>היופי שלך מתחיל כאן ✨</h1>
         </div>
 
         {/* כפתור */}
-        <div ref={ctaRef} style={{ marginTop: '1.2rem', opacity: 0, transform: 'translateY(20px)', position: 'relative', zIndex: 2 }}>
+        <div ref={ctaRef} style={{ marginTop: '1.2rem', opacity: 1, position: 'relative', zIndex: 2 }}>
           <button onClick={onBook} style={{ padding: '0.9rem 2.5rem', borderRadius: '999px', background: 'rgba(161,23,56,0.1)', border: '1.5px solid rgba(161,23,56,0.35)', color: '#5a1020', fontWeight: 700, fontSize: '0.9rem', cursor: 'pointer', fontFamily: 'Varela Round, sans-serif' }}>
             💅 קביעת תור עכשיו
           </button>
@@ -749,11 +749,6 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
 
         {/* Content card */}
     <div style={{ width: '100%', maxWidth: '420px', padding: '1.5rem 1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-
-      {/* CTA */}
-      <button onClick={onBook} style={{ width: '100%', padding: '0.9rem', borderRadius: '999px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 900, fontSize: '1rem', border: 'none', cursor: 'pointer', boxShadow: '0 6px 20px rgba(161,23,56,0.3)', fontFamily: 'Varela Round, sans-serif' }}>
-        💅 קביעת תור עכשיו
-      </button>
 
       {/* Gallery */}
       <div>
