@@ -95,7 +95,7 @@ router.get('/public/:slug', async (req, res) => {
     const businessResult = await db.query('SELECT id FROM users WHERE slug=$1', [req.params.slug]);
     if (!businessResult.rows.length) return res.status(404).json({ error: 'Business not found' });
     const result = await db.query(
-      'SELECT * FROM services WHERE business_id=$1 AND is_active=true ORDER BY created_at',
+      'SELECT * FROM services WHERE business_id=$1 AND is_active=true ORDER BY category, name',
       [businessResult.rows[0].id]
     );
     res.json(result.rows);
