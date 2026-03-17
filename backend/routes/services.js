@@ -7,7 +7,7 @@ const router = express.Router();
 router.get('/', auth, async (req, res) => {
   try {
     const result = await db.query(
-      'SELECT * FROM services WHERE business_id=$1 ORDER BY created_at ASC',
+      'SELECT * FROM services WHERE business_id=$1 AND is_active=true ORDER BY created_at ASC',
       [req.user.id]
     );
     res.json(result.rows);
