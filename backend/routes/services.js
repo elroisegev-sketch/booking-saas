@@ -16,24 +16,7 @@ router.get('/', auth, async (req, res) => {
   }
 });
 
-// GET /api/services/public/:slug - public services for booking page
-router.get('/public/:slug', async (req, res) => {
-  try {
-    const userResult = await db.query(
-      'SELECT id, business_name, slug FROM users WHERE slug=$1',
-      [req.params.slug]
-    );
-    if (!userResult.rows.length) return res.status(404).json({ error: 'Business not found' });
-    const business = userResult.rows[0];
-    const services = await db.query(
-      'SELECT id, name, duration, price FROM services WHERE business_id=$1 AND is_active=true ORDER BY name',
-      [business.id]
-    );
-    res.json({ business, services: services.rows });
-  } catch (err) {
-    res.status(500).json({ error: 'Server error' });
-  }
-});
+
 
 // POST /api/services
 router.post('/', auth, async (req, res) => {
