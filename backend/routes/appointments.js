@@ -61,21 +61,26 @@ router.get('/slots/:slug/:serviceId/:date', async (req, res) => {
     if (!availResult.rows.length) return res.json({ slots: [] });
     const { start_time, end_time } = availResult.rows[0];
     const bookedResult = await db.query(`SELECT appointment_time, end_time FROM appointments WHERE business_id=$1 AND status != 'cancelled' AND DATE(appointment_time) = $2::date`, [businessId, date]);
-    // סלוטים קבועים — UTC (ישראל UTC+2)
-    const FIXED_SLOTS = [
-      { start: '08:00', end: '09:30', label: '10:00' },
-      { start: '09:30', end: '11:00', label: '11:30' },
-      { start: '11:00', end: '12:30', label: '13:00' },
-      { start: '12:30', end: '14:00', label: '14:30' },
-      { start: '14:00', end: '15:30', label: '16:00' },
-    ];
+    // לוגיקה דינמית — זמנים לפי משך הטיפול
+    const INTERVAL = 30; // כל 30 דקות מציעים סלוט
+    const BUFFER = 0;    // זמן רווח בין תורים (להרחבה עתידית)
+
+    const [sh, sm] = start_time.split(':').map(Number);
+    const [eh, em] = end_time.split(':').map(Number);
+    // המר לדקות UTC (ישראל UTC+2)
+    const startMinsUTC = (sh - 2) * 60 + sm;
+    const endMinsUTC   = (eh - 2) * 60 + em;
 
     const now = new Date();
     const slots = [];
 
-    for (const slot of FIXED_SLOTS) {
-      const slotStart = new Date(`${date}T${slot.start}:00Z`);
-      const slotEnd = new Date(`${date}T${slot.end}:00Z`);
+    for (let m = startMinsUTC; m + duration <= endMinsUTC; m += INTERVAL) {
+      const utcH = Math.floor(((m % 1440) + 1440) % 1440 / 60);
+      const utcM = ((m % 60) + 60) % 60;
+      const hh = String(utcH).padStart(2, '0');
+      const mm = String(utcM).padStart(2, '0');
+      const slotStart = new Date(`${date}T${hh}:${mm}:00Z`);
+      const slotEnd   = new Date(slotStart.getTime() + (duration + BUFFER) * 60000);
 
       if (slotStart <= now) continue;
 
@@ -85,7 +90,11 @@ router.get('/slots/:slug/:serviceId/:date', async (req, res) => {
         return slotStart < be && slotEnd > bs;
       });
 
-      if (!conflict) slots.push(slot.label);
+      if (!conflict) {
+        const localH = String(slotStart.getUTCHours() + 2).padStart(2, '0');
+        const localM = String(slotStart.getUTCMinutes()).padStart(2, '0');
+        slots.push(`${localH}:${localM}`);
+      }
     }
     res.json({ slots });
   } catch (err) {
