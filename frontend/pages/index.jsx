@@ -180,6 +180,8 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   const [booked, setBooked] = useState(false);
   const fileRef = useRef();
   const [realServices, setRealServices] = useState([]);
+  const [nailCountModal, setNailCountModal] = useState(false);
+  const [nailService, setNailService] = useState(null);
 
   useEffect(() => {
     fetch('https://booking-saas-production-b9fd.up.railway.app/api/services/public/lior-segev')
@@ -317,7 +319,14 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                   {displayServices.filter(s => s.category === cat).map(svc => {
                     const isSelected = selectedServices.find(s => s.id === svc.id);
                     return (
-                      <button key={svc.id} onClick={() => toggleService(svc)}
+                      <button key={svc.id} onClick={() => {
+                          if (svc.name === 'השלמת ציפורן') {
+                            setNailService(svc);
+                            setNailCountModal(true);
+                          } else {
+                            toggleService(svc);
+                          }
+                        }}
                         style={{ background: isSelected ? 'linear-gradient(135deg,#fdf2f8,#F7C1C3)' : 'white', border: `2px solid ${isSelected ? '#EC6A83' : '#f0f0f0'}`, borderRadius: '12px', padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', textAlign: 'right' }}>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                           <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: `2px solid ${isSelected ? '#EC6A83' : '#d1d5db'}`, background: isSelected ? '#EC6A83' : 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
@@ -335,6 +344,35 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                 </div>
               </div>
             ))}
+
+            {/* Nail count modal */}
+            {nailCountModal && nailService && (
+              <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.5)' }}>
+                <div dir="rtl" style={{ background: 'white', borderRadius: '20px', padding: '1.5rem', width: '100%', maxWidth: '340px', margin: '1rem', fontFamily: 'Varela Round, sans-serif' }}>
+                  <h2 style={{ fontWeight: 900, color: '#A11738', fontSize: '1.1rem', marginBottom: '0.5rem' }}>כמה ציפורניים להשלמה? 💅</h2>
+                  <p style={{ color: '#9ca3af', fontSize: '0.8rem', marginBottom: '1.25rem' }}>כל השלמה = ₪10</p>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '10px', marginBottom: '1rem' }}>
+                    {[1,2,3,4].map(n => (
+                      <button key={n} onClick={() => {
+                        const updated = { ...nailService, name: `השלמת ציפורן (${n})`, price: n * 10, duration: n * 15 };
+                        setSelectedServices(prev => [...prev.filter(s => !s.name.startsWith('השלמת ציפורן')), updated]);
+                        setNailCountModal(false);
+                      }} style={{ padding: '0.875rem', borderRadius: '12px', background: 'linear-gradient(135deg,#fdf2f8,#F7C1C3)', border: '2px solid #EC6A83', fontWeight: 900, color: '#A11738', fontSize: '1rem', cursor: 'pointer' }}>
+                        {n} ציפורן{n > 1 ? 'יים' : ''}
+                        <br/><span style={{ fontSize: '0.8rem', color: '#EC6A83' }}>₪{n * 10}</span>
+                      </button>
+                    ))}
+                  </div>
+                  <button onClick={() => {
+                    setNailCountModal(false);
+                    alert('💅 לידיעתך\nמעל 4 השלמות עדיף לקצר את כל הציפורניים או לעשות בנייה חדשה\n\nצרי קשר עם ליאור לתיאום 😊');
+                  }} style={{ width: '100%', padding: '0.875rem', borderRadius: '12px', background: '#f3f4f6', color: '#374151', fontWeight: 700, border: 'none', cursor: 'pointer', marginBottom: '8px' }}>
+                    יש לי יותר מ-4 השלמות
+                  </button>
+                  <button onClick={() => setNailCountModal(false)} style={{ width: '100%', padding: '0.75rem', borderRadius: '12px', background: 'none', color: '#9ca3af', fontWeight: 700, border: 'none', cursor: 'pointer' }}>ביטול</button>
+                </div>
+              </div>
+            )}
 
             {/* Summary bar */}
             {selectedServices.length > 0 && (
