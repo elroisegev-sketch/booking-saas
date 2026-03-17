@@ -216,10 +216,15 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   const getFD = (y, m) => new Date(y, m, 1).getDay();
 
   const isAvail = (date) => {
+    const today = new Date(); today.setHours(0, 0, 0, 0);
+    if (date < today) return false;
     const dow = date.getDay();
-    const avail = realAvailability.length > 0 ? realAvailability : MOCK_AVAILABILITY;
-    const a = avail.find(x => x.day_of_week === dow);
-    return a && a.is_active && date >= new Date(new Date().setHours(0, 0, 0, 0));
+    if (realAvailability.length > 0) {
+      // public endpoint מחזיר רק ימים פעילים — אם קיים, הוא פעיל
+      return !!realAvailability.find(x => x.day_of_week === dow);
+    }
+    const a = MOCK_AVAILABILITY.find(x => x.day_of_week === dow);
+    return !!(a && a.is_active);
   };
 
   const [availableSlots, setAvailableSlots] = useState([]);
