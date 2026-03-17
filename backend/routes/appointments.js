@@ -67,9 +67,14 @@ router.get('/slots/:slug/:serviceId/:date', async (req, res) => {
 
     const [sh, sm] = start_time.split(':').map(Number);
     const [eh, em] = end_time.split(':').map(Number);
-    // המר לדקות UTC (ישראל UTC+2)
-    const startMinsUTC = (sh - 2) * 60 + sm;
-    const endMinsUTC   = (eh - 2) * 60 + em;
+
+    // חישוב dynamic UTC offset לישראל (UTC+2 בחורף, UTC+3 בקיץ)
+    const refDate = new Date(`${date}T12:00:00Z`);
+    const israelLocal = new Date(refDate.toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' }));
+    const israelOffsetMins = Math.round((israelLocal - refDate) / 60000);
+
+    const startMinsUTC = sh * 60 + sm - israelOffsetMins;
+    const endMinsUTC   = eh * 60 + em - israelOffsetMins;
 
     const now = new Date();
     const slots = [];
@@ -91,7 +96,7 @@ router.get('/slots/:slug/:serviceId/:date', async (req, res) => {
       });
 
       if (!conflict) {
-        const localH = String(slotStart.getUTCHours() + 2).padStart(2, '0');
+        const localH = String(slotStart.getUTCHours() + Math.floor(israelOffsetMins / 60)).padStart(2, '0');
         const localM = String(slotStart.getUTCMinutes()).padStart(2, '0');
         slots.push(`${localH}:${localM}`);
       }
@@ -126,8 +131,8 @@ router.post('/', async (req, res) => {
       return res.status(409).json({ error: 'This time slot is no longer available.' });
     }
     const result = await db.query(`
-      INSERT INTO appointments (business_id, service_id, customer_name, customer_phone, customer_email, appointment_time, end_time)
-      VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING *
+      INSERT INTO appointments (business_id, service_id, customer_name, customer_phone, customer_email, appointment_time, end_time, status)
+      VALUES ($1,$2,$3,$4,$5,$6,$7,'pending') RETURNING *
     `, [businessId, service_id, customer_name.trim(), customer_phone.trim(), customer_email?.trim() || null, startTime.toISOString(), endTime.toISOString()]);
 
     // 🔔 שלח התראה לליאור

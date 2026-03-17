@@ -180,6 +180,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   const [booked, setBooked] = useState(false);
   const fileRef = useRef();
   const [realServices, setRealServices] = useState([]);
+  const [realAvailability, setRealAvailability] = useState([]);
   const [nailCountModal, setNailCountModal] = useState(false);
   const [nailService, setNailService] = useState(null);
 
@@ -187,6 +188,10 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
     fetch('https://booking-saas-production-b9fd.up.railway.app/api/services/public/lior-segev')
       .then(r => r.json())
       .then(data => { if (Array.isArray(data)) setRealServices(data); else if (data.services) setRealServices(data.services); })
+      .catch(() => {});
+    fetch('https://booking-saas-production-b9fd.up.railway.app/api/availability/public/lior-segev')
+      .then(r => r.json())
+      .then(data => { if (Array.isArray(data)) setRealAvailability(data); })
       .catch(() => {});
   }, []);
 
@@ -212,7 +217,8 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
 
   const isAvail = (date) => {
     const dow = date.getDay();
-    const a = MOCK_AVAILABILITY.find(x => x.day_of_week === dow);
+    const avail = realAvailability.length > 0 ? realAvailability : MOCK_AVAILABILITY;
+    const a = avail.find(x => x.day_of_week === dow);
     return a && a.is_active && date >= new Date(new Date().setHours(0, 0, 0, 0));
   };
 

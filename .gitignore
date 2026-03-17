@@ -1,2 +1,7 @@
 node_modules/
 frontend/.next/
+backend/.env
+frontend/.env.local
+backend/serviceAccountKey.json
+backend/serviceAccountKey.json
+*.env.local

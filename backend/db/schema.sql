@@ -46,7 +46,7 @@ CREATE TABLE appointments (
   customer_email VARCHAR(255),
   appointment_time TIMESTAMPTZ NOT NULL,
   end_time TIMESTAMPTZ NOT NULL,
-  status VARCHAR(50) DEFAULT 'confirmed' CHECK (status IN ('confirmed','cancelled','completed')),
+  status VARCHAR(50) DEFAULT 'pending' CHECK (status IN ('pending','confirmed','cancelled','completed')),
   notes TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   -- Prevent double booking via exclusion constraint

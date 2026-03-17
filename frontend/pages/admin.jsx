@@ -1,4 +1,11 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+
+const API = process.env.NEXT_PUBLIC_API_URL || 'https://booking-saas-production-b9fd.up.railway.app/api';
+
+function authHeaders() {
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') : '';
+  return { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
+}
 
 const MOCK_USER = { id: '1', email: 'lior@beauty.com', business_name: 'ליאור שגב – היופי שלך', slug: 'lior-segev' };
 
@@ -98,13 +105,26 @@ const AuthScreen = ({ onLogin }) => {
 
   const handle = async (e) => {
     e.preventDefault(); setError(''); setLoading(true);
-    await new Promise(r => setTimeout(r, 600));
-    if (mode === 'login') {
-      if (form.email === 'lior@beauty.com' && form.password === 'demo1234') onLogin(MOCK_USER);
-      else setError('פרטים שגויים. נסי: lior@beauty.com / demo1234');
-    } else {
-      if (!form.business_name || !form.email || !form.password) setError('יש למלא את כל השדות');
-      else onLogin({ ...MOCK_USER, email: form.email, business_name: form.business_name });
+    try {
+      const endpoint = mode === 'login' ? '/login' : '/register';
+      const body = mode === 'login'
+        ? { email: form.email, password: form.password }
+        : { email: form.email, password: form.password, business_name: form.business_name };
+      const res = await fetch(`${API}${endpoint}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (data.token) {
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify(data.user));
+        onLogin(data.user);
+      } else {
+        setError(data.error || 'פרטים שגויים');
+      }
+    } catch {
+      setError('שגיאת חיבור לשרת');
     }
     setLoading(false);
   };
@@ -546,9 +566,10 @@ const PortfolioPage = ({ onBook }) => (
 // ── DASHBOARD ─────────────────────────────────────────────────
 const Dashboard = ({ user, onLogout }) => {
   const [tab, setTab] = useState('overview');
-  const [appointments, setAppointments] = useState(MOCK_APPOINTMENTS);
-  const [services, setServices] = useState(MOCK_SERVICES);
+  const [appointments, setAppointments] = useState([]);
+  const [services, setServices] = useState([]);
   const [availability, setAvailability] = useState(MOCK_AVAILABILITY);
+  const [loadingData, setLoadingData] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editSvc, setEditSvc] = useState(null);
   const [calMonth, setCalMonth] = useState(new Date());
@@ -557,19 +578,57 @@ const Dashboard = ({ user, onLogout }) => {
   const [viewImage, setViewImage] = useState(null);
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
+
+  const fetchAppointments = useCallback(async () => {
+    try {
+      const res = await fetch(`${API}/appointments`, { headers: authHeaders() });
+      const data = await res.json();
+      if (Array.isArray(data)) setAppointments(data);
+    } catch {}
+  }, []);
+
+  const fetchServices = useCallback(async () => {
+    try {
+      const res = await fetch(`${API}/services`, { headers: authHeaders() });
+      const data = await res.json();
+      if (Array.isArray(data)) setServices(data);
+    } catch {}
+  }, []);
+
+  const fetchAvailability = useCallback(async () => {
+    try {
+      const res = await fetch(`${API}/availability`, { headers: authHeaders() });
+      const data = await res.json();
+      if (Array.isArray(data)) setAvailability(data);
+    } catch {}
+  }, []);
+
+  useEffect(() => {
+    Promise.all([fetchAppointments(), fetchServices(), fetchAvailability()])
+      .finally(() => setLoadingData(false));
+    const interval = setInterval(fetchAppointments, 30000);
+    return () => clearInterval(interval);
+  }, [fetchAppointments, fetchServices, fetchAvailability]);
+
   const todayAppts = appointments.filter(a => new Date(a.appointment_time).toDateString() === new Date().toDateString() && a.status !== 'cancelled');
   const pendingAppts = appointments.filter(a => a.status === 'pending');
-  const revenue = todayAppts.filter(a => a.status === 'confirmed' || a.status === 'completed').reduce((s, a) => s + (a.price || 0), 0);
+  const revenue = todayAppts.filter(a => a.status === 'confirmed' || a.status === 'completed').reduce((s, a) => s + parseFloat(a.price || 0), 0);
   const upcoming = appointments.filter(a => new Date(a.appointment_time) > new Date() && a.status !== 'cancelled').length;
   const DAY_NAMES = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
 
-  const approveAppt = (id) => {
-    setAppointments(appointments.map(a => a.id === id ? { ...a, status: 'confirmed' } : a));
-    showToast('התור אושר ✅');
+  const approveAppt = async (id) => {
+    try {
+      await fetch(`${API}/appointments/${id}/status`, { method: 'PATCH', headers: authHeaders(), body: JSON.stringify({ status: 'confirmed' }) });
+      await fetchAppointments();
+      showToast('התור אושר ✅');
+    } catch { showToast('שגיאה באישור התור'); }
   };
-  const cancelAppt = (id) => {
-    setAppointments(appointments.map(a => a.id === id ? { ...a, status: 'cancelled' } : a));
-    showToast('התור בוטל');
+  const cancelAppt = async (id) => {
+    try {
+      await fetch(`${API}/appointments/${id}/status`, { method: 'PATCH', headers: authHeaders(), body: JSON.stringify({ status: 'cancelled' }) });
+      await fetchAppointments();
+      showToast('התור בוטל');
+    } catch { showToast('שגיאה בביטול התור'); }
   };
 
   const navItems = [
@@ -826,7 +885,7 @@ const Dashboard = ({ user, onLogout }) => {
                             <button onClick={() => { setEditSvc(svc); setShowModal(true); }} style={{ padding: '5px', borderRadius: '8px', background: 'none', border: 'none', cursor: 'pointer' }}>
                               <Icon name="edit" className="w-4 h-4" />
                             </button>
-                            <button onClick={() => { setServices(services.map(s => s.id === svc.id ? { ...s, is_active: false } : s)); showToast('השירות הוסר'); }} style={{ padding: '5px', borderRadius: '8px', background: 'none', border: 'none', cursor: 'pointer' }}>
+                            <button onClick={async () => { try { await fetch(`${API}/services/${svc.id}`, { method: 'DELETE', headers: authHeaders() }); await fetchServices(); showToast('השירות הוסר'); } catch { showToast('שגיאה'); } }} style={{ padding: '5px', borderRadius: '8px', background: 'none', border: 'none', cursor: 'pointer' }}>
                               <Icon name="trash" className="w-4 h-4" />
                             </button>
                           </div>
@@ -840,7 +899,19 @@ const Dashboard = ({ user, onLogout }) => {
                   </div>
                 </div>
               ))}
-              {showModal && <ServiceModal service={editSvc} onSave={(data) => { if (editSvc) { setServices(services.map(s => s.id === editSvc.id ? { ...s, ...data } : s)); showToast('השירות עודכן ✅'); } else { setServices([...services, { id: `s${Date.now()}`, ...data, is_active: true }]); showToast('השירות נוסף ✅'); } setShowModal(false); }} onClose={() => setShowModal(false)} />}
+              {showModal && <ServiceModal service={editSvc} onSave={async (data) => {
+                try {
+                  if (editSvc) {
+                    await fetch(`${API}/services/${editSvc.id}`, { method: 'PUT', headers: authHeaders(), body: JSON.stringify(data) });
+                    showToast('השירות עודכן ✅');
+                  } else {
+                    await fetch(`${API}/services`, { method: 'POST', headers: authHeaders(), body: JSON.stringify(data) });
+                    showToast('השירות נוסף ✅');
+                  }
+                  await fetchServices();
+                } catch { showToast('שגיאה בשמירת השירות'); }
+                setShowModal(false);
+              }} onClose={() => setShowModal(false)} />}
             </div>
           )}
 
@@ -852,7 +923,7 @@ const Dashboard = ({ user, onLogout }) => {
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', padding: '0.75rem 1.5rem', borderBottom: '1px solid #f0f0f0' }}>
                   {['שם', 'טלפון', 'ביקור אחרון', 'תורים'].map(h => <span key={h} style={{ fontSize: '0.75rem', fontWeight: 900, color: '#9ca3af', letterSpacing: '0.05em' }}>{h}</span>)}
                 </div>
-                {[...new Map(appointments.map(a => [a.customer_phone, a])).values()].map((appt, i) => (
+                {[...new Map(appointments.filter(a => a.status !== 'cancelled').map(a => [a.customer_phone, a])).values()].map((appt, i) => (
                   <div key={i} style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', padding: '1rem 1.5rem', alignItems: 'center', borderBottom: '1px solid #fafafa' }}>
                     <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <div style={{ width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.875rem', fontWeight: 900, background: '#fce7f3', color: '#be185d', flexShrink: 0 }}>{appt.customer_name[0]}</div>
@@ -860,7 +931,7 @@ const Dashboard = ({ user, onLogout }) => {
                     </div>
                     <span style={{ color: '#6b7280', fontSize: '0.875rem' }}>{appt.customer_phone}</span>
                     <span style={{ color: '#6b7280', fontSize: '0.875rem' }}>{fmtDate(appt.appointment_time)}</span>
-                    <span style={{ fontWeight: 900, color: '#8b2252', fontSize: '0.875rem' }}>{appointments.filter(a => a.customer_phone === appt.customer_phone).length}</span>
+                    <span style={{ fontWeight: 900, color: '#8b2252', fontSize: '0.875rem' }}>{appointments.filter(a => a.customer_phone === appt.customer_phone && a.status !== 'cancelled').length}</span>
                   </div>
                 ))}
               </div>
@@ -894,8 +965,12 @@ const Dashboard = ({ user, onLogout }) => {
                   </div>
                 ))}
               </div>
-              <button onClick={() => showToast('שעות הפעילות נשמרו ✅')}
-                style={{ marginTop: '1rem', padding: '0.875rem 1.5rem', borderRadius: '12px', background: 'linear-gradient(135deg,#2d0a1e,#8b2252)', color: '#ffb6c1', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: 'pointer', fontFamily: 'Heebo, sans-serif' }}>
+              <button onClick={async () => {
+                try {
+                  await fetch(`${API}/availability/bulk`, { method: 'PUT', headers: authHeaders(), body: JSON.stringify({ days: availability }) });
+                  showToast('שעות הפעילות נשמרו ✅');
+                } catch { showToast('שגיאה בשמירה'); }
+              }} style={{ marginTop: '1rem', padding: '0.875rem 1.5rem', borderRadius: '12px', background: 'linear-gradient(135deg,#2d0a1e,#8b2252)', color: '#ffb6c1', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: 'pointer', fontFamily: 'Heebo, sans-serif' }}>
                 שמירת שינויים
               </button>
             </div>
@@ -957,14 +1032,31 @@ const Dashboard = ({ user, onLogout }) => {
 export default function App() {
   const [user, setUser] = useState(null);
   const [view, setView] = useState('portfolio');
+
+  useEffect(() => {
+    const savedUser = localStorage.getItem('user');
+    const token = localStorage.getItem('token');
+    if (savedUser && token) {
+      try { setUser(JSON.parse(savedUser)); setView('dashboard'); } catch {}
+    }
+  }, []);
+
   if (typeof window === 'undefined') return null;
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    setUser(null);
+    setView('portfolio');
+  };
+
   return (
     <>
       <style>{`@import url('https://fonts.googleapis.com/css2?family=Heebo:wght@400;500;600;700;800;900&display=swap'); * { box-sizing: border-box; margin: 0; padding: 0; } body { font-family: Heebo, sans-serif; }`}</style>
       {view === 'portfolio' && <PortfolioPage onBook={() => setView('booking')} />}
       {view === 'booking' && <BookingPage onBack={() => setView(user ? 'dashboard' : 'portfolio')} />}
       {view === 'auth' && <AuthScreen onLogin={(u) => { setUser(u); setView('dashboard'); }} />}
-      {view === 'dashboard' && user && <Dashboard user={user} onLogout={() => { setUser(null); setView('portfolio'); }} />}
+      {view === 'dashboard' && user && <Dashboard user={user} onLogout={handleLogout} />}
     </>
   );
 }
