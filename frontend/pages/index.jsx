@@ -806,8 +806,30 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
   const upcoming = appointments.filter(a => new Date(a.appointment_time) > new Date() && a.status !== 'cancelled').length;
   const DAY_NAMES = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
 
-  const approveAppt = (id) => { setAppointments(appointments.map(a => a.id === id ? { ...a, status: 'confirmed' } : a)); showToast('התור אושר ✅'); };
-  const cancelAppt = (id) => { setAppointments(appointments.map(a => a.id === id ? { ...a, status: 'cancelled' } : a)); showToast('התור בוטל'); };
+  const approveAppt = async (id) => {
+    const token = localStorage.getItem('token');
+    try {
+      await fetch(BACKEND + '/api/appointments/' + id + '/status', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ status: 'confirmed' })
+      });
+    } catch(e) { console.error('approve failed', e); }
+    setAppointments(appointments.map(a => a.id === id ? { ...a, status: 'confirmed' } : a));
+    showToast('התור אושר ✅');
+  };
+  const cancelAppt = async (id) => {
+    const token = localStorage.getItem('token');
+    try {
+      await fetch(BACKEND + '/api/appointments/' + id + '/status', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ status: 'cancelled' })
+      });
+    } catch(e) { console.error('cancel failed', e); }
+    setAppointments(appointments.map(a => a.id === id ? { ...a, status: 'cancelled' } : a));
+    showToast('התור בוטל');
+  };
 
   const addManualAppt = () => {
     if (!newAppt.customer_name || !newAppt.date || !newAppt.time) return;
