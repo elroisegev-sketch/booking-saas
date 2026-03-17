@@ -228,14 +228,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
       .then(r => r.json())
       .then(data => {
         if (data.slots) {
-          const SLOT_LABELS = {
-            '10:00': '10:00 – 11:30',
-            '11:30': '11:30 – 13:00',
-            '13:00': '13:00 – 14:30',
-            '14:30': '14:30 – 16:00',
-            '16:00': '16:00 – 17:30',
-          };
-          const times = data.slots.map(s => SLOT_LABELS[s] || s);
+          const times = data.slots;
           setAvailableSlots(times);
         }
         setLoadingSlots(false);
@@ -559,12 +552,14 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
 
             <a href={waLink} target="_blank" rel="noreferrer" onClick={async () => {
               // חישוב appointment_time ו-end_time לפי הסלוט הקבוע
-              const SLOT_ENDS = { '10:00': '11:30', '11:30': '13:00', '13:00': '14:30', '14:30': '16:00', '16:00': '17:30' };
-              const rawTime = sel.time.includes('–') ? sel.time.split('–')[0].trim() : sel.time.includes('-') ? sel.time.split('-')[0].trim() : sel.time.trim();
-              const slotEnd = SLOT_ENDS[rawTime];
+              const rawTime = sel.time.trim();
               const dateStr2 = `${sel.date.getFullYear()}-${String(sel.date.getMonth()+1).padStart(2,'0')}-${String(sel.date.getDate()).padStart(2,'0')}`;
-              const appointmentTime = new Date(`${dateStr2}T${rawTime}:00`).toISOString();
-              const endTime = new Date(`${dateStr2}T${slotEnd}:00`).toISOString();
+              // חשב end_time לפי duration בפועל (UTC+2 → UTC)
+              const [th, tm] = rawTime.split(':').map(Number);
+              const startUTC = new Date(`${dateStr2}T${String(th-2).padStart(2,'0')}:${String(tm).padStart(2,'0')}:00Z`);
+              const endUTC = new Date(startUTC.getTime() + totalDuration * 60000);
+              const appointmentTime = startUTC.toISOString();
+              const endTime = endUTC.toISOString();
               try {
                 await fetch('https://booking-saas-production-b9fd.up.railway.app/api/appointments', {
                   method: 'POST',
