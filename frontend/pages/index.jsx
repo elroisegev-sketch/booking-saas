@@ -6,7 +6,7 @@ const MOCK_SERVICES = [
   { id: 's1', name: 'מבנה אנטומי', duration: 60, price: 140, is_active: true, category: "לק ג'ל 💅" },
   { id: 's2', name: 'בניה חדשה', duration: 75, price: 250, is_active: true, category: "לק ג'ל 💅" },
   { id: 's3', name: 'הסרה + מניקור + צורה', duration: 45, price: 70, is_active: true, category: "לק ג'ל 💅" },
-  { id: 's4', name: 'השלמת ציפורן, duration: 15, price: 10, is_active: true, category: "לק ג'ל 💅" },
+  { id: 's4', name: 'השלמת ציפורן', duration: 15, price: 10, is_active: true, category: "לק ג'ל 💅" },
   { id: 's5', name: "פרנץ'", duration: 15, price: 20, is_active: true, category: "לק ג'ל 💅" },
   { id: 's6', name: 'עיצוב גבות', duration: 20, price: 70, is_active: true, category: 'פנים 💆' },
   { id: 's7', name: 'צביעת גבות', duration: 15, price: 20, is_active: true, category: 'פנים 💆' },
@@ -320,7 +320,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                     const isSelected = selectedServices.find(s => s.id === svc.id);
                     return (
                       <button key={svc.id} onClick={() => {
-                          if (svc.name === 'השלמת ציפורן) {
+                          if (svc.name === 'השלמת ציפורן') {
                             setNailService(svc);
                             setNailCountModal(true);
                           } else {
@@ -355,7 +355,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                     {[1,2,3,4].map(n => (
                       <button key={n} onClick={() => {
                         const updated = { ...nailService, name: `השלמת ציפורן (${n})`, price: n * 10, duration: n * 15 };
-                        setSelectedServices(prev => [...prev.filter(s => !s.name.startsWith('השלמת ציפורן)), updated]);
+                        setSelectedServices(prev => [...prev.filter(s => !s.name.startsWith('השלמת ציפורן')), updated]);
                         setNailCountModal(false);
                       }} style={{ padding: '0.875rem', borderRadius: '12px', background: 'linear-gradient(135deg,#fdf2f8,#F7C1C3)', border: '2px solid #EC6A83', fontWeight: 900, color: '#A11738', fontSize: '1rem', cursor: 'pointer' }}>
                         {n === 1 ? 'ציפורן אחת' : `${n} ציפורניים`}
