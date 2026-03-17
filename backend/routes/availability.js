@@ -43,6 +43,26 @@ router.get('/public/:slug', async (req, res) => {
   }
 });
 
+// PUT /api/availability/bulk - update all days at once
+router.put('/bulk', auth, async (req, res) => {
+  const { days } = req.body;
+  if (!Array.isArray(days)) return res.status(400).json({ error: 'days array required' });
+  try {
+    const results = await Promise.all(days.map(d =>
+      db.query(`
+        INSERT INTO availability (business_id, day_of_week, start_time, end_time, is_active)
+        VALUES ($1,$2,$3,$4,$5)
+        ON CONFLICT (business_id, day_of_week)
+        DO UPDATE SET start_time=$3, end_time=$4, is_active=$5
+        RETURNING *
+      `, [req.user.id, d.day_of_week, d.start_time, d.end_time, d.is_active])
+    ));
+    res.json(results.map(r => r.rows[0]));
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 // PUT /api/availability/:dayOfWeek
 router.put('/:dayOfWeek', auth, async (req, res) => {
   const dayOfWeek = parseInt(req.params.dayOfWeek);
@@ -59,26 +79,6 @@ router.put('/:dayOfWeek', auth, async (req, res) => {
       RETURNING *
     `, [req.user.id, dayOfWeek, start_time || '09:00', end_time || '17:00', is_active !== undefined ? is_active : true]);
     res.json(result.rows[0]);
-  } catch (err) {
-    res.status(500).json({ error: 'Server error' });
-  }
-});
-
-// PUT /api/availability/bulk - update all days at once
-router.put('/bulk', auth, async (req, res) => {
-  const { days } = req.body; // array of { day_of_week, start_time, end_time, is_active }
-  if (!Array.isArray(days)) return res.status(400).json({ error: 'days array required' });
-  try {
-    const results = await Promise.all(days.map(d =>
-      db.query(`
-        INSERT INTO availability (business_id, day_of_week, start_time, end_time, is_active)
-        VALUES ($1,$2,$3,$4,$5)
-        ON CONFLICT (business_id, day_of_week)
-        DO UPDATE SET start_time=$3, end_time=$4, is_active=$5
-        RETURNING *
-      `, [req.user.id, d.day_of_week, d.start_time, d.end_time, d.is_active])
-    ));
-    res.json(results.map(r => r.rows[0]));
   } catch (err) {
     res.status(500).json({ error: 'Server error' });
   }

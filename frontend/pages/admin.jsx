@@ -7,6 +7,15 @@ function authHeaders() {
   return { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` };
 }
 
+async function apiFetch(url, options = {}) {
+  const res = await fetch(url, { ...options, headers: { ...authHeaders(), ...options.headers } });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.error || `שגיאה ${res.status}`);
+  }
+  return res.json();
+}
+
 const MOCK_USER = { id: '1', email: 'lior@beauty.com', business_name: 'ליאור שגב – היופי שלך', slug: 'lior-segev' };
 
 const MOCK_SERVICES = [
@@ -581,24 +590,21 @@ const Dashboard = ({ user, onLogout }) => {
 
   const fetchAppointments = useCallback(async () => {
     try {
-      const res = await fetch(`${API}/appointments`, { headers: authHeaders() });
-      const data = await res.json();
+      const data = await apiFetch(`${API}/appointments`);
       if (Array.isArray(data)) setAppointments(data);
     } catch {}
   }, []);
 
   const fetchServices = useCallback(async () => {
     try {
-      const res = await fetch(`${API}/services`, { headers: authHeaders() });
-      const data = await res.json();
+      const data = await apiFetch(`${API}/services`);
       if (Array.isArray(data)) setServices(data);
     } catch {}
   }, []);
 
   const fetchAvailability = useCallback(async () => {
     try {
-      const res = await fetch(`${API}/availability`, { headers: authHeaders() });
-      const data = await res.json();
+      const data = await apiFetch(`${API}/availability`);
       if (Array.isArray(data)) setAvailability(data);
     } catch {}
   }, []);
@@ -618,17 +624,17 @@ const Dashboard = ({ user, onLogout }) => {
 
   const approveAppt = async (id) => {
     try {
-      await fetch(`${API}/appointments/${id}/status`, { method: 'PATCH', headers: authHeaders(), body: JSON.stringify({ status: 'confirmed' }) });
+      await apiFetch(`${API}/appointments/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status: 'confirmed' }) });
       await fetchAppointments();
       showToast('התור אושר ✅');
-    } catch { showToast('שגיאה באישור התור'); }
+    } catch (e) { showToast(`שגיאה: ${e.message}`); }
   };
   const cancelAppt = async (id) => {
     try {
-      await fetch(`${API}/appointments/${id}/status`, { method: 'PATCH', headers: authHeaders(), body: JSON.stringify({ status: 'cancelled' }) });
+      await apiFetch(`${API}/appointments/${id}/status`, { method: 'PATCH', body: JSON.stringify({ status: 'cancelled' }) });
       await fetchAppointments();
       showToast('התור בוטל');
-    } catch { showToast('שגיאה בביטול התור'); }
+    } catch (e) { showToast(`שגיאה: ${e.message}`); }
   };
 
   const navItems = [
@@ -885,7 +891,7 @@ const Dashboard = ({ user, onLogout }) => {
                             <button onClick={() => { setEditSvc(svc); setShowModal(true); }} style={{ padding: '5px', borderRadius: '8px', background: 'none', border: 'none', cursor: 'pointer' }}>
                               <Icon name="edit" className="w-4 h-4" />
                             </button>
-                            <button onClick={async () => { try { await fetch(`${API}/services/${svc.id}`, { method: 'DELETE', headers: authHeaders() }); await fetchServices(); showToast('השירות הוסר'); } catch { showToast('שגיאה'); } }} style={{ padding: '5px', borderRadius: '8px', background: 'none', border: 'none', cursor: 'pointer' }}>
+                            <button onClick={async () => { try { await apiFetch(`${API}/services/${svc.id}`, { method: 'DELETE' }); await fetchServices(); showToast('השירות הוסר'); } catch (e) { showToast(`שגיאה: ${e.message}`); } }} style={{ padding: '5px', borderRadius: '8px', background: 'none', border: 'none', cursor: 'pointer' }}>
                               <Icon name="trash" className="w-4 h-4" />
                             </button>
                           </div>
@@ -902,14 +908,14 @@ const Dashboard = ({ user, onLogout }) => {
               {showModal && <ServiceModal service={editSvc} onSave={async (data) => {
                 try {
                   if (editSvc) {
-                    await fetch(`${API}/services/${editSvc.id}`, { method: 'PUT', headers: authHeaders(), body: JSON.stringify(data) });
+                    await apiFetch(`${API}/services/${editSvc.id}`, { method: 'PUT', body: JSON.stringify(data) });
                     showToast('השירות עודכן ✅');
                   } else {
-                    await fetch(`${API}/services`, { method: 'POST', headers: authHeaders(), body: JSON.stringify(data) });
+                    await apiFetch(`${API}/services`, { method: 'POST', body: JSON.stringify(data) });
                     showToast('השירות נוסף ✅');
                   }
                   await fetchServices();
-                } catch { showToast('שגיאה בשמירת השירות'); }
+                } catch (e) { showToast(`שגיאה: ${e.message}`); }
                 setShowModal(false);
               }} onClose={() => setShowModal(false)} />}
             </div>
@@ -967,9 +973,9 @@ const Dashboard = ({ user, onLogout }) => {
               </div>
               <button onClick={async () => {
                 try {
-                  await fetch(`${API}/availability/bulk`, { method: 'PUT', headers: authHeaders(), body: JSON.stringify({ days: availability }) });
+                  await apiFetch(`${API}/availability/bulk`, { method: 'PUT', body: JSON.stringify({ days: availability }) });
                   showToast('שעות הפעילות נשמרו ✅');
-                } catch { showToast('שגיאה בשמירה'); }
+                } catch (e) { showToast(`שגיאה: ${e.message}`); }
               }} style={{ marginTop: '1rem', padding: '0.875rem 1.5rem', borderRadius: '12px', background: 'linear-gradient(135deg,#2d0a1e,#8b2252)', color: '#ffb6c1', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: 'pointer', fontFamily: 'Heebo, sans-serif' }}>
                 שמירת שינויים
               </button>
