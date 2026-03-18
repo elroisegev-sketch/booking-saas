@@ -196,7 +196,8 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
       .catch(() => {});
   }, []);
 
-  const displayServices = realServices.length > 0 ? realServices : MOCK_SERVICES;
+  const displayServices = (realServices.length > 0 ? realServices : MOCK_SERVICES)
+    .map(s => ({ ...s, category: s.category || "לק ג'ל 💅" }));
 
   const hasGel = selectedServices.some(s => s.category && s.category.includes("לק ג'ל"));
   const totalPrice = selectedServices.reduce((s, svc) => s + parseFloat(svc.price || 0), 0);
