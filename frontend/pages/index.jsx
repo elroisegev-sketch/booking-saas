@@ -531,6 +531,13 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                 <span style={{ fontWeight: 700, fontSize: '1.05rem', color: '#A11738' }}>מקדמה: {fmtPrice(deposit)}</span>
               </div>
             </div>
+            <a
+              href={`https://bitpay.onelink.me/P1OE?af_dp=bit://pay?phoneNumber=0535249688%26amount=${deposit}`}
+              target="_blank" rel="noreferrer"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', width: '100%', padding: '1rem', borderRadius: '999px', background: 'linear-gradient(135deg, #5B3FD4, #7B5FFF)', color: 'white', fontWeight: 700, fontSize: '0.95rem', textDecoration: 'none', marginBottom: '12px', boxSizing: 'border-box', boxShadow: '0 6px 24px rgba(91,63,212,0.38)' }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="rgba(255,255,255,0.25)"/><text x="12" y="16.5" textAnchor="middle" fontSize="13" fontWeight="800" fill="white" fontFamily="Arial">B</text></svg>
+              פתח ביט לתשלום — ₪{deposit}
+            </a>
             <div style={{ background: 'rgba(254,243,199,0.6)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(252,211,77,0.3)', borderRadius: '16px', padding: '0.875rem 1rem', marginBottom: '1.5rem', fontSize: '0.8rem', color: '#92400e', lineHeight: 1.5 }}>
               <strong>⚠️</strong> לאחר העברת המקדמה לחצי על הכפתור למטה. התור יאושר לאחר אימות התשלום.
             </div>
