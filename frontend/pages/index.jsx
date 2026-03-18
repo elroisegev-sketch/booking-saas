@@ -262,27 +262,25 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   const waLink = WHATSAPP_LINK(sel.name, serviceNames, dateStr, sel.time, totalPrice);
 
   if (booked) return (
-    <div dir="rtl" style={{ ...S, minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FDECE5' }}>
-      <div style={{ textAlign: 'center', maxWidth: '420px', padding: '2rem', width: '100%' }}>
-        <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>⏳</div>
-        <h2 style={{ fontSize: '2rem', fontWeight: 900, color: '#A11738', marginBottom: '0.5rem' }}>הבקשה נשלחה!</h2>
-        <p style={{ color: '#6b7280', marginBottom: '1rem', fontSize: '0.875rem' }}>
-          התור <strong>ממתין לאישור תשלום</strong> מאת ליאור 🌸<br />
-          לאחר אימות המקדמה תקבלי אישור בוואטסאפ
+    <div dir="rtl" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FDECE5', fontFamily: "'DM Sans','Varela Round',sans-serif" }}>
+      <div style={{ textAlign: 'center', maxWidth: '380px', padding: '2rem', width: '100%', animation: 'scaleIn 0.5s cubic-bezier(0.22,1,0.36,1)' }}>
+        <div style={{ width: '72px', height: '72px', borderRadius: '50%', background: 'linear-gradient(135deg,#A11738,#EC6A83)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', boxShadow: '0 8px 32px rgba(161,23,56,0.25)' }}>
+          <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="white"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7"/></svg>
+        </div>
+        <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '2.2rem', fontWeight: 300, color: '#3d0c16', fontStyle: 'italic', marginBottom: '0.5rem' }}>הבקשה נשלחה</h2>
+        <p style={{ color: '#6b7280', marginBottom: '1.75rem', fontSize: '0.875rem', lineHeight: 1.6 }}>
+          התור <strong style={{ color: '#A11738' }}>ממתין לאישור</strong> מאת ליאור 🌸<br />לאחר אימות המקדמה תקבלי אישור בוואטסאפ
         </p>
-        <div style={{ background: 'white', border: '1px solid #f0f0f0', borderRadius: '16px', padding: '1.25rem', textAlign: 'right', marginBottom: '1rem' }}>
-          <p style={{ fontWeight: 700, fontSize: '1rem', color: '#A11738', marginBottom: '4px' }}>{serviceNames}</p>
-          <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>{dateStr} | {sel.time}</p>
-          <p style={{ fontWeight: 900, fontSize: '1.5rem', color: '#EC6A83', marginTop: '0.5rem' }}>{fmtPrice(totalPrice)}</p>
+        <div style={{ background: 'white', border: '1px solid rgba(247,193,195,0.35)', borderRadius: '20px', padding: '1.25rem', textAlign: 'right', marginBottom: '1.25rem', boxShadow: '0 2px 16px rgba(161,23,56,0.05)' }}>
+          <p style={{ fontWeight: 600, fontSize: '0.95rem', color: '#A11738', marginBottom: '4px' }}>{serviceNames}</p>
+          <p style={{ color: '#6b7280', fontSize: '0.8rem' }}>{dateStr} · {sel.time}</p>
+          <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1.75rem', fontWeight: 300, color: '#EC6A83', marginTop: '0.5rem', fontStyle: 'italic' }}>{fmtPrice(totalPrice)}</p>
         </div>
         <a href={`https://wa.me/972${LIOR_PHONE.slice(1)}?text=${encodeURIComponent('היי ליאור 🌸 שלחתי מקדמה — הנה האסמכתא:')}`} target="_blank" rel="noreferrer"
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', padding: '0.875rem', borderRadius: '12px', background: '#25D366', color: 'white', fontWeight: 700, fontSize: '0.9rem', textDecoration: 'none', marginBottom: '12px', boxSizing: 'border-box' }}>
-          <Icon name="whatsapp" className="w-5 h-5" />
-          שלחי צילום אסמכתא לליאור
+          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', padding: '1rem', borderRadius: '999px', background: '#25D366', color: 'white', fontWeight: 600, fontSize: '0.875rem', textDecoration: 'none', marginBottom: '12px', boxSizing: 'border-box', boxShadow: '0 4px 16px rgba(37,211,102,0.3)' }}>
+          <Icon name="whatsapp" className="w-5 h-5" /> שלחי צילום אסמכתא לליאור
         </a>
-        <button onClick={onBack} style={{ width: '100%', padding: '0.875rem', borderRadius: '12px', background: '#f3f4f6', color: '#374151', fontWeight: 700, border: 'none', cursor: 'pointer' }}>
-          חזרה לדף הבית
-        </button>
+        <button onClick={onBack} style={{ width: '100%', padding: '0.875rem', borderRadius: '999px', background: 'rgba(247,193,195,0.2)', color: '#A11738', fontWeight: 500, border: '1px solid rgba(247,193,195,0.4)', cursor: 'pointer' }}>חזרה לדף הבית</button>
       </div>
     </div>
   );
@@ -290,59 +288,51 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   if (step === 0) setStep(1);
 
   return (
-    <div dir="rtl" style={{ ...S, minHeight: '100vh', background: '#FDECE5' }}>
-      <div style={{ background: 'white', borderBottom: '1px solid #f0f0f0', padding: '1rem 1.5rem', display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
-        <button onClick={onBack} style={{ padding: '0.5rem', borderRadius: '10px', background: 'none', border: 'none', cursor: 'pointer' }}>
+    <div dir="rtl" style={{ minHeight: '100vh', background: '#FDECE5', fontFamily: "'DM Sans','Varela Round',sans-serif" }}>
+
+      {/* Header */}
+      <div style={{ background: 'rgba(253,236,229,0.96)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(247,193,195,0.3)', padding: '0.875rem 1.25rem', display: 'flex', alignItems: 'center', gap: '0.75rem', position: 'sticky', top: 0, zIndex: 10 }}>
+        <button onClick={onBack} style={{ padding: '0.5rem', borderRadius: '10px', background: 'none', border: 'none', cursor: 'pointer', color: '#A11738', display: 'flex' }}>
           <Icon name="chevronR" className="w-5 h-5" />
         </button>
-        <img src="/symbol.png" alt="LS" style={{ width: '32px', height: '32px', objectFit: 'contain' }} />
-        <div>
-          <p style={{ fontWeight: 900, color: '#A11738', margin: 0 }}>ליאור שגב – היופי שלך</p>
-          <p style={{ color: '#9ca3af', fontSize: '0.75rem', margin: 0 }}>קביעת תור</p>
+        <img src="/symbol.png" alt="LS" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
+        <div style={{ flex: 1 }}>
+          <p style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 400, color: '#A11738', margin: 0, fontSize: '1rem', fontStyle: 'italic' }}>ליאור שגב</p>
+          <p style={{ color: '#9ca3af', fontSize: '0.65rem', margin: 0, letterSpacing: '0.06em' }}>קביעת תור</p>
         </div>
-        <div style={{ marginRight: 'auto', display: 'flex', alignItems: 'center', gap: '4px' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
           {[1,2,3,4].map(s => (
-            <div key={s} style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
-              <div style={{ width: '28px', height: '28px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.75rem', fontWeight: 700, background: step >= s ? 'linear-gradient(135deg,#A11738,#EC6A83)' : '#f3f4f6', color: step >= s ? 'white' : '#9ca3af' }}>{s}</div>
-              {s < 4 && <div style={{ width: '12px', height: '2px', background: step > s ? '#EC6A83' : '#e5e7eb' }} />}
-            </div>
+            <div key={s} style={{ width: (typeof step === 'number' && step >= s) ? '20px' : '6px', height: '6px', borderRadius: '999px', background: (typeof step === 'number' && step >= s) ? 'linear-gradient(135deg,#A11738,#EC6A83)' : 'rgba(247,193,195,0.45)', transition: 'width 0.35s cubic-bezier(0.34,1.56,0.64,1)' }} />
           ))}
         </div>
       </div>
 
       <div style={{ maxWidth: '520px', margin: '0 auto', padding: '2rem 1.5rem' }}>
 
-        {/* Step 1 - Services (multi-select) */}
+        {/* Step 1 - Services */}
         {step === 1 && (
           <div>
-            <h2 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#A11738', marginBottom: '0.25rem' }}>בחרי שירותים</h2>
-            <p style={{ color: '#9ca3af', fontSize: '0.875rem', marginBottom: '1.5rem' }}>ניתן לבחור מספר שירותים</p>
+            <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '2rem', fontWeight: 300, color: '#3d0c16', fontStyle: 'italic', marginBottom: '0.2rem' }}>בחרי שירותים</h2>
+            <p style={{ color: '#9ca3af', fontSize: '0.8rem', marginBottom: '1.75rem' }}>ניתן לבחור מספר שירותים</p>
             {cats.map(cat => (
-              <div key={cat} style={{ marginBottom: '1.25rem' }}>
-                <p style={{ fontWeight: 700, color: '#EC6A83', fontSize: '0.875rem', marginBottom: '0.5rem' }}>{cat}</p>
+              <div key={cat} style={{ marginBottom: '1.5rem' }}>
+                <p style={{ display: 'inline-flex', fontWeight: 500, color: '#A11738', fontSize: '0.78rem', letterSpacing: '0.08em', marginBottom: '0.75rem', background: 'rgba(247,193,195,0.22)', padding: '3px 12px', borderRadius: '999px' }}>{cat}</p>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {displayServices.filter(s => s.category === cat).map(svc => {
                     const isSelected = selectedServices.find(s => s.id === svc.id);
                     return (
-                      <button key={svc.id} onClick={() => {
-                          if (svc.name === 'השלמת ציפורן') {
-                            setNailService(svc);
-                            setNailCountModal(true);
-                          } else {
-                            toggleService(svc);
-                          }
-                        }}
-                        style={{ background: isSelected ? 'linear-gradient(135deg,#fdf2f8,#F7C1C3)' : 'white', border: `2px solid ${isSelected ? '#EC6A83' : '#f0f0f0'}`, borderRadius: '12px', padding: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', textAlign: 'right' }}>
-                        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                          <div style={{ width: '20px', height: '20px', borderRadius: '50%', border: `2px solid ${isSelected ? '#EC6A83' : '#d1d5db'}`, background: isSelected ? '#EC6A83' : 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                            {isSelected && <svg width="10" height="8" fill="none" viewBox="0 0 10 8"><path d="M1 4l3 3 5-6" stroke="white" strokeWidth="2" strokeLinecap="round"/></svg>}
+                      <button key={svc.id} className="svc-card" onClick={() => { if (svc.name === 'השלמת ציפורן') { setNailService(svc); setNailCountModal(true); } else { toggleService(svc); } }}
+                        style={{ background: isSelected ? 'linear-gradient(135deg,#fff5f7,#fce7f3)' : 'white', border: `1.5px solid ${isSelected ? '#EC6A83' : 'rgba(247,193,195,0.32)'}`, borderRadius: '16px', padding: '1rem 1.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', cursor: 'pointer', textAlign: 'right', boxShadow: isSelected ? '0 4px 16px rgba(236,106,131,0.14)' : '0 1px 4px rgba(0,0,0,0.03)', width: '100%' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+                          <div style={{ width: '22px', height: '22px', borderRadius: '50%', border: `2px solid ${isSelected ? 'transparent' : 'rgba(247,193,195,0.55)'}`, background: isSelected ? 'linear-gradient(135deg,#A11738,#EC6A83)' : 'white', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: isSelected ? '0 2px 8px rgba(161,23,56,0.22)' : 'none' }}>
+                            {isSelected && <svg width="10" height="8" fill="none" viewBox="0 0 10 8"><path d="M1 4l3 3 5-6" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                           </div>
                           <div>
-                            <p style={{ fontWeight: 700, color: '#A11738', margin: 0, fontSize: '0.9rem' }}>{svc.name}</p>
-                            <p style={{ color: '#9ca3af', fontSize: '0.75rem', margin: '2px 0 0' }}>{svc.duration} דקות</p>
+                            <p style={{ fontWeight: 600, color: '#2d0a1e', margin: 0, fontSize: '0.875rem' }}>{svc.name}</p>
+                            <p style={{ color: '#9ca3af', fontSize: '0.7rem', margin: '2px 0 0' }}>{svc.duration} דקות</p>
                           </div>
                         </div>
-                        <span style={{ fontWeight: 900, fontSize: '1.1rem', color: '#EC6A83' }}>{fmtPrice(svc.price)}</span>
+                        <span style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 400, fontSize: '1.2rem', color: '#A11738', fontStyle: 'italic', flexShrink: 0 }}>{fmtPrice(svc.price)}</span>
                       </button>
                     );
                   })}
@@ -350,55 +340,35 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
               </div>
             ))}
 
-            {/* Nail count modal */}
             {nailCountModal && nailService && (
-              <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.5)' }}>
-                <div dir="rtl" style={{ background: 'white', borderRadius: '20px', padding: '1.5rem', width: '100%', maxWidth: '340px', margin: '1rem', fontFamily: 'Varela Round, sans-serif' }}>
-                  <h2 style={{ fontWeight: 900, color: '#A11738', fontSize: '1.1rem', marginBottom: '0.5rem' }}>כמה ציפורניים להשלמה? 💅</h2>
-                  <p style={{ color: '#9ca3af', fontSize: '0.8rem', marginBottom: '1.25rem' }}>כל השלמה = ₪10</p>
+              <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(45,10,30,0.5)', backdropFilter: 'blur(4px)' }}>
+                <div dir="rtl" style={{ background: 'white', borderRadius: '24px', padding: '1.75rem', width: '100%', maxWidth: '340px', margin: '1rem', animation: 'scaleIn 0.3s cubic-bezier(0.22,1,0.36,1)' }}>
+                  <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 300, color: '#3d0c16', fontSize: '1.5rem', fontStyle: 'italic', marginBottom: '0.4rem' }}>כמה ציפורניים? 💅</h2>
+                  <p style={{ color: '#9ca3af', fontSize: '0.78rem', marginBottom: '1.25rem' }}>כל השלמה = ₪10</p>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '10px', marginBottom: '1rem' }}>
                     {[1,2,3,4].map(n => (
-                      <button key={n} onClick={() => {
-                        const updated = { ...nailService, name: `השלמת ציפורן (${n})`, price: n * 10, duration: n * 15 };
-                        setSelectedServices(prev => [...prev.filter(s => !s.name.startsWith('השלמת ציפורן')), updated]);
-                        setNailCountModal(false);
-                      }} style={{ padding: '0.875rem', borderRadius: '12px', background: 'linear-gradient(135deg,#fdf2f8,#F7C1C3)', border: '2px solid #EC6A83', fontWeight: 900, color: '#A11738', fontSize: '1rem', cursor: 'pointer' }}>
-                        {n === 1 ? 'ציפורן אחת' : `${n} ציפורניים`}
-                        <br/><span style={{ fontSize: '0.8rem', color: '#EC6A83' }}>₪{n * 10}</span>
+                      <button key={n} className="lux-btn" onClick={() => { const updated = { ...nailService, name: `השלמת ציפורן (${n})`, price: n * 10, duration: n * 15 }; setSelectedServices(prev => [...prev.filter(s => !s.name.startsWith('השלמת ציפורן')), updated]); setNailCountModal(false); }}
+                        style={{ padding: '0.875rem', borderRadius: '14px', background: 'linear-gradient(135deg,#fff5f7,#fce7f3)', border: '1.5px solid rgba(247,193,195,0.5)', fontWeight: 700, color: '#A11738', fontSize: '0.9rem', cursor: 'pointer' }}>
+                        {n === 1 ? 'ציפורן אחת' : `${n} ציפורניים`}<br/>
+                        <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1rem', color: '#EC6A83', fontStyle: 'italic' }}>₪{n * 10}</span>
                       </button>
                     ))}
                   </div>
-                  <button onClick={() => {
-                    setNailCountModal(false);
-                    alert('💅 לידיעתך\nמעל 4 השלמות עדיף לקצר את כל הציפורניים או לעשות בנייה חדשה\n\nצרי קשר עם ליאור לתיאום 😊');
-                  }} style={{ width: '100%', padding: '0.875rem', borderRadius: '12px', background: '#f3f4f6', color: '#374151', fontWeight: 700, border: 'none', cursor: 'pointer', marginBottom: '8px' }}>
-                    יש לי יותר מ-4 השלמות
-                  </button>
-                  <button onClick={() => setNailCountModal(false)} style={{ width: '100%', padding: '0.75rem', borderRadius: '12px', background: 'none', color: '#9ca3af', fontWeight: 700, border: 'none', cursor: 'pointer' }}>ביטול</button>
+                  <button onClick={() => { setNailCountModal(false); alert('💅 לידיעתך\nמעל 4 השלמות עדיף לקצר את כל הציפורניים או לעשות בנייה חדשה\n\nצרי קשר עם ליאור לתיאום 😊'); }} style={{ width: '100%', padding: '0.75rem', borderRadius: '999px', background: '#f3f4f6', color: '#374151', fontWeight: 600, border: 'none', cursor: 'pointer', marginBottom: '8px', fontSize: '0.875rem' }}>יש לי יותר מ-4 השלמות</button>
+                  <button onClick={() => setNailCountModal(false)} style={{ width: '100%', padding: '0.5rem', borderRadius: '999px', background: 'none', color: '#9ca3af', fontWeight: 600, border: 'none', cursor: 'pointer', fontSize: '0.8rem' }}>ביטול</button>
                 </div>
               </div>
             )}
 
-            {/* Summary bar */}
             {selectedServices.length > 0 && (
-              <div style={{ position: 'sticky', bottom: '1rem', background: 'white', border: '2px solid #EC6A83', borderRadius: '16px', padding: '1rem', marginTop: '1rem', boxShadow: '0 4px 20px rgba(139,34,82,0.15)' }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '8px' }}>
-                  <span style={{ fontWeight: 700, color: '#A11738', fontSize: '0.875rem' }}>{selectedServices.length} שירות{selectedServices.length > 1 ? 'ים' : ''} נבחר{selectedServices.length > 1 ? 'ו' : ''}</span>
-                  <span style={{ fontWeight: 900, color: '#EC6A83', fontSize: '1.1rem' }}>סה"כ: {fmtPrice(totalPrice)}</span>
+              <div style={{ position: 'sticky', bottom: '1rem', background: 'white', border: '1.5px solid rgba(236,106,131,0.35)', borderRadius: '20px', padding: '1rem 1.25rem', marginTop: '1rem', boxShadow: '0 8px 32px rgba(161,23,56,0.14)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
+                  <span style={{ fontWeight: 600, color: '#A11738', fontSize: '0.8rem' }}>{selectedServices.length} שירות{selectedServices.length > 1 ? 'ים' : ''} נבחר{selectedServices.length > 1 ? 'ו' : ''}</span>
+                  <span style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 400, fontSize: '1.3rem', color: '#EC6A83', fontStyle: 'italic' }}>סה"כ: {fmtPrice(totalPrice)}</span>
                 </div>
-                <div style={{ fontSize: '0.75rem', color: '#6b7280', marginBottom: '10px' }}>
-                  {selectedServices.map(s => s.name).join(' + ')} · {totalDuration} דקות
-                </div>
-                <button onClick={() => {
-                  const hasKishut = selectedServices.some(s => s.name === 'קישוט');
-                  if (hasKishut) {
-                    setStep('kishut_info');
-                  } else if (hasGel) {
-                    setStep('terms_gel');
-                  } else {
-                    setStep(2);
-                  }
-                }} style={{ width: '100%', padding: '0.75rem', borderRadius: '12px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, border: 'none', cursor: 'pointer' }}>
+                <div style={{ fontSize: '0.7rem', color: '#9ca3af', marginBottom: '10px' }}>{selectedServices.map(s => s.name).join(' + ')} · {totalDuration} דקות</div>
+                <button className="lux-btn" onClick={() => { const hasKishut = selectedServices.some(s => s.name === 'קישוט'); if (hasKishut) { setStep('kishut_info'); } else if (hasGel) { setStep('terms_gel'); } else { setStep(2); } }}
+                  style={{ width: '100%', padding: '0.875rem', borderRadius: '999px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 600, border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(161,23,56,0.28)', letterSpacing: '0.04em', fontSize: '0.875rem' }}>
                   המשך לבחירת תאריך →
                 </button>
               </div>
@@ -406,30 +376,27 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
           </div>
         )}
 
-        {/* Kishut info interstitial */}
+        {/* Kishut info */}
         {step === 'kishut_info' && (
-          <div style={{ textAlign: 'center' }}>
+          <div style={{ textAlign: 'center', animation: 'fadeUp 0.5s cubic-bezier(0.22,1,0.36,1)' }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>✨</div>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 900, color: '#A11738', marginBottom: '0.75rem' }}>בחרת קישוט!</h2>
-            <div style={{ background: 'white', border: '1px solid #f0f0f0', borderRadius: '16px', padding: '1.25rem', marginBottom: '1.25rem', textAlign: 'right', fontSize: '0.9rem', color: '#374151', lineHeight: 1.7 }}>
+            <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '2rem', fontWeight: 300, color: '#3d0c16', fontStyle: 'italic', marginBottom: '0.75rem' }}>בחרת קישוט</h2>
+            <div style={{ background: 'white', border: '1px solid rgba(247,193,195,0.3)', borderRadius: '20px', padding: '1.25rem', marginBottom: '1.25rem', textAlign: 'right', fontSize: '0.875rem', color: '#374151', lineHeight: 1.7, boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
               כדי לדייק את הזמן והמחיר עבורך, מומלץ לשלוח תמונת השראה לליאור בוואטסאפ לפני האישור הסופי.<br /><br />
               ניתן להמשיך לקביעת התור גם ללא תמונה — ליאור תיצור איתך קשר לאישור הפרטים הסופיים.
             </div>
-            <a href={`https://wa.me/972${LIOR_PHONE.slice(1)}?text=${encodeURIComponent('היי ליאור 🌸 אשמח לשלוח תמונת השראה לקישוט 💅')}`}
-              target="_blank" rel="noreferrer"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', padding: '0.875rem', borderRadius: '12px', background: '#25D366', color: 'white', fontWeight: 700, fontSize: '0.9rem', textDecoration: 'none', marginBottom: '12px', boxSizing: 'border-box' }}>
-              <Icon name="whatsapp" className="w-5 h-5" />
-              שלחי תמונה לליאור בוואטסאפ
+            <a href={`https://wa.me/972${LIOR_PHONE.slice(1)}?text=${encodeURIComponent('היי ליאור 🌸 אשמח לשלוח תמונת השראה לקישוט 💅')}`} target="_blank" rel="noreferrer"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', padding: '0.875rem', borderRadius: '999px', background: '#25D366', color: 'white', fontWeight: 600, fontSize: '0.875rem', textDecoration: 'none', marginBottom: '12px', boxSizing: 'border-box', boxShadow: '0 4px 16px rgba(37,211,102,0.28)' }}>
+              <Icon name="whatsapp" className="w-5 h-5" /> שלחי תמונה לליאור בוואטסאפ
             </a>
-            <button onClick={() => { hasGel ? setStep('terms_gel') : setStep(2); }}
-              style={{ width: '100%', padding: '0.875rem', borderRadius: '12px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, border: 'none', cursor: 'pointer', marginBottom: '12px' }}>
+            <button className="lux-btn" onClick={() => { hasGel ? setStep('terms_gel') : setStep(2); }}
+              style={{ width: '100%', padding: '0.875rem', borderRadius: '999px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 600, border: 'none', cursor: 'pointer', marginBottom: '10px', boxShadow: '0 4px 16px rgba(161,23,56,0.28)' }}>
               המשך לקביעת תור →
             </button>
-            <button onClick={() => setStep(1)} style={{ width: '100%', padding: '0.75rem', borderRadius: '12px', background: '#f3f4f6', color: '#374151', fontWeight: 700, border: 'none', cursor: 'pointer' }}>חזרה</button>
+            <button onClick={() => setStep(1)} style={{ width: '100%', padding: '0.75rem', borderRadius: '999px', background: 'rgba(247,193,195,0.18)', color: '#A11738', fontWeight: 500, border: 'none', cursor: 'pointer' }}>חזרה</button>
           </div>
         )}
 
-        {/* Gel terms interstitial */}
         {step === 'terms_gel' && (
           <TermsScreen termsText={TERMS_GEL} onAccept={() => setStep(2)} onBack={() => setStep(1)} />
         )}
@@ -437,17 +404,17 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
         {/* Step 2 - Date */}
         {step === 2 && (
           <div>
-            <h2 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#A11738', marginBottom: '0.25rem' }}>בחרי תאריך</h2>
-            <p style={{ color: '#9ca3af', fontSize: '0.875rem', marginBottom: '1.5rem' }}>{selectedServices.map(s => s.name).join(' + ')}</p>
-            <div style={{ background: 'white', border: '1px solid #f0f0f0', borderRadius: '16px', overflow: 'hidden', marginBottom: '1rem' }}>
-              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem 1.5rem', borderBottom: '1px solid #f0f0f0' }}>
-                <button onClick={() => setCalMonth(new Date(calMonth.getFullYear(), calMonth.getMonth() - 1))} style={{ padding: '0.4rem', background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="chevronR" className="w-4 h-4" /></button>
-                <span style={{ fontWeight: 700, color: '#A11738' }}>{calMonth.toLocaleDateString('he-IL', { month: 'long', year: 'numeric' })}</span>
-                <button onClick={() => setCalMonth(new Date(calMonth.getFullYear(), calMonth.getMonth() + 1))} style={{ padding: '0.4rem', background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="chevronL" className="w-4 h-4" /></button>
+            <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '2rem', fontWeight: 300, color: '#3d0c16', fontStyle: 'italic', marginBottom: '0.2rem' }}>בחרי תאריך</h2>
+            <p style={{ color: '#9ca3af', fontSize: '0.8rem', marginBottom: '1.75rem' }}>{selectedServices.map(s => s.name).join(' + ')}</p>
+            <div style={{ background: 'white', border: '1px solid rgba(247,193,195,0.22)', borderRadius: '20px', overflow: 'hidden', marginBottom: '1.25rem', boxShadow: '0 2px 16px rgba(161,23,56,0.06)' }}>
+              <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem 1.5rem', borderBottom: '1px solid rgba(247,193,195,0.18)' }}>
+                <button onClick={() => setCalMonth(new Date(calMonth.getFullYear(), calMonth.getMonth() - 1))} style={{ padding: '0.4rem', background: 'none', border: 'none', cursor: 'pointer', color: '#A11738' }}><Icon name="chevronR" className="w-4 h-4" /></button>
+                <span style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 400, color: '#A11738', fontSize: '1.1rem', fontStyle: 'italic' }}>{calMonth.toLocaleDateString('he-IL', { month: 'long', year: 'numeric' })}</span>
+                <button onClick={() => setCalMonth(new Date(calMonth.getFullYear(), calMonth.getMonth() + 1))} style={{ padding: '0.4rem', background: 'none', border: 'none', cursor: 'pointer', color: '#A11738' }}><Icon name="chevronL" className="w-4 h-4" /></button>
               </div>
               <div style={{ padding: '1rem' }}>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', marginBottom: '8px' }}>
-                  {['א','ב','ג','ד','ה','ו','ש'].map(d => <div key={d} style={{ textAlign: 'center', fontSize: '0.75rem', fontWeight: 700, color: '#9ca3af', padding: '4px' }}>{d}</div>)}
+                  {['א','ב','ג','ד','ה','ו','ש'].map(d => <div key={d} style={{ textAlign: 'center', fontSize: '0.7rem', fontWeight: 600, color: '#d1b5bb', padding: '4px' }}>{d}</div>)}
                 </div>
                 <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: '4px' }}>
                   {Array.from({ length: getFD(calMonth.getFullYear(), calMonth.getMonth()) }).map((_, i) => <div key={`e${i}`} />)}
@@ -457,7 +424,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                     const isSel = sel.date && d.toDateString() === sel.date.toDateString();
                     return (
                       <button key={i} onClick={() => av && setSel({ ...sel, date: d })} disabled={!av}
-                        style={{ aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px', fontSize: '0.875rem', fontWeight: 700, border: 'none', cursor: av ? 'pointer' : 'not-allowed', background: isSel ? 'linear-gradient(135deg,#A11738,#EC6A83)' : av ? '#FDECE5' : 'transparent', color: isSel ? 'white' : av ? '#A11738' : '#d1d5db' }}>
+                        style={{ aspectRatio: '1', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '10px', fontSize: '0.85rem', fontWeight: 600, border: 'none', cursor: av ? 'pointer' : 'not-allowed', background: isSel ? 'linear-gradient(135deg,#A11738,#EC6A83)' : av ? '#FDECE5' : 'transparent', color: isSel ? 'white' : av ? '#A11738' : '#e5c0c8', transition: 'transform 0.15s' }}>
                         {i + 1}
                       </button>
                     );
@@ -465,9 +432,9 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                 </div>
               </div>
             </div>
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <button onClick={() => setStep(1)} style={{ flex: 1, padding: '0.875rem', borderRadius: '12px', background: '#f3f4f6', color: '#374151', fontWeight: 700, border: 'none', cursor: 'pointer' }}>חזרה</button>
-              <button onClick={() => sel.date && setStep(3)} disabled={!sel.date} style={{ flex: 1, padding: '0.875rem', borderRadius: '12px', background: sel.date ? 'linear-gradient(135deg,#A11738,#EC6A83)' : '#d1d5db', color: 'white', fontWeight: 700, border: 'none', cursor: sel.date ? 'pointer' : 'not-allowed' }}>המשך</button>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button onClick={() => setStep(1)} style={{ flex: 1, padding: '0.875rem', borderRadius: '999px', background: 'rgba(247,193,195,0.18)', color: '#A11738', fontWeight: 500, border: '1px solid rgba(247,193,195,0.3)', cursor: 'pointer', fontSize: '0.875rem' }}>חזרה</button>
+              <button className="lux-btn" onClick={() => sel.date && setStep(3)} disabled={!sel.date} style={{ flex: 2, padding: '0.875rem', borderRadius: '999px', background: sel.date ? 'linear-gradient(135deg,#A11738,#EC6A83)' : 'rgba(209,213,219,0.5)', color: sel.date ? 'white' : '#9ca3af', fontWeight: 600, border: 'none', cursor: sel.date ? 'pointer' : 'not-allowed', boxShadow: sel.date ? '0 4px 16px rgba(161,23,56,0.25)' : 'none' }}>המשך</button>
             </div>
           </div>
         )}
@@ -475,17 +442,25 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
         {/* Step 3 - Time */}
         {step === 3 && (
           <div>
-            <h2 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#A11738', marginBottom: '0.25rem' }}>בחרי שעה</h2>
-            <p style={{ color: '#9ca3af', fontSize: '0.875rem', marginBottom: '1.5rem' }}>{sel.date?.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
-            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '10px', marginBottom: '1.5rem' }}>
-              {slots().map(s => (
-                <button key={s} onClick={() => setSel({ ...sel, time: s })} style={btn(sel.time === s)}>{s}</button>
-              ))}
-              {slots().length === 0 && <p style={{ gridColumn: '1/-1', textAlign: 'center', color: '#9ca3af', padding: '2rem' }}>אין שעות פנויות</p>}
-            </div>
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <button onClick={() => setStep(2)} style={{ flex: 1, padding: '0.875rem', borderRadius: '12px', background: '#f3f4f6', color: '#374151', fontWeight: 700, border: 'none', cursor: 'pointer' }}>חזרה</button>
-              <button onClick={() => sel.time && setStep(4)} disabled={!sel.time} style={{ flex: 1, padding: '0.875rem', borderRadius: '12px', background: sel.time ? 'linear-gradient(135deg,#A11738,#EC6A83)' : '#d1d5db', color: 'white', fontWeight: 700, border: 'none', cursor: sel.time ? 'pointer' : 'not-allowed' }}>המשך</button>
+            <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '2rem', fontWeight: 300, color: '#3d0c16', fontStyle: 'italic', marginBottom: '0.2rem' }}>בחרי שעה</h2>
+            <p style={{ color: '#9ca3af', fontSize: '0.8rem', marginBottom: '1.75rem' }}>{sel.date?.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+            {loadingSlots ? (
+              <div style={{ textAlign: 'center', padding: '3rem' }}>
+                <div style={{ width: '32px', height: '32px', borderRadius: '50%', border: '2.5px solid rgba(236,106,131,0.2)', borderTopColor: '#EC6A83', margin: '0 auto 0.75rem', animation: 'spin 0.8s linear infinite' }} />
+                <p style={{ fontSize: '0.8rem', color: '#9ca3af' }}>טוענת שעות פנויות...</p>
+              </div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '10px', marginBottom: '1.5rem' }}>
+                {slots().map(s => (
+                  <button key={s} className="slot-btn" onClick={() => setSel({ ...sel, time: s })}
+                    style={{ padding: '0.875rem 0.5rem', borderRadius: '999px', fontWeight: 600, fontSize: '0.875rem', border: `1.5px solid ${sel.time === s ? 'transparent' : 'rgba(247,193,195,0.38)'}`, background: sel.time === s ? 'linear-gradient(135deg,#A11738,#EC6A83)' : 'white', color: sel.time === s ? 'white' : '#A11738', cursor: 'pointer', boxShadow: sel.time === s ? '0 4px 16px rgba(161,23,56,0.25)' : '0 1px 4px rgba(0,0,0,0.04)' }}>{s}</button>
+                ))}
+                {slots().length === 0 && <p style={{ gridColumn: '1/-1', textAlign: 'center', color: '#9ca3af', padding: '2rem', fontSize: '0.875rem' }}>אין שעות פנויות ביום זה</p>}
+              </div>
+            )}
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button onClick={() => setStep(2)} style={{ flex: 1, padding: '0.875rem', borderRadius: '999px', background: 'rgba(247,193,195,0.18)', color: '#A11738', fontWeight: 500, border: '1px solid rgba(247,193,195,0.3)', cursor: 'pointer', fontSize: '0.875rem' }}>חזרה</button>
+              <button className="lux-btn" onClick={() => sel.time && setStep(4)} disabled={!sel.time} style={{ flex: 2, padding: '0.875rem', borderRadius: '999px', background: sel.time ? 'linear-gradient(135deg,#A11738,#EC6A83)' : 'rgba(209,213,219,0.5)', color: sel.time ? 'white' : '#9ca3af', fontWeight: 600, border: 'none', cursor: sel.time ? 'pointer' : 'not-allowed', boxShadow: sel.time ? '0 4px 16px rgba(161,23,56,0.25)' : 'none' }}>המשך</button>
             </div>
           </div>
         )}
@@ -493,40 +468,38 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
         {/* Step 4 - Details */}
         {step === 4 && (
           <div>
-            <h2 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#A11738', marginBottom: '0.25rem' }}>פרטים אישיים</h2>
-            <p style={{ color: '#9ca3af', fontSize: '0.875rem', marginBottom: '1.5rem' }}>עוד צעד קטן 🌸</p>
-            <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>שם מלא *</label>
-              <input style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '12px', border: '1.5px solid #e5e7eb', outline: 'none', fontSize: '0.875rem', direction: 'rtl', boxSizing: 'border-box' }}
-                placeholder="שם מלא" value={sel.name} onChange={e => setSel({ ...sel, name: e.target.value })} />
+            <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '2rem', fontWeight: 300, color: '#3d0c16', fontStyle: 'italic', marginBottom: '0.2rem' }}>פרטים אישיים</h2>
+            <p style={{ color: '#9ca3af', fontSize: '0.8rem', marginBottom: '1.75rem' }}>עוד צעד קטן 🌸</p>
+            <div style={{ background: 'white', borderRadius: '20px', padding: '1.5rem', marginBottom: '1.25rem', boxShadow: '0 2px 16px rgba(161,23,56,0.05)', border: '1px solid rgba(247,193,195,0.18)' }}>
+              <div style={{ marginBottom: '1.5rem' }}>
+                <label style={{ display: 'block', fontWeight: 500, fontSize: '0.72rem', color: '#9ca3af', marginBottom: '8px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>שם מלא</label>
+                <input style={{ width: '100%', padding: '0.5rem 0', border: 'none', borderBottom: `1.5px solid ${sel.name ? '#EC6A83' : 'rgba(247,193,195,0.55)'}`, outline: 'none', fontSize: '0.95rem', direction: 'rtl', boxSizing: 'border-box', background: 'transparent', color: '#2d0a1e', transition: 'border-color 0.2s' }}
+                  placeholder="שם מלא" value={sel.name} onChange={e => setSel({ ...sel, name: e.target.value })} />
+              </div>
+              <div>
+                <label style={{ display: 'block', fontWeight: 500, fontSize: '0.72rem', color: '#9ca3af', marginBottom: '8px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>מספר טלפון</label>
+                <input style={{ width: '100%', padding: '0.5rem 0', border: 'none', borderBottom: `1.5px solid ${sel.phone ? '#EC6A83' : 'rgba(247,193,195,0.55)'}`, outline: 'none', fontSize: '0.95rem', direction: 'ltr', boxSizing: 'border-box', textAlign: 'right', background: 'transparent', color: '#2d0a1e', transition: 'border-color 0.2s' }}
+                  placeholder="050-0000000" value={sel.phone} onChange={e => setSel({ ...sel, phone: e.target.value })} />
+              </div>
             </div>
-            <div style={{ marginBottom: '1.25rem' }}>
-              <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>מספר טלפון *</label>
-              <input style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '12px', border: '1.5px solid #e5e7eb', outline: 'none', fontSize: '0.875rem', direction: 'ltr', boxSizing: 'border-box', textAlign: 'right' }}
-                placeholder="050-0000000" value={sel.phone} onChange={e => setSel({ ...sel, phone: e.target.value })} />
-            </div>
-
-
-            <div style={{ background: 'white', border: '1px solid #f0f0f0', borderRadius: '16px', padding: '1.25rem', marginBottom: '1.25rem' }}>
-              <p style={{ fontWeight: 700, color: '#EC6A83', fontSize: '0.875rem', marginBottom: '0.75rem' }}>סיכום הזמנה</p>
+            <div style={{ background: 'white', border: '1px solid rgba(247,193,195,0.18)', borderRadius: '20px', padding: '1.25rem', marginBottom: '1.25rem', boxShadow: '0 2px 12px rgba(161,23,56,0.04)' }}>
+              <p style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 400, color: '#A11738', fontSize: '1rem', fontStyle: 'italic', marginBottom: '0.875rem' }}>סיכום הזמנה</p>
               {selectedServices.map(svc => (
                 <div key={svc.id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                  <span style={{ color: '#374151', fontSize: '0.875rem' }}>{svc.name}</span>
-                  <span style={{ color: '#EC6A83', fontWeight: 700, fontSize: '0.875rem' }}>{fmtPrice(svc.price)}</span>
+                  <span style={{ color: '#374151', fontSize: '0.85rem' }}>{svc.name}</span>
+                  <span style={{ color: '#EC6A83', fontWeight: 600, fontSize: '0.85rem' }}>{fmtPrice(svc.price)}</span>
                 </div>
               ))}
-              <div style={{ borderTop: '1px solid #f0f0f0', marginTop: '8px', paddingTop: '8px', display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontWeight: 900, color: '#A11738' }}>סה"כ</span>
-                <span style={{ fontWeight: 900, fontSize: '1.25rem', color: '#EC6A83' }}>{fmtPrice(totalPrice)}</span>
+              <div style={{ borderTop: '1px solid rgba(247,193,195,0.22)', marginTop: '10px', paddingTop: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontWeight: 600, color: '#A11738', fontSize: '0.85rem' }}>סה"כ</span>
+                <span style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 300, fontSize: '1.5rem', color: '#EC6A83', fontStyle: 'italic' }}>{fmtPrice(totalPrice)}</span>
               </div>
-              <p style={{ color: '#6b7280', fontSize: '0.75rem', marginTop: '8px' }}>{dateStr} | {sel.time} · {totalDuration} דקות</p>
+              <p style={{ color: '#9ca3af', fontSize: '0.7rem', marginTop: '6px' }}>{dateStr} · {sel.time} · {totalDuration} דקות</p>
             </div>
-
-            <div style={{ display: 'flex', gap: '12px' }}>
-              <button onClick={() => setStep(3)} style={{ flex: 1, padding: '0.875rem', borderRadius: '12px', background: '#f3f4f6', color: '#374151', fontWeight: 700, border: 'none', cursor: 'pointer' }}>חזרה</button>
-              <button onClick={() => (sel.name && sel.phone) && setStep(5)}
-                disabled={!sel.name || !sel.phone}
-                style={{ flex: 1, padding: '0.875rem', borderRadius: '12px', background: (sel.name && sel.phone) ? 'linear-gradient(135deg,#A11738,#EC6A83)' : '#d1d5db', color: 'white', fontWeight: 700, border: 'none', cursor: (sel.name && sel.phone) ? 'pointer' : 'not-allowed' }}>
+            <div style={{ display: 'flex', gap: '10px' }}>
+              <button onClick={() => setStep(3)} style={{ flex: 1, padding: '0.875rem', borderRadius: '999px', background: 'rgba(247,193,195,0.18)', color: '#A11738', fontWeight: 500, border: '1px solid rgba(247,193,195,0.3)', cursor: 'pointer', fontSize: '0.875rem' }}>חזרה</button>
+              <button className="lux-btn" onClick={() => (sel.name && sel.phone) && setStep(5)} disabled={!sel.name || !sel.phone}
+                style={{ flex: 2, padding: '0.875rem', borderRadius: '999px', background: (sel.name && sel.phone) ? 'linear-gradient(135deg,#A11738,#EC6A83)' : 'rgba(209,213,219,0.5)', color: (sel.name && sel.phone) ? 'white' : '#9ca3af', fontWeight: 600, border: 'none', cursor: (sel.name && sel.phone) ? 'pointer' : 'not-allowed', boxShadow: (sel.name && sel.phone) ? '0 4px 16px rgba(161,23,56,0.25)' : 'none', fontSize: '0.875rem' }}>
                 המשך לתשלום 💳
               </button>
             </div>
@@ -536,33 +509,31 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
         {/* Step 5 - Payment */}
         {step === 5 && (
           <div>
-            <h2 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#A11738', marginBottom: '0.25rem' }}>תשלום מקדמה</h2>
-            <p style={{ color: '#9ca3af', fontSize: '0.875rem', marginBottom: '1.5rem' }}>יש להעביר מקדמה לאישור התור 🌸</p>
-
-            <div style={{ background: 'white', border: '1px solid #f0f0f0', borderRadius: '16px', padding: '1.25rem', marginBottom: '1rem' }}>
+            <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '2rem', fontWeight: 300, color: '#3d0c16', fontStyle: 'italic', marginBottom: '0.2rem' }}>תשלום מקדמה</h2>
+            <p style={{ color: '#9ca3af', fontSize: '0.8rem', marginBottom: '1.75rem' }}>להשלמת הרישום יש להעביר מקדמה 🌸</p>
+            <div style={{ background: 'white', border: '1px solid rgba(247,193,195,0.18)', borderRadius: '20px', padding: '1.25rem', marginBottom: '1rem', boxShadow: '0 2px 12px rgba(161,23,56,0.04)' }}>
               {selectedServices.map(svc => (
                 <div key={svc.id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
-                  <span style={{ color: '#374151', fontSize: '0.875rem' }}>{svc.name}</span>
-                  <span style={{ color: '#EC6A83', fontWeight: 700, fontSize: '0.875rem' }}>{fmtPrice(svc.price)}</span>
+                  <span style={{ color: '#374151', fontSize: '0.85rem' }}>{svc.name}</span>
+                  <span style={{ color: '#EC6A83', fontWeight: 600, fontSize: '0.85rem' }}>{fmtPrice(svc.price)}</span>
                 </div>
               ))}
-              <div style={{ borderTop: '1px solid #f0f0f0', marginTop: '8px', paddingTop: '8px', display: 'flex', justifyContent: 'space-between' }}>
-                <span style={{ fontWeight: 900, color: '#A11738' }}>סה"כ</span>
-                <span style={{ fontWeight: 900, fontSize: '1.25rem', color: '#EC6A83' }}>{fmtPrice(totalPrice)}</span>
+              <div style={{ borderTop: '1px solid rgba(247,193,195,0.22)', marginTop: '10px', paddingTop: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontWeight: 600, color: '#A11738', fontSize: '0.85rem' }}>סה"כ</span>
+                <span style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 300, fontSize: '1.5rem', color: '#EC6A83', fontStyle: 'italic' }}>{fmtPrice(totalPrice)}</span>
               </div>
-              <p style={{ color: '#6b7280', fontSize: '0.75rem', marginTop: '6px' }}>{dateStr} | {sel.time}</p>
+              <p style={{ color: '#9ca3af', fontSize: '0.7rem', marginTop: '6px' }}>{dateStr} · {sel.time}</p>
             </div>
-
-            <div style={{ background: '#F7C1C3', borderRadius: '12px', padding: '1.25rem', marginBottom: '1.25rem', textAlign: 'center', color: '#A11738' }}>
-              <p style={{ fontWeight: 700, fontSize: '0.875rem', margin: '0 0 6px 0' }}>💳 יש להעביר מקדמה דרך ביט / פייבוקס למספר:</p>
-              <p style={{ fontWeight: 900, fontSize: '1.5rem', letterSpacing: '0.05em', margin: '0 0 8px 0' }}>053-524-9688</p>
-              <p style={{ fontWeight: 900, fontSize: '1.25rem', margin: 0 }}>סכום המקדמה: {fmtPrice(deposit)}</p>
+            <div style={{ background: 'linear-gradient(135deg,#fce7f3,#F7C1C3)', borderRadius: '20px', padding: '1.5rem', marginBottom: '1.25rem', textAlign: 'center' }}>
+              <p style={{ fontWeight: 500, fontSize: '0.78rem', color: '#A11738', margin: '0 0 8px', letterSpacing: '0.04em' }}>💳 יש להעביר מקדמה דרך ביט / פייבוקס</p>
+              <p style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 300, fontSize: '2rem', letterSpacing: '0.05em', color: '#3d0c16', fontStyle: 'italic', margin: '0 0 8px' }}>053-524-9688</p>
+              <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.65)', borderRadius: '12px', padding: '5px 16px' }}>
+                <span style={{ fontWeight: 700, fontSize: '1.05rem', color: '#A11738' }}>מקדמה: {fmtPrice(deposit)}</span>
+              </div>
             </div>
-
-            <div style={{ background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: '12px', padding: '1rem', marginBottom: '1.5rem', fontSize: '0.875rem', color: '#92400e' }}>
-              <strong>⚠️ שימי לב:</strong> לאחר העברת המקדמה לחצי על הכפתור למטה. התור יאושר על ידי ליאור לאחר אימות התשלום.
+            <div style={{ background: 'rgba(254,243,199,0.7)', border: '1px solid rgba(252,211,77,0.35)', borderRadius: '14px', padding: '0.875rem 1rem', marginBottom: '1.5rem', fontSize: '0.8rem', color: '#92400e', lineHeight: 1.5 }}>
+              <strong>⚠️</strong> לאחר העברת המקדמה לחצי על הכפתור למטה. התור יאושר לאחר אימות התשלום.
             </div>
-
             <a href={waLink} target="_blank" rel="noreferrer" onClick={async (e) => {
               const rawTime = sel.time.trim();
               const dateStr2 = `${sel.date.getFullYear()}-${String(sel.date.getMonth()+1).padStart(2,'0')}-${String(sel.date.getDate()).padStart(2,'0')}`;
@@ -590,16 +561,14 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                 });
               } catch(e) { console.error('booking failed', e); }
               setBooked(true);
-            }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', padding: '0.875rem', borderRadius: '12px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 900, fontSize: '1rem', textDecoration: 'none', marginBottom: '12px', boxSizing: 'border-box' }}>
+            }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', padding: '1rem', borderRadius: '999px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, fontSize: '0.95rem', textDecoration: 'none', marginBottom: '12px', boxSizing: 'border-box', boxShadow: '0 6px 24px rgba(161,23,56,0.32)' }}>
               <Icon name="whatsapp" className="w-5 h-5" />
               שילמתי — שלחי פרטי תור לליאור
             </a>
-
-            <button onClick={() => setStep(4)} style={{ width: '100%', padding: '0.875rem', borderRadius: '12px', background: '#f3f4f6', color: '#374151', fontWeight: 700, border: 'none', cursor: 'pointer' }}>חזרה</button>
+            <button onClick={() => setStep(4)} style={{ width: '100%', padding: '0.875rem', borderRadius: '999px', background: 'rgba(247,193,195,0.18)', color: '#A11738', fontWeight: 500, border: '1px solid rgba(247,193,195,0.3)', cursor: 'pointer' }}>חזרה</button>
           </div>
         )}
       </div>
-
     </div>
   );
 };
@@ -652,13 +621,6 @@ const ServiceModal = ({ service, onSave, onClose }) => {
 
 // ── PORTFOLIO PAGE ────────────────────────────────────────────
 const PortfolioPage = ({ onBook, onAdmin }) => {
-  const heroRef = useRef(null);
-  const bottleRef = useRef(null);
-  const bottleOpenRef = useRef(null);
-  const headlineRef = useRef(null);
-  const ctaRef = useRef(null);
-  const sparklesRef = useRef([]);
-
   useEffect(() => {
     const initGSAP = async () => {
       try {
@@ -668,99 +630,102 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
         const { ScrollTrigger } = stModule;
         gsap.registerPlugin(ScrollTrigger);
 
-        const tl = gsap.timeline({
-          scrollTrigger: {
-            trigger: heroRef.current,
-            start: 'top top',
-            end: '+=100%',
-            scrub: 1.8,
-            pin: true,
-          }
+        gsap.to('.hero-bg-img', {
+          yPercent: 22, ease: 'none',
+          scrollTrigger: { trigger: '.hero-section', start: 'top top', end: 'bottom top', scrub: 1.5 }
         });
 
-        // בקבוק סגור — מתרחב ועולה
-        tl.to(bottleRef.current, { scale: 1.08, y: -20, duration: 1, ease: 'power2.out' }, 0);
-
-        // בקבוק פתוח נכנס
-        tl.to(bottleOpenRef.current, { opacity: 1, scale: 1.08, y: -20, duration: 0.8, ease: 'power2.out' }, 0.3);
-        tl.to(bottleRef.current, { opacity: 0, duration: 0.4 }, 0.3);
-
-        // כותרת נכנסת
-        tl.to(headlineRef.current, { opacity: 1, y: 0, duration: 0.8, ease: 'power2.out' }, 0.5);
-
-        // כפתור
-        tl.to(ctaRef.current, { opacity: 1, y: 0, duration: 0.6, ease: 'back.out(1.7)' }, 0.75);
-
-        // ניצוצות מתפזרים
-        sparklesRef.current.forEach((el, i) => {
-          if (!el) return;
-          tl.to(el, {
-            y: -40 - i*12,
-            x: (i%2===0?1:-1)*(25+i*12),
-            opacity: 0,
-            scale: 0.2,
-            duration: 0.8,
-            ease: 'power2.out'
-          }, i*0.1);
+        gsap.utils.toArray('.reveal-sec').forEach(el => {
+          gsap.fromTo(el,
+            { y: 40, opacity: 0 },
+            { y: 0, opacity: 1, duration: 0.9, ease: 'power3.out',
+              scrollTrigger: { trigger: el, start: 'top 88%' } }
+          );
         });
-
       } catch(e) { console.log('GSAP error:', e); }
     };
     initGSAP();
   }, []);
 
   return (
-  <div dir="rtl" style={{ minHeight: '100vh', fontFamily: 'Varela Round, sans-serif', background: '#FDECE5', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+    <div dir="rtl" style={{ minHeight: '100vh', fontFamily: "'DM Sans', 'Varela Round', sans-serif", background: '#FDECE5', overflowX: 'hidden' }}>
 
-    {/* Hero */}
-    <div style={{ width: '100%', position: 'relative', overflow: 'hidden' }}>
-      <img src="/bottle-closed.png" alt="hero" style={{ width: '100%', maxHeight: '100vh', objectFit: 'cover', objectPosition: 'center top', display: 'block' }} />
-      <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, padding: '2rem 1.5rem', background: 'linear-gradient(to top, rgba(253,236,229,0.98) 0%, rgba(253,236,229,0.7) 60%, transparent 100%)', textAlign: 'center', direction: 'rtl' }}>
-        
-        <h1 style={{ color: '#5a1020', fontSize: '1.9rem', fontWeight: 900, lineHeight: 1.2, marginBottom: '1rem', fontWeight: 'bold' }}>היופי שלך מתחיל כאן ✨</h1>
-        <button onClick={onBook} style={{ padding: '0.9rem 2.5rem', borderRadius: '999px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, fontSize: '0.95rem', border: 'none', cursor: 'pointer', fontFamily: 'Varela Round, sans-serif', boxShadow: '0 6px 20px rgba(161,23,56,0.3)' }}>
-          💅 קביעת תור עכשיו
-        </button>
-      </div>
-    </div>
+      {/* ── HERO ── */}
+      <div className="hero-section" style={{ position: 'relative', height: '100svh', minHeight: '580px', overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
+        <img className="hero-bg-img" src="/bottle-closed.png" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '115%', objectFit: 'cover', objectPosition: 'center top' }} />
+        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(253,236,229,0) 0%, rgba(253,236,229,0.08) 42%, rgba(253,236,229,0.82) 68%, #FDECE5 100%)' }} />
 
-        {/* Content card */}
-    <div style={{ width: '100%', maxWidth: '420px', padding: '1.5rem 1.25rem', display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+        <div style={{ position: 'relative', zIndex: 2, padding: '0 1.75rem 4rem', textAlign: 'center', animation: 'fadeUp 0.9s 0.1s cubic-bezier(0.22,1,0.36,1) both' }}>
+          <img src="/symbol.png" alt="LS" style={{ height: '30px', objectFit: 'contain', opacity: 0.65, display: 'block', margin: '0 auto 1rem' }} />
+          <h1 style={{ fontFamily: "'Cormorant Garamond', 'DM Serif Display', Georgia, serif", fontSize: 'clamp(3.2rem, 12vw, 5.5rem)', fontWeight: 300, color: '#3d0c16', lineHeight: 1.0, fontStyle: 'italic', marginBottom: '0.5rem', letterSpacing: '-0.01em' }}>
+            היופי שלך
+          </h1>
+          <p style={{ color: '#A11738', fontSize: '0.68rem', letterSpacing: '0.3em', textTransform: 'uppercase', opacity: 0.65, marginBottom: '2rem' }}>
+            Lior Segev Beauty
+          </p>
+          <button className="lux-btn" onClick={onBook} style={{
+            padding: '1rem 2.75rem', borderRadius: '999px',
+            background: 'linear-gradient(135deg, #A11738 0%, #EC6A83 100%)',
+            color: 'white', fontSize: '0.9rem', fontWeight: 500, letterSpacing: '0.07em',
+            border: 'none', cursor: 'pointer',
+            boxShadow: '0 8px 32px rgba(161,23,56,0.38), inset 0 1px 0 rgba(255,255,255,0.18)',
+            animation: 'pulse-glow 3.5s ease-in-out infinite',
+            display: 'inline-flex', alignItems: 'center', gap: '10px'
+          }}>
+            <span>💅</span> קביעת תור
+          </button>
+        </div>
 
-      {/* Gallery */}
-      <div>
-        <p style={{ textAlign: 'center', fontWeight: 900, fontSize: '0.95rem', color: '#A11738', marginBottom: '0.75rem' }}>תיק עבודות ✨</p>
-        <div style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory', display: 'flex', gap: '0.625rem', paddingBottom: '0.5rem', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-          <style>{`.gallery-scroll::-webkit-scrollbar { display: none; }`}</style>
-          {Array.from({length: 21}, (_, i) => i + 1).map(n => (
-            <div key={n} style={{ flexShrink: 0, width: '140px', height: '170px', borderRadius: '14px', overflow: 'hidden', scrollSnapAlign: 'start', boxShadow: '0 2px 12px rgba(161,23,56,0.1)' }}>
-              <img src={`/gallery/1 - ${n}.jpeg`} alt={`עבודה ${n}`} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
-            </div>
-          ))}
+        {/* Scroll indicator */}
+        <div style={{ position: 'absolute', bottom: '1.25rem', left: '50%', transform: 'translateX(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', opacity: 0.25, animation: 'float 2.5s ease-in-out infinite' }}>
+          <div style={{ width: '1px', height: '28px', background: 'linear-gradient(to bottom, transparent, #A11738)' }} />
+          <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#A11738' }} />
         </div>
       </div>
 
-      {/* Social */}
-      <div style={{ background: 'white', border: '1.5px solid #F7C1C3', borderRadius: '14px', padding: '1rem', textAlign: 'center' }}>
-        <p style={{ fontWeight: 900, color: '#A11738', fontSize: '0.9rem', margin: '0 0 0.25rem' }}>Lior Segev Beauty</p>
-        <p style={{ color: '#9ca3af', fontSize: '0.68rem', margin: '0 0 0.75rem' }}>עקבי אחרינו ברשתות</p>
-        <div style={{ display: 'flex', gap: '12px', justifyContent: 'center' }}>
-          <a href="https://www.instagram.com/liors_beauty" target="_blank" rel="noreferrer">
-            <img src="/instagram.png" alt="Instagram" style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
-          </a>
-          <a href="https://www.facebook.com/share/1DLKLrkWFb/" target="_blank" rel="noreferrer">
-            <img src="/facebook.png" alt="Facebook" style={{ width: '40px', height: '40px', objectFit: 'contain' }} />
-          </a>
+      {/* ── CONTENT ── */}
+      <div style={{ maxWidth: '480px', margin: '0 auto', padding: '0 1.25rem 6rem' }}>
+
+        {/* Divider */}
+        <div className="reveal-sec" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1.25rem', padding: '2.5rem 0 2.25rem' }}>
+          <div style={{ flex: 1, height: '1px', background: 'linear-gradient(to right, transparent, rgba(236,106,131,0.3))' }} />
+          <span style={{ color: '#EC6A83', fontSize: '0.85rem', opacity: 0.5, letterSpacing: '0.3em' }}>✦</span>
+          <div style={{ flex: 1, height: '1px', background: 'linear-gradient(to left, transparent, rgba(236,106,131,0.3))' }} />
+        </div>
+
+        {/* Gallery */}
+        <div className="reveal-sec" style={{ marginBottom: '2.5rem' }}>
+          <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.9rem', fontWeight: 300, color: '#3d0c16', fontStyle: 'italic', textAlign: 'center', marginBottom: '1.5rem' }}>
+            תיק עבודות
+          </h2>
+          <div className="gallery-scroll" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory', display: 'flex', gap: '0.75rem', paddingBottom: '0.5rem', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+            {Array.from({length: 21}, (_, i) => i + 1).map(n => (
+              <div key={n} className="gallery-item" style={{ flexShrink: 0, width: '158px', height: '200px', borderRadius: '20px', overflow: 'hidden', scrollSnapAlign: 'start', boxShadow: '0 4px 18px rgba(161,23,56,0.09)' }}>
+                <img src={`/gallery/1 - ${n}.jpeg`} alt={`עבודה ${n}`} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Social card */}
+        <div className="reveal-sec" style={{ background: 'white', borderRadius: '24px', padding: '2rem', textAlign: 'center', boxShadow: '0 4px 32px rgba(161,23,56,0.05)', border: '1px solid rgba(247,193,195,0.2)', marginBottom: '1.75rem' }}>
+          <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.5rem', fontWeight: 400, color: '#A11738', fontStyle: 'italic', marginBottom: '0.2rem' }}>Lior Segev Beauty</p>
+          <p style={{ color: '#9ca3af', fontSize: '0.67rem', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: '1.5rem' }}>עקבי אחרינו</p>
+          <div style={{ display: 'flex', gap: '0.875rem', justifyContent: 'center' }}>
+            <a href="https://www.instagram.com/liors_beauty" target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '52px', height: '52px', borderRadius: '16px', background: '#FDECE5', textDecoration: 'none' }}>
+              <img src="/instagram.png" alt="Instagram" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
+            </a>
+            <a href="https://www.facebook.com/share/1DLKLrkWFb/" target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '52px', height: '52px', borderRadius: '16px', background: '#FDECE5', textDecoration: 'none' }}>
+              <img src="/facebook.png" alt="Facebook" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
+            </a>
+          </div>
+        </div>
+
+        <div style={{ textAlign: 'center' }}>
+          <button onClick={onAdmin} style={{ color: 'rgba(156,163,175,0.3)', fontSize: '0.58rem', background: 'none', border: 'none', cursor: 'pointer', letterSpacing: '0.1em' }}>ניהול</button>
         </div>
       </div>
-
-      <div style={{ textAlign: 'center' }}>
-        <button onClick={onAdmin} style={{ color: '#d1d5db', fontSize: '0.68rem', background: 'none', border: 'none', cursor: 'pointer' }}>
-          כניסה לניהול
-        </button>
-      </div>
     </div>
-  </div>
   );
 };
 
@@ -1313,7 +1278,90 @@ export default function App() {
   if (typeof window === 'undefined') return null;
   return (
     <>
-      <style>{`@import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap'); * { box-sizing: border-box; margin: 0; padding: 0; } body { font-family: 'Varela Round', sans-serif; }`}</style>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=DM+Sans:wght@300;400;500;700&display=swap');
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'DM Sans', sans-serif; background: #faf9f7; }
+        ::selection { background: #F7C1C3; color: #A11738; }
+
+        @keyframes pulse-glow {
+          0%, 100% { box-shadow: 0 0 0 0 rgba(236,106,131,0.4); }
+          50% { box-shadow: 0 0 0 14px rgba(236,106,131,0); }
+        }
+        @keyframes float {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-8px); }
+        }
+        @keyframes fadeUp {
+          from { opacity: 0; transform: translateY(28px); }
+          to { opacity: 1; transform: translateY(0); }
+        }
+        @keyframes scaleIn {
+          from { opacity: 0; transform: scale(0.88); }
+          to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+
+        .lux-btn {
+          display: inline-block;
+          padding: 15px 40px;
+          background: linear-gradient(135deg, #A11738, #EC6A83);
+          color: #fff;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 0.95rem;
+          font-weight: 500;
+          letter-spacing: 0.12em;
+          text-transform: uppercase;
+          border: none;
+          border-radius: 999px;
+          cursor: pointer;
+          transition: transform 0.2s, box-shadow 0.2s;
+          animation: pulse-glow 3s ease-in-out infinite;
+        }
+        .lux-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(161,23,56,0.35); }
+
+        .svc-card {
+          background: #fff;
+          border-radius: 18px;
+          padding: 20px;
+          border: 1.5px solid transparent;
+          transition: border-color 0.2s, box-shadow 0.2s, transform 0.2s;
+          cursor: pointer;
+        }
+        .svc-card:hover { border-color: #F7C1C3; box-shadow: 0 6px 24px rgba(247,193,195,0.45); transform: translateY(-2px); }
+        .svc-card.selected { border-color: #EC6A83; box-shadow: 0 6px 24px rgba(236,106,131,0.3); }
+
+        .slot-btn {
+          padding: 10px 20px;
+          border-radius: 999px;
+          border: 1.5px solid #F7C1C3;
+          background: #fff;
+          color: #A11738;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 0.875rem;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.18s;
+        }
+        .slot-btn:hover { background: #fff0f2; border-color: #EC6A83; }
+        .slot-btn.selected { background: linear-gradient(135deg,#A11738,#EC6A83); color: #fff; border-color: transparent; }
+
+        .gallery-item {
+          border-radius: 20px;
+          overflow: hidden;
+          transition: transform 0.3s, box-shadow 0.3s;
+          cursor: pointer;
+        }
+        .gallery-item:hover { transform: scale(1.04) translateY(-4px); box-shadow: 0 16px 40px rgba(161,23,56,0.18); }
+
+        .gallery-scroll::-webkit-scrollbar { display: none; }
+
+        .reveal-sec { opacity: 0; transform: translateY(32px); transition: opacity 0.7s ease, transform 0.7s ease; }
+        .reveal-sec.visible { opacity: 1; transform: translateY(0); }
+      `}</style>
       {view === 'portfolio' && <PortfolioPage onBook={() => setView('booking')} onAdmin={() => setView('auth')} />}
       {view === 'booking' && <BookingPage onBack={() => setView('portfolio')} onAppointmentBooked={(appt) => { setAppointments(prev => [...prev, appt]); }} />}
       {view === 'auth' && <AuthScreen onLogin={(u) => { setUser(u); setView('dashboard'); }} />}
