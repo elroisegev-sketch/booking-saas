@@ -262,19 +262,19 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   const waLink = WHATSAPP_LINK(sel.name, serviceNames, dateStr, sel.time, totalPrice);
 
   if (booked) return (
-    <div dir="rtl" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FDECE5', fontFamily: "'DM Sans','Varela Round',sans-serif" }}>
+    <div dir="rtl" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#FDECE5', fontFamily: "'Varela Round', sans-serif" }}>
       <div style={{ textAlign: 'center', maxWidth: '380px', padding: '2rem', width: '100%', animation: 'scaleIn 0.5s cubic-bezier(0.22,1,0.36,1)' }}>
         <div style={{ width: '72px', height: '72px', borderRadius: '50%', background: 'linear-gradient(135deg,#A11738,#EC6A83)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', boxShadow: '0 8px 32px rgba(161,23,56,0.25)' }}>
           <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="white"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7"/></svg>
         </div>
-        <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '2.2rem', fontWeight: 300, color: '#3d0c16', fontStyle: 'italic', marginBottom: '0.5rem' }}>הבקשה נשלחה</h2>
+        <h2 style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '2.2rem', fontWeight: 300, color: '#3d0c16', marginBottom: '0.5rem' }}>הבקשה נשלחה</h2>
         <p style={{ color: '#6b7280', marginBottom: '1.75rem', fontSize: '0.875rem', lineHeight: 1.6 }}>
           התור <strong style={{ color: '#A11738' }}>ממתין לאישור</strong> מאת ליאור 🌸<br />לאחר אימות המקדמה תקבלי אישור בוואטסאפ
         </p>
         <div style={{ background: 'white', border: '1px solid rgba(247,193,195,0.35)', borderRadius: '20px', padding: '1.25rem', textAlign: 'right', marginBottom: '1.25rem', boxShadow: '0 2px 16px rgba(161,23,56,0.05)' }}>
           <p style={{ fontWeight: 600, fontSize: '0.95rem', color: '#A11738', marginBottom: '4px' }}>{serviceNames}</p>
           <p style={{ color: '#6b7280', fontSize: '0.8rem' }}>{dateStr} · {sel.time}</p>
-          <p style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1.75rem', fontWeight: 300, color: '#EC6A83', marginTop: '0.5rem', fontStyle: 'italic' }}>{fmtPrice(totalPrice)}</p>
+          <p style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '1.75rem', fontWeight: 300, color: '#EC6A83', marginTop: '0.5rem',}}>{fmtPrice(totalPrice)}</p>
         </div>
         <a href={`https://wa.me/972${LIOR_PHONE.slice(1)}?text=${encodeURIComponent('היי ליאור 🌸 שלחתי מקדמה — הנה האסמכתא:')}`} target="_blank" rel="noreferrer"
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', padding: '1rem', borderRadius: '999px', background: '#25D366', color: 'white', fontWeight: 600, fontSize: '0.875rem', textDecoration: 'none', marginBottom: '12px', boxSizing: 'border-box', boxShadow: '0 4px 16px rgba(37,211,102,0.3)' }}>
@@ -288,7 +288,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   if (step === 0) setStep(1);
 
   return (
-    <div dir="rtl" style={{ minHeight: '100vh', background: '#FDECE5', fontFamily: "'DM Sans','Varela Round',sans-serif" }}>
+    <div dir="rtl" style={{ minHeight: '100vh', background: '#FDECE5', fontFamily: "'Varela Round', sans-serif" }}>
 
       {/* Header */}
       <div style={{ background: 'rgba(253,236,229,0.96)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', borderBottom: '1px solid rgba(247,193,195,0.3)', padding: '0.875rem 1.25rem', display: 'flex', alignItems: 'center', gap: '0.75rem', position: 'sticky', top: 0, zIndex: 10 }}>
@@ -297,7 +297,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
         </button>
         <img src="/symbol.png" alt="LS" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
         <div style={{ flex: 1 }}>
-          <p style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 400, color: '#A11738', margin: 0, fontSize: '1rem', fontStyle: 'italic' }}>ליאור שגב</p>
+          <p style={{ fontFamily: "'Varela Round', sans-serif", fontWeight: 400, color: '#A11738', margin: 0, fontSize: '1rem',}}>ליאור שגב</p>
           <p style={{ color: '#9ca3af', fontSize: '0.65rem', margin: 0, letterSpacing: '0.06em' }}>קביעת תור</p>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', gap: '4px' }}>
@@ -312,7 +312,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
         {/* Step 1 - Services */}
         {step === 1 && (
           <div>
-            <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '2rem', fontWeight: 300, color: '#3d0c16', fontStyle: 'italic', marginBottom: '0.2rem' }}>בחרי שירותים</h2>
+            <h2 style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '2rem', fontWeight: 300, color: '#3d0c16', marginBottom: '0.2rem' }}>בחרי שירותים</h2>
             <p style={{ color: '#9ca3af', fontSize: '0.8rem', marginBottom: '1.75rem' }}>ניתן לבחור מספר שירותים</p>
             {cats.map(cat => (
               <div key={cat} style={{ marginBottom: '1.5rem' }}>
@@ -332,7 +332,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                             <p style={{ color: '#9ca3af', fontSize: '0.7rem', margin: '2px 0 0' }}>{svc.duration} דקות</p>
                           </div>
                         </div>
-                        <span style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 400, fontSize: '1.2rem', color: '#A11738', fontStyle: 'italic', flexShrink: 0 }}>{fmtPrice(svc.price)}</span>
+                        <span style={{ fontFamily: "'Varela Round', sans-serif", fontWeight: 400, fontSize: '1.2rem', color: '#A11738', flexShrink: 0 }}>{fmtPrice(svc.price)}</span>
                       </button>
                     );
                   })}
@@ -343,14 +343,14 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
             {nailCountModal && nailService && (
               <div style={{ position: 'fixed', inset: 0, zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(45,10,30,0.5)', backdropFilter: 'blur(4px)' }}>
                 <div dir="rtl" style={{ background: 'white', borderRadius: '24px', padding: '1.75rem', width: '100%', maxWidth: '340px', margin: '1rem', animation: 'scaleIn 0.3s cubic-bezier(0.22,1,0.36,1)' }}>
-                  <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 300, color: '#3d0c16', fontSize: '1.5rem', fontStyle: 'italic', marginBottom: '0.4rem' }}>כמה ציפורניים? 💅</h2>
+                  <h2 style={{ fontFamily: "'Varela Round', sans-serif", fontWeight: 300, color: '#3d0c16', fontSize: '1.5rem', marginBottom: '0.4rem' }}>כמה ציפורניים? 💅</h2>
                   <p style={{ color: '#9ca3af', fontSize: '0.78rem', marginBottom: '1.25rem' }}>כל השלמה = ₪10</p>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '10px', marginBottom: '1rem' }}>
                     {[1,2,3,4].map(n => (
                       <button key={n} className="lux-btn" onClick={() => { const updated = { ...nailService, name: `השלמת ציפורן (${n})`, price: n * 10, duration: n * 15 }; setSelectedServices(prev => [...prev.filter(s => !s.name.startsWith('השלמת ציפורן')), updated]); setNailCountModal(false); }}
                         style={{ padding: '0.875rem', borderRadius: '14px', background: 'linear-gradient(135deg,#fff5f7,#fce7f3)', border: '1.5px solid rgba(247,193,195,0.5)', fontWeight: 700, color: '#A11738', fontSize: '0.9rem', cursor: 'pointer' }}>
                         {n === 1 ? 'ציפורן אחת' : `${n} ציפורניים`}<br/>
-                        <span style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '1rem', color: '#EC6A83', fontStyle: 'italic' }}>₪{n * 10}</span>
+                        <span style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '1rem', color: '#EC6A83',}}>₪{n * 10}</span>
                       </button>
                     ))}
                   </div>
@@ -364,7 +364,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
               <div style={{ position: 'sticky', bottom: '1rem', background: 'white', border: '1.5px solid rgba(236,106,131,0.35)', borderRadius: '20px', padding: '1rem 1.25rem', marginTop: '1rem', boxShadow: '0 8px 32px rgba(161,23,56,0.14)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
                   <span style={{ fontWeight: 600, color: '#A11738', fontSize: '0.8rem' }}>{selectedServices.length} שירות{selectedServices.length > 1 ? 'ים' : ''} נבחר{selectedServices.length > 1 ? 'ו' : ''}</span>
-                  <span style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 400, fontSize: '1.3rem', color: '#EC6A83', fontStyle: 'italic' }}>סה"כ: {fmtPrice(totalPrice)}</span>
+                  <span style={{ fontFamily: "'Varela Round', sans-serif", fontWeight: 400, fontSize: '1.3rem', color: '#EC6A83',}}>סה"כ: {fmtPrice(totalPrice)}</span>
                 </div>
                 <div style={{ fontSize: '0.7rem', color: '#9ca3af', marginBottom: '10px' }}>{selectedServices.map(s => s.name).join(' + ')} · {totalDuration} דקות</div>
                 <button className="lux-btn" onClick={() => { const hasKishut = selectedServices.some(s => s.name === 'קישוט'); if (hasKishut) { setStep('kishut_info'); } else if (hasGel) { setStep('terms_gel'); } else { setStep(2); } }}
@@ -380,7 +380,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
         {step === 'kishut_info' && (
           <div style={{ textAlign: 'center', animation: 'fadeUp 0.5s cubic-bezier(0.22,1,0.36,1)' }}>
             <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>✨</div>
-            <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '2rem', fontWeight: 300, color: '#3d0c16', fontStyle: 'italic', marginBottom: '0.75rem' }}>בחרת קישוט</h2>
+            <h2 style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '2rem', fontWeight: 300, color: '#3d0c16', marginBottom: '0.75rem' }}>בחרת קישוט</h2>
             <div style={{ background: 'white', border: '1px solid rgba(247,193,195,0.3)', borderRadius: '20px', padding: '1.25rem', marginBottom: '1.25rem', textAlign: 'right', fontSize: '0.875rem', color: '#374151', lineHeight: 1.7, boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
               כדי לדייק את הזמן והמחיר עבורך, מומלץ לשלוח תמונת השראה לליאור בוואטסאפ לפני האישור הסופי.<br /><br />
               ניתן להמשיך לקביעת התור גם ללא תמונה — ליאור תיצור איתך קשר לאישור הפרטים הסופיים.
@@ -404,12 +404,12 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
         {/* Step 2 - Date */}
         {step === 2 && (
           <div>
-            <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '2rem', fontWeight: 300, color: '#3d0c16', fontStyle: 'italic', marginBottom: '0.2rem' }}>בחרי תאריך</h2>
+            <h2 style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '2rem', fontWeight: 300, color: '#3d0c16', marginBottom: '0.2rem' }}>בחרי תאריך</h2>
             <p style={{ color: '#9ca3af', fontSize: '0.8rem', marginBottom: '1.75rem' }}>{selectedServices.map(s => s.name).join(' + ')}</p>
             <div style={{ background: 'white', border: '1px solid rgba(247,193,195,0.22)', borderRadius: '20px', overflow: 'hidden', marginBottom: '1.25rem', boxShadow: '0 2px 16px rgba(161,23,56,0.06)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem 1.5rem', borderBottom: '1px solid rgba(247,193,195,0.18)' }}>
                 <button onClick={() => setCalMonth(new Date(calMonth.getFullYear(), calMonth.getMonth() - 1))} style={{ padding: '0.4rem', background: 'none', border: 'none', cursor: 'pointer', color: '#A11738' }}><Icon name="chevronR" className="w-4 h-4" /></button>
-                <span style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 400, color: '#A11738', fontSize: '1.1rem', fontStyle: 'italic' }}>{calMonth.toLocaleDateString('he-IL', { month: 'long', year: 'numeric' })}</span>
+                <span style={{ fontFamily: "'Varela Round', sans-serif", fontWeight: 400, color: '#A11738', fontSize: '1.1rem',}}>{calMonth.toLocaleDateString('he-IL', { month: 'long', year: 'numeric' })}</span>
                 <button onClick={() => setCalMonth(new Date(calMonth.getFullYear(), calMonth.getMonth() + 1))} style={{ padding: '0.4rem', background: 'none', border: 'none', cursor: 'pointer', color: '#A11738' }}><Icon name="chevronL" className="w-4 h-4" /></button>
               </div>
               <div style={{ padding: '1rem' }}>
@@ -442,7 +442,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
         {/* Step 3 - Time */}
         {step === 3 && (
           <div>
-            <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '2rem', fontWeight: 300, color: '#3d0c16', fontStyle: 'italic', marginBottom: '0.2rem' }}>בחרי שעה</h2>
+            <h2 style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '2rem', fontWeight: 300, color: '#3d0c16', marginBottom: '0.2rem' }}>בחרי שעה</h2>
             <p style={{ color: '#9ca3af', fontSize: '0.8rem', marginBottom: '1.75rem' }}>{sel.date?.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
             {loadingSlots ? (
               <div style={{ textAlign: 'center', padding: '3rem' }}>
@@ -468,7 +468,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
         {/* Step 4 - Details */}
         {step === 4 && (
           <div>
-            <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '2rem', fontWeight: 300, color: '#3d0c16', fontStyle: 'italic', marginBottom: '0.2rem' }}>פרטים אישיים</h2>
+            <h2 style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '2rem', fontWeight: 300, color: '#3d0c16', marginBottom: '0.2rem' }}>פרטים אישיים</h2>
             <p style={{ color: '#9ca3af', fontSize: '0.8rem', marginBottom: '1.75rem' }}>עוד צעד קטן 🌸</p>
             <div style={{ background: 'white', borderRadius: '20px', padding: '1.5rem', marginBottom: '1.25rem', boxShadow: '0 2px 16px rgba(161,23,56,0.05)', border: '1px solid rgba(247,193,195,0.18)' }}>
               <div style={{ marginBottom: '1.5rem' }}>
@@ -483,7 +483,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
               </div>
             </div>
             <div style={{ background: 'white', border: '1px solid rgba(247,193,195,0.18)', borderRadius: '20px', padding: '1.25rem', marginBottom: '1.25rem', boxShadow: '0 2px 12px rgba(161,23,56,0.04)' }}>
-              <p style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 400, color: '#A11738', fontSize: '1rem', fontStyle: 'italic', marginBottom: '0.875rem' }}>סיכום הזמנה</p>
+              <p style={{ fontFamily: "'Varela Round', sans-serif", fontWeight: 400, color: '#A11738', fontSize: '1rem', marginBottom: '0.875rem' }}>סיכום הזמנה</p>
               {selectedServices.map(svc => (
                 <div key={svc.id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
                   <span style={{ color: '#374151', fontSize: '0.85rem' }}>{svc.name}</span>
@@ -492,7 +492,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
               ))}
               <div style={{ borderTop: '1px solid rgba(247,193,195,0.22)', marginTop: '10px', paddingTop: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontWeight: 600, color: '#A11738', fontSize: '0.85rem' }}>סה"כ</span>
-                <span style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 300, fontSize: '1.5rem', color: '#EC6A83', fontStyle: 'italic' }}>{fmtPrice(totalPrice)}</span>
+                <span style={{ fontFamily: "'Varela Round', sans-serif", fontWeight: 300, fontSize: '1.5rem', color: '#EC6A83',}}>{fmtPrice(totalPrice)}</span>
               </div>
               <p style={{ color: '#9ca3af', fontSize: '0.7rem', marginTop: '6px' }}>{dateStr} · {sel.time} · {totalDuration} דקות</p>
             </div>
@@ -509,7 +509,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
         {/* Step 5 - Payment */}
         {step === 5 && (
           <div>
-            <h2 style={{ fontFamily: "'Cormorant Garamond',serif", fontSize: '2rem', fontWeight: 300, color: '#3d0c16', fontStyle: 'italic', marginBottom: '0.2rem' }}>תשלום מקדמה</h2>
+            <h2 style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '2rem', fontWeight: 300, color: '#3d0c16', marginBottom: '0.2rem' }}>תשלום מקדמה</h2>
             <p style={{ color: '#9ca3af', fontSize: '0.8rem', marginBottom: '1.75rem' }}>להשלמת הרישום יש להעביר מקדמה 🌸</p>
             <div style={{ background: 'white', border: '1px solid rgba(247,193,195,0.18)', borderRadius: '20px', padding: '1.25rem', marginBottom: '1rem', boxShadow: '0 2px 12px rgba(161,23,56,0.04)' }}>
               {selectedServices.map(svc => (
@@ -520,13 +520,13 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
               ))}
               <div style={{ borderTop: '1px solid rgba(247,193,195,0.22)', marginTop: '10px', paddingTop: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                 <span style={{ fontWeight: 600, color: '#A11738', fontSize: '0.85rem' }}>סה"כ</span>
-                <span style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 300, fontSize: '1.5rem', color: '#EC6A83', fontStyle: 'italic' }}>{fmtPrice(totalPrice)}</span>
+                <span style={{ fontFamily: "'Varela Round', sans-serif", fontWeight: 300, fontSize: '1.5rem', color: '#EC6A83',}}>{fmtPrice(totalPrice)}</span>
               </div>
               <p style={{ color: '#9ca3af', fontSize: '0.7rem', marginTop: '6px' }}>{dateStr} · {sel.time}</p>
             </div>
             <div style={{ background: 'linear-gradient(135deg,#fce7f3,#F7C1C3)', borderRadius: '20px', padding: '1.5rem', marginBottom: '1.25rem', textAlign: 'center' }}>
               <p style={{ fontWeight: 500, fontSize: '0.78rem', color: '#A11738', margin: '0 0 8px', letterSpacing: '0.04em' }}>💳 יש להעביר מקדמה דרך ביט / פייבוקס</p>
-              <p style={{ fontFamily: "'Cormorant Garamond',serif", fontWeight: 300, fontSize: '2rem', letterSpacing: '0.05em', color: '#3d0c16', fontStyle: 'italic', margin: '0 0 8px' }}>053-524-9688</p>
+              <p style={{ fontFamily: "'Varela Round', sans-serif", fontWeight: 300, fontSize: '2rem', letterSpacing: '0.05em', color: '#3d0c16', margin: '0 0 8px' }}>053-524-9688</p>
               <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.65)', borderRadius: '12px', padding: '5px 16px' }}>
                 <span style={{ fontWeight: 700, fontSize: '1.05rem', color: '#A11738' }}>מקדמה: {fmtPrice(deposit)}</span>
               </div>
@@ -648,7 +648,7 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
   }, []);
 
   return (
-    <div dir="rtl" style={{ minHeight: '100vh', fontFamily: "'DM Sans', 'Varela Round', sans-serif", background: '#FDECE5', overflowX: 'hidden' }}>
+    <div dir="rtl" style={{ minHeight: '100vh', fontFamily: "'Varela Round', sans-serif", background: '#FDECE5', overflowX: 'hidden' }}>
 
       {/* ── HERO ── */}
       <div className="hero-section" style={{ position: 'relative', height: '100svh', minHeight: '580px', overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
@@ -657,7 +657,7 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
 
         <div style={{ position: 'relative', zIndex: 2, padding: '0 1.75rem 4rem', textAlign: 'center', animation: 'fadeUp 0.9s 0.1s cubic-bezier(0.22,1,0.36,1) both' }}>
           <img src="/symbol.png" alt="LS" style={{ height: '30px', objectFit: 'contain', opacity: 0.65, display: 'block', margin: '0 auto 1rem' }} />
-          <h1 style={{ fontFamily: "'Cormorant Garamond', 'DM Serif Display', Georgia, serif", fontSize: 'clamp(3.2rem, 12vw, 5.5rem)', fontWeight: 300, color: '#3d0c16', lineHeight: 1.0, fontStyle: 'italic', marginBottom: '0.5rem', letterSpacing: '-0.01em' }}>
+          <h1 style={{ fontFamily: "'Varela Round', sans-serif", fontSize: 'clamp(2.8rem, 11vw, 5rem)', fontWeight: 700, color: '#A11738', lineHeight: 1.1, marginBottom: '0.5rem', letterSpacing: '0.01em', animation: 'breathe 4s ease-in-out infinite', display: 'inline-block' }}>
             היופי שלך
           </h1>
           <p style={{ color: '#A11738', fontSize: '0.68rem', letterSpacing: '0.3em', textTransform: 'uppercase', opacity: 0.65, marginBottom: '2rem' }}>
@@ -695,7 +695,7 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
 
         {/* Gallery */}
         <div className="reveal-sec" style={{ marginBottom: '2.5rem' }}>
-          <h2 style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.9rem', fontWeight: 300, color: '#3d0c16', fontStyle: 'italic', textAlign: 'center', marginBottom: '1.5rem' }}>
+          <h2 style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '1.9rem', fontWeight: 300, color: '#3d0c16', textAlign: 'center', marginBottom: '1.5rem' }}>
             תיק עבודות
           </h2>
           <div className="gallery-scroll" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory', display: 'flex', gap: '0.75rem', paddingBottom: '0.5rem', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
@@ -709,7 +709,7 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
 
         {/* Social card */}
         <div className="reveal-sec" style={{ background: 'white', borderRadius: '24px', padding: '2rem', textAlign: 'center', boxShadow: '0 4px 32px rgba(161,23,56,0.05)', border: '1px solid rgba(247,193,195,0.2)', marginBottom: '1.75rem' }}>
-          <p style={{ fontFamily: "'Cormorant Garamond', serif", fontSize: '1.5rem', fontWeight: 400, color: '#A11738', fontStyle: 'italic', marginBottom: '0.2rem' }}>Lior Segev Beauty</p>
+          <p style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '1.5rem', fontWeight: 400, color: '#A11738', marginBottom: '0.2rem' }}>Lior Segev Beauty</p>
           <p style={{ color: '#9ca3af', fontSize: '0.67rem', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: '1.5rem' }}>עקבי אחרינו</p>
           <div style={{ display: 'flex', gap: '0.875rem', justifyContent: 'center' }}>
             <a href="https://www.instagram.com/liors_beauty" target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '52px', height: '52px', borderRadius: '16px', background: '#FDECE5', textDecoration: 'none' }}>
@@ -1279,9 +1279,9 @@ export default function App() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500;1,600&family=DM+Sans:wght@300;400;500;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'DM Sans', sans-serif; background: #faf9f7; }
+        body { font-family: 'Varela Round', sans-serif; background: #faf9f7; }
         ::selection { background: #F7C1C3; color: #A11738; }
 
         @keyframes pulse-glow {
@@ -1304,13 +1304,17 @@ export default function App() {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
         }
+        @keyframes breathe {
+          0%, 100% { transform: scale(1); }
+          50% { transform: scale(1.04); }
+        }
 
         .lux-btn {
           display: inline-block;
           padding: 15px 40px;
           background: linear-gradient(135deg, #A11738, #EC6A83);
           color: #fff;
-          font-family: 'DM Sans', sans-serif;
+          font-family: 'Varela Round', sans-serif;
           font-size: 0.95rem;
           font-weight: 500;
           letter-spacing: 0.12em;
@@ -1340,7 +1344,7 @@ export default function App() {
           border: 1.5px solid #F7C1C3;
           background: #fff;
           color: #A11738;
-          font-family: 'DM Sans', sans-serif;
+          font-family: 'Varela Round', sans-serif;
           font-size: 0.875rem;
           font-weight: 500;
           cursor: pointer;
