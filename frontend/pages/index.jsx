@@ -266,18 +266,21 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
         <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>⏳</div>
         <h2 style={{ fontSize: '2rem', fontWeight: 900, color: '#A11738', marginBottom: '0.5rem' }}>הבקשה נשלחה!</h2>
         <p style={{ color: '#6b7280', marginBottom: '1rem', fontSize: '0.875rem' }}>
-          התור <strong>ממתין לאישור</strong> מאת ליאור 🌸<br />
-          תקבלי הודעה בוואטסאפ ברגע שיאושר
+          התור <strong>ממתין לאישור תשלום</strong> מאת ליאור 🌸<br />
+          לאחר אימות המקדמה תקבלי אישור בוואטסאפ
         </p>
-        <div style={{ background: 'white', border: '1px solid #f0f0f0', borderRadius: '16px', padding: '1.25rem', textAlign: 'right', marginBottom: '1.5rem' }}>
+        <div style={{ background: 'white', border: '1px solid #f0f0f0', borderRadius: '16px', padding: '1.25rem', textAlign: 'right', marginBottom: '1rem' }}>
           <p style={{ fontWeight: 700, fontSize: '1rem', color: '#A11738', marginBottom: '4px' }}>{serviceNames}</p>
           <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>{dateStr} | {sel.time}</p>
           <p style={{ fontWeight: 900, fontSize: '1.5rem', color: '#EC6A83', marginTop: '0.5rem' }}>{fmtPrice(totalPrice)}</p>
         </div>
+        <div style={{ background: '#F7C1C3', borderRadius: '12px', padding: '0.875rem', marginBottom: '1.25rem', fontSize: '0.875rem', color: '#A11738', fontWeight: 700 }}>
+          מקדמה ששולמה: {fmtPrice(deposit)}
+        </div>
         <a href={waLink} target="_blank" rel="noreferrer"
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', padding: '0.875rem', borderRadius: '12px', background: '#25D366', color: 'white', fontWeight: 700, fontSize: '0.9rem', textDecoration: 'none', marginBottom: '12px', boxSizing: 'border-box' }}>
           <Icon name="whatsapp" className="w-5 h-5" />
-          שלחי הודעה לליאור בוואטסאפ
+          שלחי צילום אסמכתא לליאור
         </a>
         <button onClick={onBack} style={{ width: '100%', padding: '0.875rem', borderRadius: '12px', background: '#f3f4f6', color: '#374151', fontWeight: 700, border: 'none', cursor: 'pointer' }}>
           חזרה לדף הבית
@@ -552,27 +555,30 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
               <p style={{ color: '#6b7280', fontSize: '0.75rem', marginTop: '6px' }}>{dateStr} | {sel.time}</p>
             </div>
 
-            <div style={{ background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: '12px', padding: '1rem', marginBottom: '1.25rem', fontSize: '0.875rem', color: '#92400e' }}>
-              <strong>⚠️ שימי לב:</strong> התור יאושר רק לאחר שליאור תראה את ההעברה ותאשר ידנית.
+            <div style={{ background: '#F7C1C3', borderRadius: '12px', padding: '1.25rem', marginBottom: '1.25rem', textAlign: 'center', color: '#A11738' }}>
+              <p style={{ fontWeight: 700, fontSize: '0.875rem', margin: '0 0 6px 0' }}>💳 יש להעביר מקדמה דרך ביט / פייבוקס למספר:</p>
+              <p style={{ fontWeight: 900, fontSize: '1.5rem', letterSpacing: '0.05em', margin: '0 0 8px 0' }}>053-524-9688</p>
+              <p style={{ fontWeight: 900, fontSize: '1.25rem', margin: 0 }}>סכום המקדמה: {fmtPrice(deposit)}</p>
             </div>
 
-            <div style={{ background: '#F7C1C3', borderRadius: '12px', padding: '1rem', marginBottom: '1.25rem', textAlign: 'center', fontSize: '0.875rem', color: '#A11738', fontWeight: 700 }}>
-              💳 יש להעביר מקדמה דרך ביט / פייבוקס למספר:<br />
-              <span style={{ fontSize: '1.25rem', letterSpacing: '0.05em' }}>053-524-9688</span>
+            <div style={{ background: '#fff7ed', border: '1px solid #fed7aa', borderRadius: '12px', padding: '1rem', marginBottom: '1.5rem', fontSize: '0.875rem', color: '#92400e' }}>
+              <strong>⚠️ שימי לב:</strong> לאחר העברת המקדמה לחצי על הכפתור למטה. התור יאושר על ידי ליאור לאחר אימות התשלום.
             </div>
 
-            <a href={waLink} target="_blank" rel="noreferrer" onClick={async () => {
-              // חישוב appointment_time ו-end_time לפי הסלוט הקבוע
+            <button onClick={async () => {
               const rawTime = sel.time.trim();
               const dateStr2 = `${sel.date.getFullYear()}-${String(sel.date.getMonth()+1).padStart(2,'0')}-${String(sel.date.getDate()).padStart(2,'0')}`;
-              // חשב end_time לפי duration בפועל (UTC+2 → UTC)
+              const refDate = new Date(`${dateStr2}T12:00:00Z`);
+              const israelLocal = new Date(refDate.toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' }));
+              const israelOffsetMins = Math.round((israelLocal - refDate) / 60000);
               const [th, tm] = rawTime.split(':').map(Number);
-              const startUTC = new Date(`${dateStr2}T${String(th-2).padStart(2,'0')}:${String(tm).padStart(2,'0')}:00Z`);
+              const startMins = th * 60 + tm - israelOffsetMins;
+              const startH = String(Math.floor(((startMins % 1440) + 1440) % 1440 / 60)).padStart(2, '0');
+              const startM = String(((startMins % 60) + 60) % 60).padStart(2, '0');
+              const startUTC = new Date(`${dateStr2}T${startH}:${startM}:00Z`);
               const endUTC = new Date(startUTC.getTime() + totalDuration * 60000);
-              const appointmentTime = startUTC.toISOString();
-              const endTime = endUTC.toISOString();
               try {
-                await fetch('https://booking-saas-production-b9fd.up.railway.app/api/appointments', {
+                await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://booking-saas-production-b9fd.up.railway.app/api'}/appointments`, {
                   method: 'POST',
                   headers: { 'Content-Type': 'application/json' },
                   body: JSON.stringify({
@@ -580,13 +586,15 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                     service_id: selectedServices[0]?.id,
                     customer_name: sel.name,
                     customer_phone: sel.phone,
-                    appointment_time: appointmentTime,
-                    end_time: endTime,
+                    appointment_time: startUTC.toISOString(),
+                    end_time: endUTC.toISOString(),
                   })
                 });
               } catch(e) { console.error('booking failed', e); }
               setBooked(true);
-            }} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "8px", width: "100%", padding: "0.875rem", borderRadius: "12px", background: "#25D366", color: "white", fontWeight: 700, fontSize: "0.9rem", textDecoration: "none", marginBottom: "12px", boxSizing: "border-box" }}><Icon name="whatsapp" className="w-5 h-5" />שלחי הודעה לליאור לאישור התור</a>
+            }} style={{ width: '100%', padding: '0.875rem', borderRadius: '12px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 900, fontSize: '1rem', border: 'none', cursor: 'pointer', marginBottom: '12px' }}>
+              ✅ שילמתי — קבעי לי תור
+            </button>
 
             <button onClick={() => setStep(4)} style={{ width: '100%', padding: '0.875rem', borderRadius: '12px', background: '#f3f4f6', color: '#374151', fontWeight: 700, border: 'none', cursor: 'pointer' }}>חזרה</button>
           </div>
