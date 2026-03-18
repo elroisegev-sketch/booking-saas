@@ -179,7 +179,6 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   const [sel, setSel] = useState({ date: null, time: null, name: '', phone: '', image: null });
   const [calMonth, setCalMonth] = useState(new Date());
   const [booked, setBooked] = useState(false);
-  const fileRef = useRef();
   const [realServices, setRealServices] = useState([]);
   const [realAvailability, setRealAvailability] = useState([]);
   const [nailCountModal, setNailCountModal] = useState(false);
@@ -507,31 +506,6 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                 placeholder="050-0000000" value={sel.phone} onChange={e => setSel({ ...sel, phone: e.target.value })} />
             </div>
 
-            {hasGel && (
-              <div style={{ marginBottom: '1.25rem', background: '#FDECE5', border: '2px dashed #f0d0e0', borderRadius: '12px', padding: '1.25rem' }}>
-                <p style={{ fontWeight: 700, fontSize: '0.875rem', color: '#EC6A83', marginBottom: '4px' }}>💅 רוצה להעלות השראה?</p>
-                <p style={{ fontSize: '0.75rem', color: '#9ca3af', marginBottom: '0.75rem' }}>העלי תמונה שתעזור לליאור להכין את העיצוב המושלם</p>
-                <input ref={fileRef} type="file" accept="image/*" style={{ display: 'none' }}
-                  onChange={e => {
-                    const file = e.target.files[0];
-                    if (file) {
-                      const reader = new FileReader();
-                      reader.onload = ev => setSel({ ...sel, image: ev.target.result });
-                      reader.readAsDataURL(file);
-                    }
-                  }} />
-                {sel.image ? (
-                  <div style={{ position: 'relative', display: 'inline-block' }}>
-                    <img src={sel.image} alt="inspiration" style={{ width: '100px', height: '100px', objectFit: 'cover', borderRadius: '10px', border: '2px solid #EC6A83' }} />
-                    <button onClick={() => setSel({ ...sel, image: null })} style={{ position: 'absolute', top: '-8px', right: '-8px', width: '22px', height: '22px', borderRadius: '50%', background: '#ef4444', color: 'white', border: 'none', cursor: 'pointer', fontWeight: 900, fontSize: '0.75rem', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
-                  </div>
-                ) : (
-                  <button onClick={() => fileRef.current.click()} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0.625rem 1rem', borderRadius: '10px', background: 'white', border: '1.5px solid #e5e7eb', color: '#374151', fontWeight: 700, fontSize: '0.875rem', cursor: 'pointer' }}>
-                    <Icon name="image" className="w-4 h-4" /> העלי תמונה
-                  </button>
-                )}
-              </div>
-            )}
 
             <div style={{ background: 'white', border: '1px solid #f0f0f0', borderRadius: '16px', padding: '1.25rem', marginBottom: '1.25rem' }}>
               <p style={{ fontWeight: 700, color: '#EC6A83', fontSize: '0.875rem', marginBottom: '0.75rem' }}>סיכום הזמנה</p>
