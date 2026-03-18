@@ -612,8 +612,19 @@ const Dashboard = ({ user, onLogout }) => {
   useEffect(() => {
     Promise.all([fetchAppointments(), fetchServices(), fetchAvailability()])
       .finally(() => setLoadingData(false));
-    const interval = setInterval(fetchAppointments, 5000);
-    return () => clearInterval(interval);
+
+    // SSE — עדכון בזמן אמת כשנכנס תור חדש
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : '';
+    let es;
+    try {
+      es = new EventSource(`${API}/appointments/stream?token=${token}`);
+      es.onmessage = (e) => { if (e.data === 'refresh') fetchAppointments(); };
+      es.onerror = () => es.close();
+    } catch {}
+
+    // polling כגיבוי
+    const interval = setInterval(fetchAppointments, 30000);
+    return () => { clearInterval(interval); es?.close(); };
   }, [fetchAppointments, fetchServices, fetchAvailability]);
 
   const todayAppts = appointments.filter(a => new Date(a.appointment_time).toDateString() === new Date().toDateString() && a.status !== 'cancelled');

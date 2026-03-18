@@ -4,6 +4,35 @@ const auth = require('../middleware/auth');
 const { sendPush } = require('./push');
 const router = express.Router();
 
+// SSE clients: Map<businessId, Set<res>>
+const sseClients = new Map();
+
+function notifyBusiness(businessId) {
+  const clients = sseClients.get(String(businessId));
+  if (!clients) return;
+  clients.forEach(res => res.write('data: refresh\n\n'));
+}
+
+// GET /api/appointments/stream — SSE endpoint for admin
+router.get('/stream', auth, (req, res) => {
+  res.setHeader('Content-Type', 'text/event-stream');
+  res.setHeader('Cache-Control', 'no-cache');
+  res.setHeader('Connection', 'keep-alive');
+  res.flushHeaders();
+  res.write('data: connected\n\n');
+
+  const bizId = String(req.user.id);
+  if (!sseClients.has(bizId)) sseClients.set(bizId, new Set());
+  sseClients.get(bizId).add(res);
+
+  const keepAlive = setInterval(() => res.write(': ping\n\n'), 25000);
+
+  req.on('close', () => {
+    clearInterval(keepAlive);
+    sseClients.get(bizId)?.delete(res);
+  });
+});
+
 router.get('/', auth, async (req, res) => {
   const { date, from, to, status } = req.query;
   try {
@@ -142,6 +171,9 @@ router.post('/', async (req, res) => {
       title: '🌸 תור חדש!',
       body: `${customer_name} | ${service.name}\n${dateHeb} בשעה ${timeHeb}`
     });
+
+    // 📡 עדכן אדמין בזמן אמת
+    notifyBusiness(businessId);
 
     res.status(201).json(result.rows[0]);
   } catch (err) {
