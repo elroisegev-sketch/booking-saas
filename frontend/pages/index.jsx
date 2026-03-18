@@ -277,7 +277,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
         <div style={{ background: '#F7C1C3', borderRadius: '12px', padding: '0.875rem', marginBottom: '1.25rem', fontSize: '0.875rem', color: '#A11738', fontWeight: 700 }}>
           מקדמה ששולמה: {fmtPrice(deposit)}
         </div>
-        <a href={waLink} target="_blank" rel="noreferrer"
+        <a href={`https://wa.me/972${LIOR_PHONE.slice(1)}?text=${encodeURIComponent('היי ליאור 🌸 שלחתי מקדמה — הנה האסמכתא:')}`} target="_blank" rel="noreferrer"
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', padding: '0.875rem', borderRadius: '12px', background: '#25D366', color: 'white', fontWeight: 700, fontSize: '0.9rem', textDecoration: 'none', marginBottom: '12px', boxSizing: 'border-box' }}>
           <Icon name="whatsapp" className="w-5 h-5" />
           שלחי צילום אסמכתא לליאור
@@ -565,7 +565,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
               <strong>⚠️ שימי לב:</strong> לאחר העברת המקדמה לחצי על הכפתור למטה. התור יאושר על ידי ליאור לאחר אימות התשלום.
             </div>
 
-            <button onClick={async () => {
+            <a href={waLink} target="_blank" rel="noreferrer" onClick={async (e) => {
               const rawTime = sel.time.trim();
               const dateStr2 = `${sel.date.getFullYear()}-${String(sel.date.getMonth()+1).padStart(2,'0')}-${String(sel.date.getDate()).padStart(2,'0')}`;
               const refDate = new Date(`${dateStr2}T12:00:00Z`);
@@ -592,9 +592,10 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                 });
               } catch(e) { console.error('booking failed', e); }
               setBooked(true);
-            }} style={{ width: '100%', padding: '0.875rem', borderRadius: '12px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 900, fontSize: '1rem', border: 'none', cursor: 'pointer', marginBottom: '12px' }}>
-              ✅ שילמתי — קבעי לי תור
-            </button>
+            }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', padding: '0.875rem', borderRadius: '12px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 900, fontSize: '1rem', textDecoration: 'none', marginBottom: '12px', boxSizing: 'border-box' }}>
+              <Icon name="whatsapp" className="w-5 h-5" />
+              שילמתי — שלחי פרטי תור לליאור
+            </a>
 
             <button onClick={() => setStep(4)} style={{ width: '100%', padding: '0.875rem', borderRadius: '12px', background: '#f3f4f6', color: '#374151', fontWeight: 700, border: 'none', cursor: 'pointer' }}>חזרה</button>
           </div>
