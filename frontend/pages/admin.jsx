@@ -572,8 +572,14 @@ const Dashboard = ({ user, onLogout }) => {
   const fetchAvailability = useCallback(async () => {
     try {
       const data = await apiFetch(`${API}/availability`);
-      if (Array.isArray(data)) setAvailability(data);
-    } catch {}
+      if (Array.isArray(data)) setAvailability(data.map(d => ({
+        ...d,
+        start_time: d.start_time ? String(d.start_time).slice(0, 5) : '09:00',
+        end_time: d.end_time ? String(d.end_time).slice(0, 5) : '17:00',
+      })));
+    } catch (e) {
+      showToast(`שגיאת טעינה: ${e.message}`);
+    }
   }, []);
 
   useEffect(() => {
@@ -941,12 +947,12 @@ const Dashboard = ({ user, onLogout }) => {
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                         <input type="time" value={day.start_time}
                           onChange={e => setAvailability(availability.map((d, j) => j === i ? { ...d, start_time: e.target.value } : d))}
-                          onBlur={async e => { try { await apiFetch(`${API}/availability/${day.day_of_week}`, { method: 'PUT', body: JSON.stringify({ start_time: e.target.value, end_time: day.end_time, is_active: day.is_active }) }); showToast('✅ נשמר'); } catch (err) { showToast(`שגיאה: ${err.message}`); } }}
+                          onBlur={async e => { try { await apiFetch(`${API}/availability/${day.day_of_week}`, { method: 'PUT', body: JSON.stringify({ start_time: e.target.value, end_time: day.end_time, is_active: day.is_active }) }); await fetchAvailability(); showToast('✅ נשמר'); } catch (err) { showToast(`שגיאה: ${err.message}`); } }}
                           style={{ padding: '6px 10px', borderRadius: '8px', border: '1.5px solid #e5e7eb', outline: 'none', fontSize: '0.875rem' }} />
                         <span style={{ color: '#9ca3af', fontSize: '0.875rem' }}>עד</span>
                         <input type="time" value={day.end_time}
                           onChange={e => setAvailability(availability.map((d, j) => j === i ? { ...d, end_time: e.target.value } : d))}
-                          onBlur={async e => { try { await apiFetch(`${API}/availability/${day.day_of_week}`, { method: 'PUT', body: JSON.stringify({ start_time: day.start_time, end_time: e.target.value, is_active: day.is_active }) }); showToast('✅ נשמר'); } catch (err) { showToast(`שגיאה: ${err.message}`); } }}
+                          onBlur={async e => { try { await apiFetch(`${API}/availability/${day.day_of_week}`, { method: 'PUT', body: JSON.stringify({ start_time: day.start_time, end_time: e.target.value, is_active: day.is_active }) }); await fetchAvailability(); showToast('✅ נשמר'); } catch (err) { showToast(`שגיאה: ${err.message}`); } }}
                           style={{ padding: '6px 10px', borderRadius: '8px', border: '1.5px solid #e5e7eb', outline: 'none', fontSize: '0.875rem' }} />
                       </div>
                     ) : <span style={{ color: '#d1d5db', fontWeight: 700, fontSize: '0.875rem' }}>סגור</span>}
@@ -956,8 +962,9 @@ const Dashboard = ({ user, onLogout }) => {
               <button onClick={async () => {
                 try {
                   await apiFetch(`${API}/availability/bulk`, { method: 'PUT', body: JSON.stringify({ days: availability }) });
+                  await fetchAvailability();
                   showToast('שעות הפעילות נשמרו ✅');
-                } catch (e) { showToast(`שגיאה: ${e.message}`); }
+                } catch (e) { showToast(`שגיאה בשמירה: ${e.message}`); }
               }} style={{ marginTop: '1rem', padding: '0.875rem 1.5rem', borderRadius: '12px', background: 'linear-gradient(135deg,#2d0a1e,#8b2252)', color: '#ffb6c1', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: 'pointer', fontFamily: 'Heebo, sans-serif' }}>
                 שמירת שינויים
               </button>
