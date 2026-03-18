@@ -612,7 +612,7 @@ const Dashboard = ({ user, onLogout }) => {
   useEffect(() => {
     Promise.all([fetchAppointments(), fetchServices(), fetchAvailability()])
       .finally(() => setLoadingData(false));
-    const interval = setInterval(fetchAppointments, 30000);
+    const interval = setInterval(fetchAppointments, 5000);
     return () => clearInterval(interval);
   }, [fetchAppointments, fetchServices, fetchAvailability]);
 
