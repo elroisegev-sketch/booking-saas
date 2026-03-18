@@ -45,7 +45,7 @@ const MOCK_APPOINTMENTS = [
 ];
 
 const MOCK_AVAILABILITY = [
-  { day_of_week: 0, is_active: false, start_time: '09:00', end_time: '18:00' },
+  { day_of_week: 0, is_active: true, start_time: '10:00', end_time: '17:00' },
   { day_of_week: 1, is_active: true, start_time: '09:00', end_time: '18:00' },
   { day_of_week: 2, is_active: true, start_time: '09:00', end_time: '18:00' },
   { day_of_week: 3, is_active: true, start_time: '09:00', end_time: '18:00' },
