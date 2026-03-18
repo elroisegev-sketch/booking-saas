@@ -939,10 +939,14 @@ const Dashboard = ({ user, onLogout }) => {
                     </button>
                     {day.is_active ? (
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <input type="time" value={day.start_time} onChange={e => setAvailability(availability.map((d, j) => j === i ? { ...d, start_time: e.target.value } : d))}
+                        <input type="time" value={day.start_time}
+                          onChange={e => setAvailability(availability.map((d, j) => j === i ? { ...d, start_time: e.target.value } : d))}
+                          onBlur={async e => { try { await apiFetch(`${API}/availability/${day.day_of_week}`, { method: 'PUT', body: JSON.stringify({ start_time: e.target.value, end_time: day.end_time, is_active: day.is_active }) }); showToast('✅ נשמר'); } catch (err) { showToast(`שגיאה: ${err.message}`); } }}
                           style={{ padding: '6px 10px', borderRadius: '8px', border: '1.5px solid #e5e7eb', outline: 'none', fontSize: '0.875rem' }} />
                         <span style={{ color: '#9ca3af', fontSize: '0.875rem' }}>עד</span>
-                        <input type="time" value={day.end_time} onChange={e => setAvailability(availability.map((d, j) => j === i ? { ...d, end_time: e.target.value } : d))}
+                        <input type="time" value={day.end_time}
+                          onChange={e => setAvailability(availability.map((d, j) => j === i ? { ...d, end_time: e.target.value } : d))}
+                          onBlur={async e => { try { await apiFetch(`${API}/availability/${day.day_of_week}`, { method: 'PUT', body: JSON.stringify({ start_time: day.start_time, end_time: e.target.value, is_active: day.is_active }) }); showToast('✅ נשמר'); } catch (err) { showToast(`שגיאה: ${err.message}`); } }}
                           style={{ padding: '6px 10px', borderRadius: '8px', border: '1.5px solid #e5e7eb', outline: 'none', fontSize: '0.875rem' }} />
                       </div>
                     ) : <span style={{ color: '#d1d5db', fontWeight: 700, fontSize: '0.875rem' }}>סגור</span>}
