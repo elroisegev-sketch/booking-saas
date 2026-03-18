@@ -20,7 +20,7 @@ router.get('/', auth, async (req, res) => {
 
 // POST /api/services
 router.post('/', auth, async (req, res) => {
-  const { name, duration, price } = req.body;
+  const { name, duration, price, category } = req.body;
   if (!name || !duration) {
     return res.status(400).json({ error: 'Service name and duration are required' });
   }
@@ -29,8 +29,8 @@ router.post('/', auth, async (req, res) => {
   }
   try {
     const result = await db.query(
-      'INSERT INTO services (business_id, name, duration, price) VALUES ($1,$2,$3,$4) RETURNING *',
-      [req.user.id, name.trim(), parseInt(duration), parseFloat(price) || 0]
+      'INSERT INTO services (business_id, name, duration, price, category) VALUES ($1,$2,$3,$4,$5) RETURNING *',
+      [req.user.id, name.trim(), parseInt(duration), parseFloat(price) || 0, category || null]
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {
@@ -40,16 +40,17 @@ router.post('/', auth, async (req, res) => {
 
 // PUT /api/services/:id
 router.put('/:id', auth, async (req, res) => {
-  const { name, duration, price, is_active } = req.body;
+  const { name, duration, price, is_active, category } = req.body;
   try {
     const result = await db.query(
       `UPDATE services
        SET name=COALESCE($1,name), duration=COALESCE($2,duration),
-           price=COALESCE($3,price), is_active=COALESCE($4,is_active)
-       WHERE id=$5 AND business_id=$6
+           price=COALESCE($3,price), is_active=COALESCE($4,is_active),
+           category=COALESCE($5,category)
+       WHERE id=$6 AND business_id=$7
        RETURNING *`,
       [name, duration ? parseInt(duration) : null, price !== undefined ? parseFloat(price) : null,
-       is_active, req.params.id, req.user.id]
+       is_active, category || null, req.params.id, req.user.id]
     );
     if (!result.rows.length) return res.status(404).json({ error: 'Service not found' });
     res.json(result.rows[0]);
