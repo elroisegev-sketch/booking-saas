@@ -8,6 +8,7 @@ const MOCK_SERVICES = [
   { id: 's3', name: 'הסרה + מניקור + צורה', duration: 45, price: 70, is_active: true, category: "לק ג'ל 💅" },
   { id: 's4', name: 'השלמת ציפורן', duration: 15, price: 10, is_active: true, category: "לק ג'ל 💅" },
   { id: 's5', name: "פרנץ'", duration: 15, price: 20, is_active: true, category: "לק ג'ל 💅" },
+  { id: 's15', name: 'קישוט', duration: 30, price: 0, is_active: true, category: "לק ג'ל 💅" },
   { id: 's6', name: 'עיצוב גבות', duration: 20, price: 70, is_active: true, category: 'פנים 💆' },
   { id: 's7', name: 'צביעת גבות', duration: 15, price: 20, is_active: true, category: 'פנים 💆' },
   { id: 's8', name: 'עיצוב + צביעת גבות', duration: 30, price: 80, is_active: true, category: 'פנים 💆' },
@@ -69,7 +70,7 @@ const WHATSAPP_LINK = (name, services, date, time, total) =>
 
 const fmtTime = (iso) => new Date(iso).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
 const fmtDate = (iso) => new Date(iso).toLocaleDateString('he-IL', { weekday: 'short', month: 'short', day: 'numeric' });
-const fmtPrice = (n) => `₪${parseFloat(n || 0).toFixed(0)}`;
+const fmtPrice = (n) => parseFloat(n || 0) === 0 ? 'משתנה' : `₪${parseFloat(n).toFixed(0)}`;
 
 const Icon = ({ name, className = 'w-5 h-5' }) => {
   const icons = {
@@ -389,8 +390,10 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                   {selectedServices.map(s => s.name).join(' + ')} · {totalDuration} דקות
                 </div>
                 <button onClick={() => {
-                  if (hasGel) {
-                    // Show gel terms before proceeding
+                  const hasKishut = selectedServices.some(s => s.name === 'קישוט');
+                  if (hasKishut) {
+                    setStep('kishut_info');
+                  } else if (hasGel) {
                     setStep('terms_gel');
                   } else {
                     setStep(2);
@@ -400,6 +403,29 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                 </button>
               </div>
             )}
+          </div>
+        )}
+
+        {/* Kishut info interstitial */}
+        {step === 'kishut_info' && (
+          <div style={{ textAlign: 'center' }}>
+            <div style={{ fontSize: '3rem', marginBottom: '1rem' }}>✨</div>
+            <h2 style={{ fontSize: '1.5rem', fontWeight: 900, color: '#A11738', marginBottom: '0.75rem' }}>בחרת קישוט!</h2>
+            <div style={{ background: 'white', border: '1px solid #f0f0f0', borderRadius: '16px', padding: '1.25rem', marginBottom: '1.25rem', textAlign: 'right', fontSize: '0.9rem', color: '#374151', lineHeight: 1.7 }}>
+              כדי לדייק את הזמן והמחיר עבורך, מומלץ לשלוח תמונת השראה לליאור בוואטסאפ לפני האישור הסופי.<br /><br />
+              ניתן להמשיך לקביעת התור גם ללא תמונה — ליאור תיצור איתך קשר לאישור הפרטים הסופיים.
+            </div>
+            <a href={`https://wa.me/972${LIOR_PHONE.slice(1)}?text=${encodeURIComponent('היי ליאור 🌸 אשמח לשלוח תמונת השראה לקישוט 💅')}`}
+              target="_blank" rel="noreferrer"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', padding: '0.875rem', borderRadius: '12px', background: '#25D366', color: 'white', fontWeight: 700, fontSize: '0.9rem', textDecoration: 'none', marginBottom: '12px', boxSizing: 'border-box' }}>
+              <Icon name="whatsapp" className="w-5 h-5" />
+              שלחי תמונה לליאור בוואטסאפ
+            </a>
+            <button onClick={() => { hasGel ? setStep('terms_gel') : setStep(2); }}
+              style={{ width: '100%', padding: '0.875rem', borderRadius: '12px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, border: 'none', cursor: 'pointer', marginBottom: '12px' }}>
+              המשך לקביעת תור →
+            </button>
+            <button onClick={() => setStep(1)} style={{ width: '100%', padding: '0.75rem', borderRadius: '12px', background: '#f3f4f6', color: '#374151', fontWeight: 700, border: 'none', cursor: 'pointer' }}>חזרה</button>
           </div>
         )}
 
