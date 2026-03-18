@@ -274,9 +274,6 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
           <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>{dateStr} | {sel.time}</p>
           <p style={{ fontWeight: 900, fontSize: '1.5rem', color: '#EC6A83', marginTop: '0.5rem' }}>{fmtPrice(totalPrice)}</p>
         </div>
-        <div style={{ background: '#F7C1C3', borderRadius: '12px', padding: '0.875rem', marginBottom: '1.25rem', fontSize: '0.875rem', color: '#A11738', fontWeight: 700 }}>
-          מקדמה ששולמה: {fmtPrice(deposit)}
-        </div>
         <a href={`https://wa.me/972${LIOR_PHONE.slice(1)}?text=${encodeURIComponent('היי ליאור 🌸 שלחתי מקדמה — הנה האסמכתא:')}`} target="_blank" rel="noreferrer"
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', padding: '0.875rem', borderRadius: '12px', background: '#25D366', color: 'white', fontWeight: 700, fontSize: '0.9rem', textDecoration: 'none', marginBottom: '12px', boxSizing: 'border-box' }}>
           <Icon name="whatsapp" className="w-5 h-5" />
