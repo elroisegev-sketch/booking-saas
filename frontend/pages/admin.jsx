@@ -1048,7 +1048,7 @@ const Dashboard = ({ user, onLogout }) => {
 // ── ROOT ──────────────────────────────────────────────────────
 export default function App() {
   const [user, setUser] = useState(null);
-  const [view, setView] = useState('portfolio');
+  const [view, setView] = useState('auth');
 
   useEffect(() => {
     const savedUser = localStorage.getItem('user');

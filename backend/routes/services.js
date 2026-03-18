@@ -30,7 +30,7 @@ router.post('/', auth, async (req, res) => {
   try {
     const result = await db.query(
       'INSERT INTO services (business_id, name, duration, price, category) VALUES ($1,$2,$3,$4,$5) RETURNING *',
-      [req.user.id, name.trim(), parseInt(duration), parseFloat(price) || 0, category || null]
+      [req.user.id, name.trim(), parseInt(duration), parseFloat(price) || 0, category || 'כללי']
     );
     res.status(201).json(result.rows[0]);
   } catch (err) {

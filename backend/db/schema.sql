@@ -21,6 +21,7 @@ CREATE TABLE services (
   name VARCHAR(255) NOT NULL,
   duration INTEGER NOT NULL, -- in minutes
   price NUMERIC(10,2) NOT NULL DEFAULT 0,
+  category VARCHAR(100) DEFAULT 'כללי',
   is_active BOOLEAN DEFAULT TRUE,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
