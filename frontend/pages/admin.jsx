@@ -522,6 +522,7 @@ const ServiceModal = ({ service, onSave, onClose }) => {
             value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}>
             <option>לק ג&apos;ל 💅</option>
             <option>פנים 💆</option>
+            <option>קישוט 💄</option>
           </select>
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '1.25rem' }}>
@@ -966,7 +967,7 @@ const Dashboard = ({ user, onLogout }) => {
                     <div style={{ width: '80px', textAlign: 'right' }}>
                       <span style={{ fontWeight: 700, fontSize: '0.875rem', color: day.is_active ? '#2d0a1e' : '#9ca3af' }}>יום {DAY_NAMES[day.day_of_week]}</span>
                     </div>
-                    <button onClick={() => setAvailability(availability.map((d, j) => j === i ? { ...d, is_active: !d.is_active } : d))}
+                    <button onClick={async () => { const newActive = !day.is_active; setAvailability(availability.map((d, j) => j === i ? { ...d, is_active: newActive } : d)); try { await apiFetch(`${API}/availability/${day.day_of_week}`, { method: 'PUT', body: JSON.stringify({ start_time: day.start_time, end_time: day.end_time, is_active: newActive }) }); } catch (e) { showToast(`שגיאה: ${e.message}`); } }}
                       style={{ width: '40px', height: '20px', borderRadius: '999px', border: 'none', cursor: 'pointer', background: day.is_active ? '#8b2252' : '#d1d5db', position: 'relative', flexShrink: 0 }}>
                       <div style={{ width: '16px', height: '16px', background: 'white', borderRadius: '50%', position: 'absolute', top: '2px', transition: 'left 0.2s', left: day.is_active ? '22px' : '2px', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }} />
                     </button>
