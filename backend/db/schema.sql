@@ -57,7 +57,18 @@ CREATE TABLE appointments (
   ) WHERE (status != 'cancelled')
 );
 
+-- Push notification subscriptions
+CREATE TABLE push_subscriptions (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  business_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  endpoint TEXT NOT NULL,
+  subscription JSONB NOT NULL,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(business_id, endpoint)
+);
+
 -- Indexes for performance
 CREATE INDEX idx_appointments_business_date ON appointments(business_id, appointment_time);
 CREATE INDEX idx_services_business ON services(business_id);
 CREATE INDEX idx_availability_business ON availability(business_id);
+CREATE INDEX idx_push_subscriptions_business ON push_subscriptions(business_id);

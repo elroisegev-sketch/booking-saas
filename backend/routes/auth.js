@@ -58,10 +58,21 @@ router.post('/register', registerLimiter, async (req, res) => {
     );
     const user = result.rows[0];
 
-    for (let day = 1; day <= 5; day++) {
+    // Days 0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat
+    // Default: Sun–Thu active, Fri 09:00–14:00, Sat inactive
+    const defaultDays = [
+      { day: 0, start: '09:00', end: '17:00', active: true  }, // ראשון
+      { day: 1, start: '09:00', end: '17:00', active: true  }, // שני
+      { day: 2, start: '09:00', end: '17:00', active: true  }, // שלישי
+      { day: 3, start: '09:00', end: '17:00', active: true  }, // רביעי
+      { day: 4, start: '09:00', end: '17:00', active: true  }, // חמישי
+      { day: 5, start: '09:00', end: '14:00', active: false }, // שישי
+      { day: 6, start: '09:00', end: '17:00', active: false }, // שבת
+    ];
+    for (const d of defaultDays) {
       await db.query(
-        'INSERT INTO availability (business_id, day_of_week, start_time, end_time) VALUES ($1,$2,$3,$4)',
-        [user.id, day, '09:00', '17:00']
+        'INSERT INTO availability (business_id, day_of_week, start_time, end_time, is_active) VALUES ($1,$2,$3,$4,$5)',
+        [user.id, d.day, d.start, d.end, d.active]
       );
     }
 
