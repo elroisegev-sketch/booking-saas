@@ -1,26 +1,52 @@
 const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const rateLimit = require('express-rate-limit');
 const db = require('../db');
 const router = express.Router();
+
+// ── Rate limiters ─────────────────────────────────────────────
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,   // 15 minutes
+  max: 10,                     // 10 attempts per IP
+  skipSuccessfulRequests: true,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'יותר מדי ניסיונות כניסה. נסה שוב בעוד 15 דקות.' },
+});
+
+const registerLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,   // 1 hour
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'יותר מדי ניסיונות הרשמה. נסה שוב בעוד שעה.' },
+});
+
+// ── Helpers ───────────────────────────────────────────────────
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const slugify = (text) =>
   text.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
 
-// POST /api/register
-router.post('/register', async (req, res) => {
+// ── POST /api/register ────────────────────────────────────────
+router.post('/register', registerLimiter, async (req, res) => {
   const { email, password, business_name } = req.body;
-  if (!email || !password || !business_name) {
+
+  if (!email || !password || !business_name)
     return res.status(400).json({ error: 'Email, password, and business name are required' });
-  }
-  if (password.length < 8) {
+  if (!EMAIL_RE.test(email))
+    return res.status(400).json({ error: 'Invalid email format' });
+  if (password.length < 8)
     return res.status(400).json({ error: 'Password must be at least 8 characters' });
-  }
+  if (typeof business_name !== 'string' || business_name.trim().length > 100)
+    return res.status(400).json({ error: 'Business name must be 1-100 characters' });
+
   try {
-    const existing = await db.query('SELECT id FROM users WHERE email=$1', [email]);
-    if (existing.rows.length > 0) {
+    const existing = await db.query('SELECT id FROM users WHERE email=$1', [email.toLowerCase().trim()]);
+    if (existing.rows.length > 0)
       return res.status(409).json({ error: 'Email is already registered' });
-    }
+
     let slug = slugify(business_name);
     const slugCheck = await db.query('SELECT id FROM users WHERE slug=$1', [slug]);
     if (slugCheck.rows.length > 0) slug = `${slug}-${Date.now()}`;
@@ -28,11 +54,10 @@ router.post('/register', async (req, res) => {
     const hash = await bcrypt.hash(password, 12);
     const result = await db.query(
       'INSERT INTO users (email, password_hash, business_name, slug) VALUES ($1,$2,$3,$4) RETURNING id, email, business_name, slug',
-      [email, hash, business_name, slug]
+      [email.toLowerCase().trim(), hash, business_name.trim(), slug]
     );
     const user = result.rows[0];
 
-    // Seed default availability Mon-Fri 9am-5pm
     for (let day = 1; day <= 5; day++) {
       await db.query(
         'INSERT INTO availability (business_id, day_of_week, start_time, end_time) VALUES ($1,$2,$3,$4)',
@@ -48,22 +73,27 @@ router.post('/register', async (req, res) => {
   }
 });
 
-// POST /api/login
-router.post('/login', async (req, res) => {
+// ── POST /api/login ───────────────────────────────────────────
+router.post('/login', loginLimiter, async (req, res) => {
   const { email, password } = req.body;
-  if (!email || !password) {
+
+  if (!email || !password)
     return res.status(400).json({ error: 'Email and password required' });
-  }
+  if (!EMAIL_RE.test(email))
+    return res.status(400).json({ error: 'Invalid email format' });
+  if (typeof password !== 'string' || password.length > 200)
+    return res.status(400).json({ error: 'Invalid password' });
+
   try {
-    const result = await db.query('SELECT * FROM users WHERE email=$1', [email]);
-    if (!result.rows.length) {
+    const result = await db.query('SELECT * FROM users WHERE email=$1', [email.toLowerCase().trim()]);
+    if (!result.rows.length)
       return res.status(401).json({ error: 'Invalid email or password' });
-    }
+
     const user = result.rows[0];
     const valid = await bcrypt.compare(password, user.password_hash);
-    if (!valid) {
+    if (!valid)
       return res.status(401).json({ error: 'Invalid email or password' });
-    }
+
     const token = jwt.sign({ id: user.id, email: user.email }, process.env.JWT_SECRET, { expiresIn: '7d' });
     res.json({
       token,
@@ -75,7 +105,7 @@ router.post('/login', async (req, res) => {
   }
 });
 
-// GET /api/me
+// ── GET /api/me ───────────────────────────────────────────────
 router.get('/me', require('../middleware/auth'), async (req, res) => {
   try {
     const result = await db.query(
