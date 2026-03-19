@@ -649,7 +649,13 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
               scrollTrigger: { trigger: el, start: 'top 88%' } }
           );
         });
-      } catch(e) { console.log('GSAP error:', e); }
+      } catch(e) {
+        // GSAP failed — make all sections visible immediately
+        document.querySelectorAll('.reveal-sec').forEach(el => {
+          el.style.opacity = '1';
+          el.style.transform = 'none';
+        });
+      }
     };
     initGSAP();
   }, []);
@@ -902,7 +908,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                 </div>
               )}
 
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '1rem', marginBottom: '2rem' }}>
+              <div className="admin-stats-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '1rem', marginBottom: '2rem' }}>
                 {[{ label: 'תורים היום', value: todayAppts.length, emoji: '🗓' }, { label: 'הכנסה היום', value: fmtPrice(revenue), emoji: '💰' }, { label: 'תורים קרובים', value: upcoming, emoji: '⏰' }].map((s, i) => (
                   <div key={i} style={{ ...card, padding: '1.25rem' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
@@ -1058,7 +1064,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                   <Icon name="plus" className="w-4 h-4" /> הוסף תור
                 </button>
               </div>
-              <div style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: '1.25rem' }}>
+              <div className="admin-calendar-grid" style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: '1.25rem' }}>
                 <div style={card}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.5rem', borderBottom: '1px solid #f9fafb' }}>
                     <button onClick={() => setCalMonth(new Date(calMonth.getFullYear(), calMonth.getMonth() - 1))} style={{ padding: '6px', background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="chevronR" className="w-4 h-4" /></button>
@@ -1164,18 +1170,21 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                 </div>
               ) : (
                 <div style={card}>
-                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', padding: '0.75rem 1.5rem', borderBottom: '1px solid #f0f0f0' }}>
-                    {['שם', 'טלפון', 'ביקור אחרון', 'תורים'].map(h => <span key={h} style={{ fontSize: '0.75rem', fontWeight: 900, color: '#9ca3af' }}>{h}</span>)}
+                  <div className="admin-customers-table" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', padding: '0.75rem 1.5rem', borderBottom: '1px solid #f0f0f0' }}>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 900, color: '#9ca3af' }}>שם</span>
+                    <span style={{ fontSize: '0.75rem', fontWeight: 900, color: '#9ca3af' }}>טלפון</span>
+                    <span className="col-hide" style={{ fontSize: '0.75rem', fontWeight: 900, color: '#9ca3af' }}>ביקור אחרון</span>
+                    <span className="col-hide" style={{ fontSize: '0.75rem', fontWeight: 900, color: '#9ca3af' }}>תורים</span>
                   </div>
                   {[...new Map(appointments.filter(a => a.status !== 'cancelled').map(a => [a.customer_phone, a])).values()].map((appt, i) => (
-                    <div key={i} style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', padding: '1rem 1.5rem', alignItems: 'center', borderBottom: '1px solid #fafafa' }}>
+                    <div key={i} className="admin-customers-table" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', padding: '1rem 1.5rem', alignItems: 'center', borderBottom: '1px solid #fafafa' }}>
                       <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <div style={{ width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.875rem', fontWeight: 900, background: '#F7C1C3', color: '#A11738', flexShrink: 0 }}>{appt.customer_name[0]}</div>
                         <span style={{ fontWeight: 700, color: '#A11738', fontSize: '0.875rem' }}>{appt.customer_name}</span>
                       </div>
                       <span style={{ color: '#6b7280', fontSize: '0.875rem' }}>{appt.customer_phone}</span>
-                      <span style={{ color: '#6b7280', fontSize: '0.875rem' }}>{fmtDate(appt.appointment_time)}</span>
-                      <span style={{ fontWeight: 900, color: '#EC6A83', fontSize: '0.875rem' }}>{appointments.filter(a => a.customer_phone === appt.customer_phone).length}</span>
+                      <span className="col-hide" style={{ color: '#6b7280', fontSize: '0.875rem' }}>{fmtDate(appt.appointment_time)}</span>
+                      <span className="col-hide" style={{ fontWeight: 900, color: '#EC6A83', fontSize: '0.875rem' }}>{appointments.filter(a => a.customer_phone === appt.customer_phone).length}</span>
                     </div>
                   ))}
                 </div>
@@ -1252,7 +1261,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
       </div>
 
       {/* Bottom Navigation */}
-      <div style={{ position: 'fixed', bottom: 0, right: 0, left: 0, background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)', borderTop: '1px solid rgba(255,255,255,0.8)', display: 'flex', justifyContent: 'space-around', padding: '8px 0 12px', zIndex: 50, fontFamily: 'Varela Round, sans-serif' }}>
+      <div className="admin-bottom-nav" style={{ position: 'fixed', bottom: 0, right: 0, left: 0, background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)', borderTop: '1px solid rgba(255,255,255,0.8)', display: 'flex', justifyContent: 'space-around', padding: '8px 0 12px', zIndex: 50, fontFamily: 'Varela Round, sans-serif' }}>
         {navItems.map(item => (
           <button key={item.id} onClick={() => setTab(item.id)}
             style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', padding: '6px 10px', background: 'none', border: 'none', cursor: 'pointer', color: tab === item.id ? '#A11738' : '#9ca3af', fontFamily: 'Varela Round, sans-serif', position: 'relative' }}>
@@ -1384,8 +1393,19 @@ export default function App() {
         }
         .gallery-item:hover { transform: scale(1.04) translateY(-4px); box-shadow: 0 16px 40px rgba(161,23,56,0.18); }
         .gallery-scroll::-webkit-scrollbar { display: none; }
-        .reveal-sec { opacity: 0; transform: translateY(32px); transition: opacity 0.7s ease, transform 0.7s ease; }
-        .reveal-sec.visible { opacity: 1; transform: translateY(0); }
+        .reveal-sec { transition: opacity 0.7s ease, transform 0.7s ease; }
+
+        @media (max-width: 480px) {
+          .admin-stats-grid > div { padding: 0.875rem !important; }
+          .admin-stats-grid > div p { font-size: 1.35rem !important; }
+          .admin-stats-grid > div span { font-size: 0.7rem !important; }
+          .admin-calendar-grid { grid-template-columns: 1fr !important; }
+          .admin-customers-table .col-hide { display: none !important; }
+          .admin-customers-table > div { grid-template-columns: 1fr 1fr !important; }
+          .admin-bottom-nav button { padding: 4px 5px !important; }
+          .admin-bottom-nav button span { font-size: 0.52rem !important; }
+          .admin-bottom-nav button svg { width: 18px !important; height: 18px !important; }
+        }
       `}</style>
       {view === 'portfolio' && <PortfolioPage onBook={() => setView('booking')} onAdmin={() => setView('auth')} />}
       {view === 'booking' && <BookingPage onBack={() => setView('portfolio')} onAppointmentBooked={(appt) => { setAppointments(prev => [...prev, appt]); }} />}
