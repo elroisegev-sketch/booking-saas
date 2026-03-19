@@ -723,7 +723,7 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
         {/* Social card */}
         <div className="reveal-sec" style={{ background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.85)', borderRadius: '28px', padding: '2rem', textAlign: 'center', boxShadow: '0 8px 32px rgba(161,23,56,0.08), inset 0 1px 0 rgba(255,255,255,0.9)', marginBottom: '1.75rem' }}>
           <p style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '1.5rem', fontWeight: 400, color: '#A11738', marginBottom: '0.2rem' }}>Lior Segev Beauty</p>
-          <p style={{ color: '#9ca3af', fontSize: '0.67rem', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: '1.5rem' }}>עקבי אחרינו</p>
+          <p style={{ color: '#9ca3af', fontSize: '0.67rem', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: '1.5rem' }}>עקבי אחרי הקסם</p>
           <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
             {/* Instagram */}
             <a href="https://www.instagram.com/liors_beauty" target="_blank" rel="noreferrer"
