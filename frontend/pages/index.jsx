@@ -724,12 +724,22 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
         <div className="reveal-sec" style={{ background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.85)', borderRadius: '28px', padding: '2rem', textAlign: 'center', boxShadow: '0 8px 32px rgba(161,23,56,0.08), inset 0 1px 0 rgba(255,255,255,0.9)', marginBottom: '1.75rem' }}>
           <p style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '1.5rem', fontWeight: 400, color: '#A11738', marginBottom: '0.2rem' }}>Lior Segev Beauty</p>
           <p style={{ color: '#9ca3af', fontSize: '0.67rem', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: '1.5rem' }}>עקבי אחרינו</p>
-          <div style={{ display: 'flex', gap: '0.875rem', justifyContent: 'center' }}>
-            <a href="https://www.instagram.com/liors_beauty" target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '52px', height: '52px', borderRadius: '16px', background: '#FDECE5', textDecoration: 'none' }}>
-              <img src="/instagram.png" alt="Instagram" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
+          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+            {/* Instagram */}
+            <a href="https://www.instagram.com/liors_beauty" target="_blank" rel="noreferrer"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '52px', height: '52px', borderRadius: '16px', background: 'linear-gradient(135deg,#f9ce34,#ee2a7b,#6228d7)', textDecoration: 'none', boxShadow: '0 4px 16px rgba(238,42,123,0.28)' }}>
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="white">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="none" stroke="white" strokeWidth="2"/>
+                <circle cx="12" cy="12" r="4" fill="none" stroke="white" strokeWidth="2"/>
+                <circle cx="17.5" cy="6.5" r="1.2" fill="white"/>
+              </svg>
             </a>
-            <a href="https://www.facebook.com/share/1DLKLrkWFb/" target="_blank" rel="noreferrer" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '52px', height: '52px', borderRadius: '16px', background: '#FDECE5', textDecoration: 'none' }}>
-              <img src="/facebook.png" alt="Facebook" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
+            {/* Facebook */}
+            <a href="https://www.facebook.com/share/1DLKLrkWFb/" target="_blank" rel="noreferrer"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '52px', height: '52px', borderRadius: '16px', background: '#1877F2', textDecoration: 'none', boxShadow: '0 4px 16px rgba(24,119,242,0.28)' }}>
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="white">
+                <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
+              </svg>
             </a>
           </div>
         </div>
