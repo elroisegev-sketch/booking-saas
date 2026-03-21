@@ -661,7 +661,7 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
   }, []);
 
   return (
-    <div dir="rtl" style={{ minHeight: '100vh', fontFamily: "'Varela Round', sans-serif", background: 'linear-gradient(135deg, #fff5f7 0%, #fce8f3 40%, #f3eeff 80%, #fff5f7 100%)', overflowX: 'hidden' }}>
+    <div dir="rtl" style={{ minHeight: '100vh', fontFamily: "'Varela Round', sans-serif", background: 'linear-gradient(160deg, #FDECE5 0%, #F7C1C3 50%, #EC6A83 100%)', overflowX: 'hidden' }}>
 
       {/* ── HERO ── */}
       <div className="hero-section" style={{ position: 'relative', height: '100svh', minHeight: '580px', overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
