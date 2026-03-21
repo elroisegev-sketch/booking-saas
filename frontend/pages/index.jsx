@@ -696,9 +696,9 @@ const FanGallery = () => {
           );
         })}
 
-        <button onClick={() => setCenter(c => (c - 1 + TOTAL_IMAGES) % TOTAL_IMAGES)}
-          style={{ position: 'absolute', right: '0', top: '50%', transform: 'translateY(-50%)', zIndex: 20, background: 'rgba(255,255,255,0.72)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.85)', borderRadius: '50%', width: '36px', height: '36px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#A11738', fontSize: '1.4rem', boxShadow: '0 4px 14px rgba(161,23,56,0.15)' }}>‹</button>
         <button onClick={() => setCenter(c => (c + 1) % TOTAL_IMAGES)}
+          style={{ position: 'absolute', right: '0', top: '50%', transform: 'translateY(-50%)', zIndex: 20, background: 'rgba(255,255,255,0.72)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.85)', borderRadius: '50%', width: '36px', height: '36px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#A11738', fontSize: '1.4rem', boxShadow: '0 4px 14px rgba(161,23,56,0.15)' }}>‹</button>
+        <button onClick={() => setCenter(c => (c - 1 + TOTAL_IMAGES) % TOTAL_IMAGES)}
           style={{ position: 'absolute', left: '0', top: '50%', transform: 'translateY(-50%)', zIndex: 20, background: 'rgba(255,255,255,0.72)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.85)', borderRadius: '50%', width: '36px', height: '36px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#A11738', fontSize: '1.4rem', boxShadow: '0 4px 14px rgba(161,23,56,0.15)' }}>›</button>
       </div>
 
