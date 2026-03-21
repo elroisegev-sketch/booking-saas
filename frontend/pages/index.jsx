@@ -659,34 +659,26 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
     <div dir="rtl" style={{ minHeight: '100vh', fontFamily: "'Varela Round', sans-serif", background: 'linear-gradient(160deg, #FDECE5 0%, #F7C1C3 50%, #EC6A83 100%)', overflowX: 'hidden' }}>
 
       {/* ── HERO ── */}
-      <div className="hero-section" style={{ position: 'relative', height: '100svh', minHeight: '580px', overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-
-        <div style={{ position: 'relative', zIndex: 2, padding: '0 1.75rem 4rem', textAlign: 'center', animation: 'fadeUp 0.9s 0.1s cubic-bezier(0.22,1,0.36,1) both' }}>
-          <img src="/symbol.png" alt="LS" style={{ height: '30px', objectFit: 'contain', opacity: 0.65, display: 'block', margin: '0 auto 1rem' }} />
-          <h1 style={{ fontFamily: "'Varela Round', sans-serif", fontSize: 'clamp(2.8rem, 11vw, 5rem)', fontWeight: 700, color: '#A11738', lineHeight: 1.1, marginBottom: '0.5rem', letterSpacing: '0.01em', animation: 'breathe 4s ease-in-out infinite', display: 'inline-block' }}>
-            היופי שלך
-          </h1>
-          <p style={{ color: '#A11738', fontSize: '0.68rem', letterSpacing: '0.3em', textTransform: 'uppercase', opacity: 0.65, marginBottom: '2rem' }}>
-            Lior Segev Beauty
-          </p>
-          <button className="lux-btn" onClick={onBook} style={{
-            padding: '1rem 2.75rem', borderRadius: '999px',
-            background: 'linear-gradient(135deg, #A11738 0%, #EC6A83 100%)',
-            color: 'white', fontSize: '0.9rem', fontWeight: 500, letterSpacing: '0.07em',
-            border: 'none', cursor: 'pointer',
-            boxShadow: '0 8px 32px rgba(161,23,56,0.38), inset 0 1px 0 rgba(255,255,255,0.18)',
-            animation: 'pulse-glow 3.5s ease-in-out infinite',
-            display: 'inline-flex', alignItems: 'center', gap: '10px'
-          }}>
-            <span>💅</span> קביעת תור
-          </button>
-        </div>
-
-        {/* Scroll indicator */}
-        <div style={{ position: 'absolute', bottom: '1.25rem', left: '50%', transform: 'translateX(-50%)', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px', opacity: 0.25, animation: 'float 2.5s ease-in-out infinite' }}>
-          <div style={{ width: '1px', height: '28px', background: 'linear-gradient(to bottom, transparent, #A11738)' }} />
-          <div style={{ width: '4px', height: '4px', borderRadius: '50%', background: '#A11738' }} />
-        </div>
+      <div style={{ paddingTop: '80px', paddingBottom: '3rem', textAlign: 'center', padding: '80px 1.75rem 3rem', animation: 'fadeUp 0.9s 0.1s cubic-bezier(0.22,1,0.36,1) both' }}>
+        <img src="/symbol.png" alt="LS" style={{ height: '36px', objectFit: 'contain', opacity: 0.7, display: 'block', margin: '0 auto 1.25rem' }} />
+        <h1 style={{ fontFamily: "'Varela Round', sans-serif", fontSize: 'clamp(2.8rem, 11vw, 5rem)', fontWeight: 700, color: '#A11738', lineHeight: 1.1, marginBottom: '0.5rem', letterSpacing: '0.01em', animation: 'breathe 4s ease-in-out infinite', display: 'inline-block' }}>
+          היופי שלך
+        </h1>
+        <p style={{ color: '#A11738', fontSize: '0.72rem', letterSpacing: '0.3em', textTransform: 'uppercase', opacity: 0.7, marginBottom: '2.5rem' }}>
+          Lior Segev Beauty
+        </p>
+        <button className="lux-btn" onClick={onBook} style={{
+          width: '100%', maxWidth: '360px', height: '64px',
+          borderRadius: '999px',
+          background: 'linear-gradient(135deg, #A11738 0%, #EC6A83 100%)',
+          color: 'white', fontSize: '1.25rem', fontWeight: 600, letterSpacing: '0.05em',
+          border: 'none', cursor: 'pointer',
+          boxShadow: '0 8px 32px rgba(161,23,56,0.38), inset 0 1px 0 rgba(255,255,255,0.18)',
+          animation: 'pulse-glow 3.5s ease-in-out infinite',
+          display: 'inline-flex', alignItems: 'center', justifyContent: 'center', gap: '10px'
+        }}>
+          <span>💅</span> קביעת תור
+        </button>
       </div>
 
       {/* ── CONTENT ── */}
