@@ -637,11 +637,6 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
         const { ScrollTrigger } = stModule;
         gsap.registerPlugin(ScrollTrigger);
 
-        gsap.to('.hero-bg-img', {
-          yPercent: 22, ease: 'none',
-          scrollTrigger: { trigger: '.hero-section', start: 'top top', end: 'bottom top', scrub: 1.5 }
-        });
-
         gsap.utils.toArray('.reveal-sec').forEach(el => {
           gsap.fromTo(el,
             { y: 40, opacity: 0 },
@@ -665,8 +660,6 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
 
       {/* ── HERO ── */}
       <div className="hero-section" style={{ position: 'relative', height: '100svh', minHeight: '580px', overflow: 'hidden', display: 'flex', flexDirection: 'column', justifyContent: 'flex-end' }}>
-        <img className="hero-bg-img" src="/bottle-closed.png" alt="" style={{ position: 'absolute', inset: 0, width: '100%', height: '115%', objectFit: 'cover', objectPosition: 'center top' }} />
-        <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom, rgba(255,245,247,0) 0%, rgba(255,245,247,0.05) 40%, rgba(255,245,247,0.85) 70%, #fff5f7 100%)' }} />
 
         <div style={{ position: 'relative', zIndex: 2, padding: '0 1.75rem 4rem', textAlign: 'center', animation: 'fadeUp 0.9s 0.1s cubic-bezier(0.22,1,0.36,1) both' }}>
           <img src="/symbol.png" alt="LS" style={{ height: '30px', objectFit: 'contain', opacity: 0.65, display: 'block', margin: '0 auto 1rem' }} />
