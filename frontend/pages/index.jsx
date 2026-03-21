@@ -626,6 +626,87 @@ const ServiceModal = ({ service, onSave, onClose }) => {
   );
 };
 
+// ── FAN GALLERY ───────────────────────────────────────────────
+const TOTAL_IMAGES = 21;
+const GALLERY_IMAGES = Array.from({ length: TOTAL_IMAGES }, (_, i) => `/gallery/1 - ${i + 1}.jpeg`);
+
+const FAN_CONFIG = {
+  '-2': { x: -105, rotate: -26, scale: 0.70, z: 1, opacity: 0.52 },
+  '-1': { x: -54,  rotate: -13, scale: 0.84, z: 3, opacity: 0.80 },
+   '0': { x: 0,    rotate: 0,   scale: 1,    z: 5, opacity: 1    },
+   '1': { x: 54,   rotate: 13,  scale: 0.84, z: 3, opacity: 0.80 },
+   '2': { x: 105,  rotate: 26,  scale: 0.70, z: 1, opacity: 0.52 },
+};
+
+const FanGallery = () => {
+  const [center, setCenter] = useState(0);
+  const [lightbox, setLightbox] = useState(null);
+
+  const getOffset = (idx) => {
+    let o = idx - center;
+    if (o > TOTAL_IMAGES / 2) o -= TOTAL_IMAGES;
+    if (o < -TOTAL_IMAGES / 2) o += TOTAL_IMAGES;
+    return o;
+  };
+
+  const getCfg = (offset) =>
+    FAN_CONFIG[String(Math.max(-2, Math.min(2, offset)))] || FAN_CONFIG['2'];
+
+  return (
+    <>
+      {lightbox !== null && (
+        <div onClick={() => setLightbox(null)} style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'zoom-out' }}>
+          <img src={GALLERY_IMAGES[lightbox]} alt="" style={{ maxWidth: '92vw', maxHeight: '88vh', borderRadius: '20px', boxShadow: '0 32px 80px rgba(0,0,0,0.6)', animation: 'scaleIn 0.35s cubic-bezier(0.22,1,0.36,1)' }} />
+          <button onClick={() => setLightbox(null)} style={{ position: 'absolute', top: '1.5rem', left: '1.5rem', background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: '50%', width: '40px', height: '40px', color: 'white', fontSize: '1.2rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
+        </div>
+      )}
+
+      <div style={{ position: 'relative', height: '285px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.25rem' }}>
+        {GALLERY_IMAGES.map((src, idx) => {
+          const offset = getOffset(idx);
+          if (Math.abs(offset) > 3) return null;
+          const cfg = getCfg(offset);
+          const isCenter = offset === 0;
+          const isVisible = Math.abs(offset) <= 2;
+          return (
+            <div key={idx}
+              onClick={() => { if (isCenter) setLightbox(idx); else if (isVisible) setCenter(idx); }}
+              style={{
+                position: 'absolute',
+                width: '158px', height: '210px',
+                borderRadius: '18px', overflow: 'hidden',
+                cursor: isVisible ? 'pointer' : 'default',
+                transform: `translateX(${cfg.x}px) rotate(${cfg.rotate}deg) scale(${cfg.scale})`,
+                zIndex: cfg.z,
+                opacity: cfg.opacity,
+                border: '3px solid rgba(255,255,255,0.95)',
+                boxShadow: isCenter
+                  ? '0 24px 56px rgba(161,23,56,0.28), 0 0 0 1px rgba(255,255,255,0.4)'
+                  : '0 8px 20px rgba(161,23,56,0.1)',
+                transition: 'all 0.48s cubic-bezier(0.34,1.1,0.64,1)',
+                pointerEvents: isVisible ? 'auto' : 'none',
+              }}>
+              <img src={src} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+              {isCenter && (
+                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, rgba(61,12,30,0.3) 0%, transparent 55%)', display: 'flex', alignItems: 'flex-end', justifyContent: 'center', paddingBottom: '10px' }}>
+                  <span style={{ color: 'rgba(255,255,255,0.8)', fontSize: '0.6rem', letterSpacing: '0.14em' }}>לחצי להגדלה</span>
+                </div>
+              )}
+            </div>
+          );
+        })}
+
+        <button onClick={() => setCenter(c => (c - 1 + TOTAL_IMAGES) % TOTAL_IMAGES)}
+          style={{ position: 'absolute', right: '0', top: '50%', transform: 'translateY(-50%)', zIndex: 20, background: 'rgba(255,255,255,0.72)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.85)', borderRadius: '50%', width: '36px', height: '36px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#A11738', fontSize: '1.4rem', boxShadow: '0 4px 14px rgba(161,23,56,0.15)' }}>‹</button>
+        <button onClick={() => setCenter(c => (c + 1) % TOTAL_IMAGES)}
+          style={{ position: 'absolute', left: '0', top: '50%', transform: 'translateY(-50%)', zIndex: 20, background: 'rgba(255,255,255,0.72)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.85)', borderRadius: '50%', width: '36px', height: '36px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#A11738', fontSize: '1.4rem', boxShadow: '0 4px 14px rgba(161,23,56,0.15)' }}>›</button>
+      </div>
+
+      <p style={{ textAlign: 'center', color: 'rgba(161,23,56,0.38)', fontSize: '0.67rem', letterSpacing: '0.18em', marginBottom: '0.25rem' }}>{center + 1} / {TOTAL_IMAGES}</p>
+    </>
+  );
+};
+
 // ── PORTFOLIO PAGE ────────────────────────────────────────────
 const PortfolioPage = ({ onBook, onAdmin }) => {
   useEffect(() => {
@@ -693,16 +774,10 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
 
         {/* Gallery */}
         <div className="reveal-sec" style={{ marginBottom: '2.5rem' }}>
-          <h2 style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '1.9rem', fontWeight: 300, color: '#3d0c16', textAlign: 'center', marginBottom: '1.5rem' }}>
+          <h2 style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '1.9rem', fontWeight: 300, color: '#3d0c16', textAlign: 'center', marginBottom: '1.75rem' }}>
             תיק עבודות
           </h2>
-          <div className="gallery-scroll" style={{ overflowX: 'auto', WebkitOverflowScrolling: 'touch', scrollSnapType: 'x mandatory', display: 'flex', gap: '0.75rem', paddingBottom: '0.5rem', scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
-            {Array.from({length: 21}, (_, i) => i + 1).map(n => (
-              <div key={n} className="gallery-item" style={{ flexShrink: 0, width: '158px', height: '200px', borderRadius: '20px', overflow: 'hidden', scrollSnapAlign: 'start', boxShadow: '0 4px 18px rgba(161,23,56,0.09)' }}>
-                <img src={`/gallery/1 - ${n}.jpeg`} alt={`עבודה ${n}`} style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center' }} />
-              </div>
-            ))}
-          </div>
+          <FanGallery />
         </div>
 
         {/* Social card */}
