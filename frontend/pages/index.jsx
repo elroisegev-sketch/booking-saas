@@ -721,24 +721,42 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
         </div>
 
         {/* Social card */}
-        <div className="reveal-sec" style={{ background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.85)', borderRadius: '28px', padding: '2rem', textAlign: 'center', boxShadow: '0 8px 32px rgba(161,23,56,0.08), inset 0 1px 0 rgba(255,255,255,0.9)', marginBottom: '1.75rem' }}>
-          <p style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '1.5rem', fontWeight: 400, color: '#A11738', marginBottom: '0.2rem' }}>Lior Segev Beauty</p>
-          <p style={{ color: '#9ca3af', fontSize: '0.67rem', letterSpacing: '0.2em', textTransform: 'uppercase', marginBottom: '1.5rem' }}>עקבי אחרי הקסם</p>
-          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
-            {/* Instagram */}
-            <a href="https://www.instagram.com/liors_beauty" target="_blank" rel="noreferrer"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '52px', height: '52px', borderRadius: '16px', background: 'linear-gradient(135deg,#f9ce34,#ee2a7b,#6228d7)', textDecoration: 'none', boxShadow: '0 4px 16px rgba(238,42,123,0.28)' }}>
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="white">
-                <rect x="2" y="2" width="20" height="20" rx="5" ry="5" fill="none" stroke="white" strokeWidth="2"/>
-                <circle cx="12" cy="12" r="4" fill="none" stroke="white" strokeWidth="2"/>
-                <circle cx="17.5" cy="6.5" r="1.2" fill="white"/>
-              </svg>
-            </a>
+        <div className="reveal-sec social-card-breathe" style={{ position: 'relative', background: 'linear-gradient(135deg, rgba(255,245,247,0.9), rgba(252,231,243,0.85), rgba(243,238,255,0.9))', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.9)', borderRadius: '32px', padding: '2.5rem 2rem', textAlign: 'center', boxShadow: '0 12px 48px rgba(161,23,56,0.1), inset 0 1px 0 rgba(255,255,255,1)', marginBottom: '1.75rem', overflow: 'hidden' }}>
+
+          {/* Sparkles */}
+          <span className="sparkle sp1" style={{ position: 'absolute', top: '14%', right: '12%', fontSize: '1rem', opacity: 0.7 }}>✦</span>
+          <span className="sparkle sp2" style={{ position: 'absolute', top: '18%', right: '20%', fontSize: '0.5rem', opacity: 0.5 }}>✦</span>
+          <span className="sparkle sp3" style={{ position: 'absolute', top: '10%', left: '15%', fontSize: '0.65rem', opacity: 0.5 }}>✦</span>
+          <span className="sparkle sp4" style={{ position: 'absolute', bottom: '20%', left: '10%', fontSize: '0.8rem', opacity: 0.4 }}>✦</span>
+          <span className="sparkle sp5" style={{ position: 'absolute', bottom: '25%', right: '8%', fontSize: '0.55rem', opacity: 0.45 }}>✦</span>
+
+          {/* Title */}
+          <p style={{ fontFamily: "'Dancing Script', cursive", fontSize: '2.4rem', fontWeight: 700, background: 'linear-gradient(135deg, #A11738, #c4607a, #9b6b3a)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', marginBottom: '0.1rem', lineHeight: 1.2 }}>Lior Segev Beauty</p>
+
+          {/* Studio line */}
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '1rem' }}>
+            <div style={{ width: '28px', height: '1px', background: 'linear-gradient(to left, #c4a35a, transparent)' }} />
+            <span style={{ fontSize: '0.6rem', letterSpacing: '0.35em', color: '#c4a35a', fontWeight: 700, textTransform: 'uppercase' }}>Studio</span>
+            <div style={{ width: '28px', height: '1px', background: 'linear-gradient(to right, #c4a35a, transparent)' }} />
+          </div>
+
+          <p style={{ color: '#b08fa0', fontSize: '0.78rem', letterSpacing: '0.12em', marginBottom: '1.75rem' }}>עקבי אחרי הקסם</p>
+
+          <div style={{ display: 'flex', gap: '1.25rem', justifyContent: 'center' }}>
             {/* Facebook */}
             <a href="https://www.facebook.com/share/1DLKLrkWFb/" target="_blank" rel="noreferrer"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '52px', height: '52px', borderRadius: '16px', background: '#1877F2', textDecoration: 'none', boxShadow: '0 4px 16px rgba(24,119,242,0.28)' }}>
-              <svg width="26" height="26" viewBox="0 0 24 24" fill="white">
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '64px', height: '64px', borderRadius: '20px', background: '#1877F2', textDecoration: 'none', boxShadow: '0 8px 24px rgba(24,119,242,0.35)', transition: 'transform 0.2s' }}>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="white">
                 <path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/>
+              </svg>
+            </a>
+            {/* Instagram */}
+            <a href="https://www.instagram.com/liors_beauty" target="_blank" rel="noreferrer"
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', width: '64px', height: '64px', borderRadius: '20px', background: 'linear-gradient(135deg,#f9ce34 0%,#ee2a7b 50%,#6228d7 100%)', textDecoration: 'none', boxShadow: '0 8px 24px rgba(238,42,123,0.35)', transition: 'transform 0.2s' }}>
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                <circle cx="12" cy="12" r="4"/>
+                <circle cx="17.5" cy="6.5" r="1.2" fill="white" stroke="none"/>
               </svg>
             </a>
           </div>
@@ -1305,7 +1323,7 @@ export default function App() {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Varela+Round&family=Dancing+Script:wght@700&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Varela Round', sans-serif; background: linear-gradient(135deg, #fff5f7 0%, #fce8f3 40%, #f3eeff 80%, #fff5f7 100%); min-height: 100vh; }
         ::selection { background: #F7C1C3; color: #A11738; }
@@ -1404,6 +1422,23 @@ export default function App() {
         .gallery-item:hover { transform: scale(1.04) translateY(-4px); box-shadow: 0 16px 40px rgba(161,23,56,0.18); }
         .gallery-scroll::-webkit-scrollbar { display: none; }
         .reveal-sec { transition: opacity 0.7s ease, transform 0.7s ease; }
+
+        @keyframes social-breathe {
+          0%, 100% { transform: scale(1); box-shadow: 0 12px 48px rgba(161,23,56,0.1), inset 0 1px 0 rgba(255,255,255,1); }
+          50% { transform: scale(1.018); box-shadow: 0 20px 60px rgba(161,23,56,0.16), inset 0 1px 0 rgba(255,255,255,1); }
+        }
+        .social-card-breathe { animation: social-breathe 4s ease-in-out infinite; }
+
+        @keyframes sparkle-1 { 0%,100%{opacity:0.7;transform:scale(1) rotate(0deg)} 50%{opacity:0.2;transform:scale(1.4) rotate(20deg)} }
+        @keyframes sparkle-2 { 0%,100%{opacity:0.5;transform:scale(1) rotate(0deg)} 50%{opacity:0.1;transform:scale(1.6) rotate(-15deg)} }
+        @keyframes sparkle-3 { 0%,100%{opacity:0.5;transform:scale(1) rotate(0deg)} 50%{opacity:0.15;transform:scale(1.3) rotate(30deg)} }
+        @keyframes sparkle-4 { 0%,100%{opacity:0.4;transform:scale(1)} 50%{opacity:0.1;transform:scale(1.5) rotate(-20deg)} }
+        @keyframes sparkle-5 { 0%,100%{opacity:0.45;transform:scale(1)} 50%{opacity:0.1;transform:scale(1.4) rotate(25deg)} }
+        .sp1 { animation: sparkle-1 3s ease-in-out infinite; color: #c4a35a; }
+        .sp2 { animation: sparkle-2 2.5s ease-in-out infinite 0.4s; color: #EC6A83; }
+        .sp3 { animation: sparkle-3 3.5s ease-in-out infinite 0.8s; color: #c4a35a; }
+        .sp4 { animation: sparkle-4 4s ease-in-out infinite 0.2s; color: #EC6A83; }
+        .sp5 { animation: sparkle-5 2.8s ease-in-out infinite 1s; color: #c4a35a; }
 
         @media (max-width: 480px) {
           .admin-stats-grid > div { padding: 0.875rem !important; }
