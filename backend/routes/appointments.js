@@ -6,19 +6,26 @@ const { sendPush } = require('./push');
 const router = express.Router();
 
 // ── Telegram notification ─────────────────────────────────────
-async function sendTelegram(message) {
+function sendTelegram(message) {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
-  if (!token || !chatId) return;
-  try {
-    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chatId, text: message }),
-    });
-  } catch(e) {
-    console.error('Telegram error:', e.message);
-  }
+  if (!token || !chatId) { console.log('Telegram: missing env vars'); return; }
+  const body = JSON.stringify({ chat_id: chatId, text: message });
+  const https = require('https');
+  const options = {
+    hostname: 'api.telegram.org',
+    path: `/bot${token}/sendMessage`,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) },
+  };
+  const req = https.request(options, res => {
+    let data = '';
+    res.on('data', chunk => data += chunk);
+    res.on('end', () => { if (res.statusCode !== 200) console.error('Telegram error:', res.statusCode, data); });
+  });
+  req.on('error', e => console.error('Telegram error:', e.message));
+  req.write(body);
+  req.end();
 }
 
 // ── Rate limiter — public booking endpoint ────────────────────
