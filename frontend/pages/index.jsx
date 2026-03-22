@@ -511,67 +511,66 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
           <div>
             <h2 style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '2rem', fontWeight: 300, color: '#3d0c16', marginBottom: '0.2rem' }}>תשלום מקדמה</h2>
             <p style={{ color: '#9ca3af', fontSize: '0.8rem', marginBottom: '1.75rem' }}>להשלמת הרישום יש להעביר מקדמה 🌸</p>
+
+            {/* סיכום תור */}
             <div style={{ background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.8)', borderRadius: '24px', padding: '1.25rem', marginBottom: '1rem', boxShadow: '0 8px 32px rgba(161,23,56,0.08), inset 0 1px 0 rgba(255,255,255,0.9)' }}>
               {selectedServices.map(svc => (
-                <div key={svc.id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '4px' }}>
+                <div key={svc.id} style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '6px' }}>
                   <span style={{ color: '#374151', fontSize: '0.85rem' }}>{svc.name}</span>
                   <span style={{ color: '#EC6A83', fontWeight: 600, fontSize: '0.85rem' }}>{fmtPrice(svc.price)}</span>
                 </div>
               ))}
-              <div style={{ borderTop: '1px solid rgba(247,193,195,0.22)', marginTop: '10px', paddingTop: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                <span style={{ fontWeight: 600, color: '#A11738', fontSize: '0.85rem' }}>סה"כ</span>
-                <span style={{ fontFamily: "'Varela Round', sans-serif", fontWeight: 300, fontSize: '1.5rem', color: '#EC6A83',}}>{fmtPrice(totalPrice)}</span>
+              <div style={{ borderTop: '1.5px solid rgba(247,193,195,0.35)', marginTop: '10px', paddingTop: '10px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                <span style={{ fontWeight: 700, color: '#A11738', fontSize: '0.85rem' }}>סה"כ</span>
+                <span style={{ fontFamily: "'Varela Round', sans-serif", fontWeight: 300, fontSize: '1.5rem', color: '#EC6A83' }}>{fmtPrice(totalPrice)}</span>
               </div>
               <p style={{ color: '#9ca3af', fontSize: '0.7rem', marginTop: '6px' }}>{dateStr} · {sel.time}</p>
             </div>
-            <div style={{ background: 'linear-gradient(135deg, rgba(252,231,243,0.8), rgba(247,193,195,0.65))', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.75)', borderRadius: '24px', padding: '1.5rem', marginBottom: '1.25rem', textAlign: 'center' }}>
-              <p style={{ fontWeight: 500, fontSize: '0.78rem', color: '#A11738', margin: '0 0 8px', letterSpacing: '0.04em' }}>💳 יש להעביר מקדמה דרך ביט / פייבוקס</p>
-              <p style={{ fontFamily: "'Varela Round', sans-serif", fontWeight: 300, fontSize: '2rem', letterSpacing: '0.05em', color: '#3d0c16', margin: '0 0 8px' }}>053-524-9688</p>
-              <div style={{ display: 'inline-block', background: 'rgba(255,255,255,0.65)', borderRadius: '12px', padding: '5px 16px' }}>
-                <span style={{ fontWeight: 700, fontSize: '1.05rem', color: '#A11738' }}>מקדמה: {fmtPrice(deposit)}</span>
-              </div>
+
+            {/* כרטיס מקדמה */}
+            <div style={{ background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.8)', borderRadius: '24px', padding: '2rem 1.5rem', marginBottom: '1.25rem', textAlign: 'center', boxShadow: '0 8px 32px rgba(161,23,56,0.08), inset 0 1px 0 rgba(255,255,255,0.9)' }}>
+              <p style={{ fontWeight: 600, fontSize: '0.78rem', color: '#9ca3af', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.75rem' }}>תשלום מקדמה</p>
+              <p style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '3rem', fontWeight: 700, color: '#A11738', margin: '0 0 0.4rem', lineHeight: 1 }}>₪{deposit}</p>
+              <p style={{ color: '#b0b8c4', fontSize: '0.75rem' }}>50% ממחיר הטיפול</p>
             </div>
+
+            {/* כפתור ביט */}
             <a
               href={`https://bitpay.onelink.me/P1OE?af_dp=bit://pay?phoneNumber=0535249688%26amount=${deposit}`}
               target="_blank" rel="noreferrer"
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', width: '100%', padding: '1rem', borderRadius: '999px', background: 'linear-gradient(135deg, #5B3FD4, #7B5FFF)', color: 'white', fontWeight: 700, fontSize: '0.95rem', textDecoration: 'none', marginBottom: '12px', boxSizing: 'border-box', boxShadow: '0 6px 24px rgba(91,63,212,0.38)' }}>
+              onClick={async () => {
+                const rawTime = sel.time.trim();
+                const dateStr2 = `${sel.date.getFullYear()}-${String(sel.date.getMonth()+1).padStart(2,'0')}-${String(sel.date.getDate()).padStart(2,'0')}`;
+                const refDate = new Date(`${dateStr2}T12:00:00Z`);
+                const israelLocal = new Date(refDate.toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' }));
+                const israelOffsetMins = Math.round((israelLocal - refDate) / 60000);
+                const [th, tm] = rawTime.split(':').map(Number);
+                const startMins = th * 60 + tm - israelOffsetMins;
+                const startH = String(Math.floor(((startMins % 1440) + 1440) % 1440 / 60)).padStart(2, '0');
+                const startM = String(((startMins % 60) + 60) % 60).padStart(2, '0');
+                const startUTC = new Date(`${dateStr2}T${startH}:${startM}:00Z`);
+                const endUTC = new Date(startUTC.getTime() + totalDuration * 60000);
+                try {
+                  await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://booking-saas-production-b9fd.up.railway.app/api'}/appointments`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                      business_slug: 'lior-segev',
+                      service_id: selectedServices[0]?.id,
+                      customer_name: sel.name,
+                      customer_phone: sel.phone,
+                      appointment_time: startUTC.toISOString(),
+                      end_time: endUTC.toISOString(),
+                    })
+                  });
+                } catch(e) { console.error('booking failed', e); }
+                setBooked(true);
+              }}
+              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', width: '100%', padding: '1rem', borderRadius: '999px', background: 'linear-gradient(135deg, #5B3FD4, #7B5FFF)', color: 'white', fontWeight: 700, fontSize: '1rem', textDecoration: 'none', marginBottom: '12px', boxSizing: 'border-box', boxShadow: '0 6px 24px rgba(91,63,212,0.38)' }}>
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="rgba(255,255,255,0.25)"/><text x="12" y="16.5" textAnchor="middle" fontSize="13" fontWeight="800" fill="white" fontFamily="Arial">B</text></svg>
               פתח ביט לתשלום — ₪{deposit}
             </a>
-            <div style={{ background: 'rgba(254,243,199,0.6)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(252,211,77,0.3)', borderRadius: '16px', padding: '0.875rem 1rem', marginBottom: '1.5rem', fontSize: '0.8rem', color: '#92400e', lineHeight: 1.5 }}>
-              <strong>⚠️</strong> לאחר העברת המקדמה לחצי על הכפתור למטה. התור יאושר לאחר אימות התשלום.
-            </div>
-            <a href={waLink} target="_blank" rel="noreferrer" onClick={async (e) => {
-              const rawTime = sel.time.trim();
-              const dateStr2 = `${sel.date.getFullYear()}-${String(sel.date.getMonth()+1).padStart(2,'0')}-${String(sel.date.getDate()).padStart(2,'0')}`;
-              const refDate = new Date(`${dateStr2}T12:00:00Z`);
-              const israelLocal = new Date(refDate.toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' }));
-              const israelOffsetMins = Math.round((israelLocal - refDate) / 60000);
-              const [th, tm] = rawTime.split(':').map(Number);
-              const startMins = th * 60 + tm - israelOffsetMins;
-              const startH = String(Math.floor(((startMins % 1440) + 1440) % 1440 / 60)).padStart(2, '0');
-              const startM = String(((startMins % 60) + 60) % 60).padStart(2, '0');
-              const startUTC = new Date(`${dateStr2}T${startH}:${startM}:00Z`);
-              const endUTC = new Date(startUTC.getTime() + totalDuration * 60000);
-              try {
-                await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://booking-saas-production-b9fd.up.railway.app/api'}/appointments`, {
-                  method: 'POST',
-                  headers: { 'Content-Type': 'application/json' },
-                  body: JSON.stringify({
-                    business_slug: 'lior-segev',
-                    service_id: selectedServices[0]?.id,
-                    customer_name: sel.name,
-                    customer_phone: sel.phone,
-                    appointment_time: startUTC.toISOString(),
-                    end_time: endUTC.toISOString(),
-                  })
-                });
-              } catch(e) { console.error('booking failed', e); }
-              setBooked(true);
-            }} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', padding: '1rem', borderRadius: '999px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, fontSize: '0.95rem', textDecoration: 'none', marginBottom: '12px', boxSizing: 'border-box', boxShadow: '0 6px 24px rgba(161,23,56,0.32)' }}>
-              <Icon name="whatsapp" className="w-5 h-5" />
-              שילמתי — שלחי פרטי תור לליאור
-            </a>
+
             <button onClick={() => setStep(4)} style={{ width: '100%', padding: '0.875rem', borderRadius: '999px', background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.7)', color: '#A11738', fontWeight: 500, cursor: 'pointer' }}>חזרה</button>
           </div>
         )}
