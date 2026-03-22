@@ -1,2 +1,5 @@
+[phases.setup]
+cmds = ["rm -rf .next"]
+
 [phases.build]
 cmds = ["npm run build"]
