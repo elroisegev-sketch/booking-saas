@@ -514,7 +514,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
 
             {/* כפתור ביט */}
             <a
-              href={`https://bitpay.onelink.me/P1OE?af_dp=bit://pay?phoneNumber=0535249688%26amount=${deposit}`}
+              href={`bit://pay?phoneNumber=0535249688&amount=${deposit}`}
               target="_blank" rel="noreferrer"
               onClick={async () => {
                 const rawTime = sel.time.trim();
