@@ -943,19 +943,16 @@ const Dashboard = ({ user, onLogout }) => {
                       style={{ width: '40px', height: '20px', borderRadius: '999px', border: 'none', cursor: 'pointer', background: day.is_active ? '#8b2252' : '#d1d5db', position: 'relative', flexShrink: 0 }}>
                       <div style={{ width: '16px', height: '16px', background: 'white', borderRadius: '50%', position: 'absolute', top: '2px', transition: 'left 0.2s', left: day.is_active ? '22px' : '2px', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }} />
                     </button>
-                    {day.is_active ? (
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <input type="time" value={day.start_time}
-                          onChange={e => setAvailability(availability.map((d, j) => j === i ? { ...d, start_time: e.target.value } : d))}
-                          onBlur={async e => { try { await apiFetch(`${API}/availability/${day.day_of_week}`, { method: 'PUT', body: JSON.stringify({ start_time: e.target.value, end_time: day.end_time, is_active: day.is_active }) }); await fetchAvailability(); showToast('✅ נשמר'); } catch (err) { showToast(`שגיאה: ${err.message}`); } }}
-                          style={{ padding: '6px 10px', borderRadius: '8px', border: '1.5px solid #e5e7eb', outline: 'none', fontSize: '0.875rem' }} />
-                        <span style={{ color: '#9ca3af', fontSize: '0.875rem' }}>עד</span>
-                        <input type="time" value={day.end_time}
-                          onChange={e => setAvailability(availability.map((d, j) => j === i ? { ...d, end_time: e.target.value } : d))}
-                          onBlur={async e => { try { await apiFetch(`${API}/availability/${day.day_of_week}`, { method: 'PUT', body: JSON.stringify({ start_time: day.start_time, end_time: e.target.value, is_active: day.is_active }) }); await fetchAvailability(); showToast('✅ נשמר'); } catch (err) { showToast(`שגיאה: ${err.message}`); } }}
-                          style={{ padding: '6px 10px', borderRadius: '8px', border: '1.5px solid #e5e7eb', outline: 'none', fontSize: '0.875rem' }} />
-                      </div>
-                    ) : <span style={{ color: '#d1d5db', fontWeight: 700, fontSize: '0.875rem' }}>סגור</span>}
+                    {day.is_active ? (() => {
+                      const timeOpts = Array.from({ length: 33 }, (_, k) => { const tot = k * 30; const h = String(6 + Math.floor(tot/60)).padStart(2,'0'); const m = tot%60===0?'00':'30'; return `${h}:${m}`; });
+                      const sel = (field) => (
+                        <select value={day[field]} onChange={e => setAvailability(availability.map((d,j) => j===i ? {...d,[field]:e.target.value} : d))}
+                          style={{ padding:'6px 10px', borderRadius:'8px', border:'1.5px solid #e5e7eb', fontSize:'0.875rem', cursor:'pointer', background:'white' }}>
+                          {timeOpts.map(t => <option key={t} value={t}>{t}</option>)}
+                        </select>
+                      );
+                      return <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>{sel('start_time')}<span style={{ color:'#9ca3af', fontSize:'0.875rem' }}>עד</span>{sel('end_time')}</div>;
+                    })() : <span style={{ color:'#d1d5db', fontWeight:700, fontSize:'0.875rem' }}>סגור</span>}
                   </div>
                 ))}
               </div>
