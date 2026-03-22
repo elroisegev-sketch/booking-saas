@@ -181,6 +181,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   const [sel, setSel] = useState({ date: null, time: null, name: '', phone: '', image: null });
   const [calMonth, setCalMonth] = useState(new Date());
   const [booked, setBooked] = useState(false);
+  const skipFirstSaveRef = useRef(true);
   const [realServices, setRealServices] = useState([]);
   const [realAvailability, setRealAvailability] = useState([]);
   const [nailCountModal, setNailCountModal] = useState(false);
@@ -200,8 +201,9 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
     } catch(e) {}
   }, []);
 
-  // Save state to sessionStorage on every change
+  // Save state to sessionStorage on every change (skip first run — restore hasn't applied yet)
   useEffect(() => {
+    if (skipFirstSaveRef.current) { skipFirstSaveRef.current = false; return; }
     try {
       sessionStorage.setItem(BOOKING_KEY, JSON.stringify({
         step,
@@ -575,7 +577,6 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                     })
                   });
                 } catch(e) { console.error('booking failed', e); }
-                setBooked(true);
               }}
               style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', width: '100%', padding: '1rem', borderRadius: '999px', background: 'linear-gradient(135deg, #5B3FD4, #7B5FFF)', color: 'white', fontWeight: 700, fontSize: '1rem', textDecoration: 'none', marginBottom: '12px', boxSizing: 'border-box', boxShadow: '0 6px 24px rgba(91,63,212,0.38)' }}>
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="rgba(255,255,255,0.25)"/><text x="12" y="16.5" textAnchor="middle" fontSize="13" fontWeight="800" fill="white" fontFamily="Arial">B</text></svg>
