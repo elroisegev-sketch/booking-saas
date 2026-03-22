@@ -545,6 +545,7 @@ const Dashboard = ({ user, onLogout }) => {
   const [appointments, setAppointments] = useState([]);
   const [services, setServices] = useState([]);
   const [availability, setAvailability] = useState(MOCK_AVAILABILITY);
+  const availabilityRef = useRef(MOCK_AVAILABILITY);
   const [loadingData, setLoadingData] = useState(true);
   const [showModal, setShowModal] = useState(false);
   const [editSvc, setEditSvc] = useState(null);
@@ -572,11 +573,15 @@ const Dashboard = ({ user, onLogout }) => {
   const fetchAvailability = useCallback(async () => {
     try {
       const data = await apiFetch(`${API}/availability`);
-      if (Array.isArray(data)) setAvailability(data.map(d => ({
-        ...d,
-        start_time: d.start_time ? String(d.start_time).slice(0, 5) : '09:00',
-        end_time: d.end_time ? String(d.end_time).slice(0, 5) : '17:00',
-      })));
+      if (Array.isArray(data)) {
+        const mapped = data.map(d => ({
+          ...d,
+          start_time: d.start_time ? String(d.start_time).slice(0, 5) : '09:00',
+          end_time: d.end_time ? String(d.end_time).slice(0, 5) : '17:00',
+        }));
+        availabilityRef.current = mapped;
+        setAvailability(mapped);
+      }
     } catch (e) {
       showToast(`שגיאת טעינה: ${e.message}`);
     }
@@ -939,26 +944,30 @@ const Dashboard = ({ user, onLogout }) => {
                     <div style={{ width: '80px', textAlign: 'right' }}>
                       <span style={{ fontWeight: 700, fontSize: '0.875rem', color: day.is_active ? '#2d0a1e' : '#9ca3af' }}>יום {DAY_NAMES[day.day_of_week]}</span>
                     </div>
-                    <button onClick={async () => { const newActive = !day.is_active; setAvailability(availability.map((d, j) => j === i ? { ...d, is_active: newActive } : d)); try { await apiFetch(`${API}/availability/${day.day_of_week}`, { method: 'PUT', body: JSON.stringify({ start_time: day.start_time, end_time: day.end_time, is_active: newActive }) }); } catch (e) { showToast(`שגיאה: ${e.message}`); } }}
+                    <button onClick={() => {
+                        const newActive = !day.is_active;
+                        setAvailability(prev => { const next = prev.map((d,j) => j===i ? {...d, is_active: newActive} : d); availabilityRef.current = next; return next; });
+                      }}
                       style={{ width: '40px', height: '20px', borderRadius: '999px', border: 'none', cursor: 'pointer', background: day.is_active ? '#8b2252' : '#d1d5db', position: 'relative', flexShrink: 0 }}>
                       <div style={{ width: '16px', height: '16px', background: 'white', borderRadius: '50%', position: 'absolute', top: '2px', transition: 'left 0.2s', left: day.is_active ? '22px' : '2px', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }} />
                     </button>
-                    {day.is_active ? (() => {
-                      const timeOpts = Array.from({ length: 33 }, (_, k) => { const tot = k * 30; const h = String(6 + Math.floor(tot/60)).padStart(2,'0'); const m = tot%60===0?'00':'30'; return `${h}:${m}`; });
-                      const sel = (field) => (
-                        <select value={day[field]} onChange={e => setAvailability(availability.map((d,j) => j===i ? {...d,[field]:e.target.value} : d))}
-                          style={{ padding:'6px 10px', borderRadius:'8px', border:'1.5px solid #e5e7eb', fontSize:'0.875rem', cursor:'pointer', background:'white' }}>
-                          {timeOpts.map(t => <option key={t} value={t}>{t}</option>)}
-                        </select>
-                      );
-                      return <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>{sel('start_time')}<span style={{ color:'#9ca3af', fontSize:'0.875rem' }}>עד</span>{sel('end_time')}</div>;
-                    })() : <span style={{ color:'#d1d5db', fontWeight:700, fontSize:'0.875rem' }}>סגור</span>}
+                    {day.is_active ? (
+                      <div style={{ display:'flex', alignItems:'center', gap:'8px' }}>
+                        {['start_time','end_time'].map((field, fi) => (
+                          <select key={field} value={day[field]}
+                            onChange={e => { const val = e.target.value; setAvailability(prev => { const next = prev.map((d,j) => j===i ? {...d,[field]:val} : d); availabilityRef.current = next; return next; }); }}
+                            style={{ padding:'6px 10px', borderRadius:'8px', border:'1.5px solid #e5e7eb', fontSize:'0.875rem', cursor:'pointer', background:'white' }}>
+                            {Array.from({length:33},(_,k)=>{ const tot=k*30; const h=String(6+Math.floor(tot/60)).padStart(2,'0'); const m=tot%60===0?'00':'30'; return `${h}:${m}`; }).map(t=><option key={t} value={t}>{t}</option>)}
+                          </select>
+                        )).reduce((acc,el,idx) => idx===0 ? [el] : [...acc, <span key="s" style={{color:'#9ca3af',fontSize:'0.875rem'}}>עד</span>, el], [])}
+                      </div>
+                    ) : <span style={{ color:'#d1d5db', fontWeight:700, fontSize:'0.875rem' }}>סגור</span>}
                   </div>
                 ))}
               </div>
               <button onClick={async () => {
                 try {
-                  await apiFetch(`${API}/availability/bulk`, { method: 'PUT', body: JSON.stringify({ days: availability }) });
+                  await apiFetch(`${API}/availability/bulk`, { method: 'PUT', body: JSON.stringify({ days: availabilityRef.current }) });
                   await fetchAvailability();
                   showToast('שעות הפעילות נשמרו ✅');
                 } catch (e) { showToast(`שגיאה בשמירה: ${e.message}`); }
