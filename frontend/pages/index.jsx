@@ -261,29 +261,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   const deposit = Math.ceil(totalPrice / 2);
   const waLink = WHATSAPP_LINK(sel.name, serviceNames, dateStr, sel.time, totalPrice);
 
-  if (booked) return (
-    <div dir="rtl" style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'linear-gradient(135deg, #fff5f7 0%, #fce8f3 40%, #f3eeff 80%, #fff5f7 100%)', fontFamily: "'Varela Round', sans-serif" }}>
-      <div style={{ textAlign: 'center', maxWidth: '380px', padding: '2rem', width: '100%', animation: 'scaleIn 0.5s cubic-bezier(0.22,1,0.36,1)' }}>
-        <div style={{ width: '72px', height: '72px', borderRadius: '50%', background: 'linear-gradient(135deg,#A11738,#EC6A83)', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem', boxShadow: '0 8px 32px rgba(161,23,56,0.25)' }}>
-          <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="white"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M5 13l4 4L19 7"/></svg>
-        </div>
-        <h2 style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '2.2rem', fontWeight: 300, color: '#3d0c16', marginBottom: '0.5rem' }}>הבקשה נשלחה</h2>
-        <p style={{ color: '#6b7280', marginBottom: '1.75rem', fontSize: '0.875rem', lineHeight: 1.6 }}>
-          התור <strong style={{ color: '#A11738' }}>ממתין לאישור</strong> מאת ליאור 🌸<br />לאחר אימות המקדמה תקבלי אישור בוואטסאפ
-        </p>
-        <div style={{ background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.8)', borderRadius: '24px', padding: '1.25rem', textAlign: 'right', marginBottom: '1.25rem', boxShadow: '0 8px 32px rgba(161,23,56,0.08), inset 0 1px 0 rgba(255,255,255,0.9)' }}>
-          <p style={{ fontWeight: 600, fontSize: '0.95rem', color: '#A11738', marginBottom: '4px' }}>{serviceNames}</p>
-          <p style={{ color: '#6b7280', fontSize: '0.8rem' }}>{dateStr} · {sel.time}</p>
-          <p style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '1.75rem', fontWeight: 300, color: '#EC6A83', marginTop: '0.5rem',}}>{fmtPrice(totalPrice)}</p>
-        </div>
-        <a href={`https://wa.me/972${LIOR_PHONE.slice(1)}?text=${encodeURIComponent('היי ליאור 🌸 שלחתי מקדמה — הנה האסמכתא:')}`} target="_blank" rel="noreferrer"
-          style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', padding: '1rem', borderRadius: '999px', background: '#25D366', color: 'white', fontWeight: 600, fontSize: '0.875rem', textDecoration: 'none', marginBottom: '12px', boxSizing: 'border-box', boxShadow: '0 4px 16px rgba(37,211,102,0.3)' }}>
-          <Icon name="whatsapp" className="w-5 h-5" /> שלחי צילום אסמכתא לליאור
-        </a>
-        <button onClick={onBack} style={{ width: '100%', padding: '0.875rem', borderRadius: '999px', background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.7)', color: '#A11738', fontWeight: 500, cursor: 'pointer' }}>חזרה לדף הבית</button>
-      </div>
-    </div>
-  );
+  if (booked) { onBack(); return null; }
 
   if (step === 0) setStep(1);
 
