@@ -894,7 +894,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
     fetch(BACKEND + '/api/appointments', { headers: { 'Authorization': 'Bearer ' + token } })
       .then(r => r.json()).then(data => { if (Array.isArray(data)) setAppointments(data); });
     fetch(BACKEND + '/api/availability', { headers: { 'Authorization': 'Bearer ' + token } })
-      .then(r => r.json()).then(data => { if (Array.isArray(data)) setAvailability(data); });
+      .then(r => r.json()).then(data => { if (Array.isArray(data)) setAvailability(data.map(d => ({ ...d, start_time: (d.start_time || '').slice(0, 5), end_time: (d.end_time || '').slice(0, 5) }))); });
   }, []);
 
   useEffect(() => {
