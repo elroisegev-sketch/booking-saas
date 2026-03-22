@@ -67,6 +67,17 @@ CREATE TABLE push_subscriptions (
   UNIQUE(business_id, endpoint)
 );
 
+-- Blocked slots (specific time ranges blocked on specific dates)
+CREATE TABLE IF NOT EXISTS blocked_slots (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  business_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  date DATE NOT NULL,
+  start_time TIME NOT NULL,
+  end_time TIME NOT NULL,
+  reason TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- Indexes for performance
 CREATE INDEX idx_appointments_business_date ON appointments(business_id, appointment_time);
 CREATE INDEX idx_services_business ON services(business_id);

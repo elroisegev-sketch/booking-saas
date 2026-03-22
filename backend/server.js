@@ -46,9 +46,23 @@ app.use('/api', require('./routes/auth'));
 app.use('/api/services', require('./routes/services'));
 app.use('/api/appointments', require('./routes/appointments'));
 app.use('/api/availability', require('./routes/availability'));
+app.use('/api/blocked-slots', require('./routes/blocked_slots'));
 app.use('/api/push', require('./routes/push').router);
 
 app.get('/health', (_, res) => res.json({ status: 'ok', service: 'BookSlot API' }));
+
+// Auto-migrate blocked_slots table
+require('./db').query(`
+  CREATE TABLE IF NOT EXISTS blocked_slots (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    business_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    date DATE NOT NULL,
+    start_time TIME NOT NULL,
+    end_time TIME NOT NULL,
+    reason TEXT,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+  )
+`).catch(err => console.error('Migration error:', err));
 
 // ── JWT secret strength check on startup ─────────────────────
 if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {

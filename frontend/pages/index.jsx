@@ -882,6 +882,9 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
   const [viewImage, setViewImage] = useState(null);
   const [showAddAppt, setShowAddAppt] = useState(false);
   const [newAppt, setNewAppt] = useState({ customer_name: '', service_name: '', date: '', time: '', deposit: '', price: '' });
+  const [blockedSlots, setBlockedSlots] = useState([]);
+  const [showBlockModal, setShowBlockModal] = useState(false);
+  const [blockForm, setBlockForm] = useState({ start_time: '09:00', end_time: '10:00', reason: '' });
 
   const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'https://booking-saas-production-b9fd.up.railway.app';
   const VAPID_PUBLIC = 'BJruLIZOsClN97fYdg9i5G52FyTQGEVD_5pSAW6BWQNPKO5lecZhhOn58DCnS1aEkPX1qWQIKcA9INApaRiW1X0';
@@ -895,6 +898,8 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
       .then(r => r.json()).then(data => { if (Array.isArray(data)) setAppointments(data); });
     fetch(BACKEND + '/api/availability', { headers: { 'Authorization': 'Bearer ' + token } })
       .then(r => r.json()).then(data => { if (Array.isArray(data)) setAvailability(data.map(d => ({ ...d, start_time: (d.start_time || '').slice(0, 5), end_time: (d.end_time || '').slice(0, 5) }))); });
+    fetch(BACKEND + '/api/blocked-slots', { headers: { 'Authorization': 'Bearer ' + token } })
+      .then(r => r.json()).then(data => { if (Array.isArray(data)) setBlockedSlots(data.map(b => ({ ...b, start_time: (b.start_time || '').slice(0, 5), end_time: (b.end_time || '').slice(0, 5) }))); });
   }, []);
 
   useEffect(() => {
@@ -1185,6 +1190,41 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
             </div>
           )}
 
+          {showBlockModal && (
+            <div style={{ position: 'fixed', inset: 0, zIndex: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.4)', fontFamily: 'Varela Round, sans-serif' }}>
+              <div dir="rtl" style={{ background: 'white', borderRadius: '24px', padding: '1.5rem', width: '100%', maxWidth: '380px', margin: '1rem', boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+                  <h2 style={{ fontWeight: 900, color: '#A11738', fontSize: '1.1rem', margin: 0 }}>🚫 חסימת שעות — {selDay.toLocaleDateString('he-IL', { day: 'numeric', month: 'short' })}</h2>
+                  <button onClick={() => setShowBlockModal(false)} style={{ background: 'none', border: 'none', cursor: 'pointer', fontSize: '1.25rem' }}>✕</button>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '1rem' }}>
+                  {['start_time', 'end_time'].map((field, fi) => (
+                    <select key={field} value={blockForm[field]} onChange={e => setBlockForm(f => ({ ...f, [field]: e.target.value }))}
+                      style={{ flex: 1, padding: '8px 10px', borderRadius: '10px', border: '1.5px solid #e5e7eb', fontSize: '0.875rem', background: 'white' }}>
+                      {Array.from({ length: 33 }, (_, k) => { const tot = k * 30; const h = String(6 + Math.floor(tot / 60)).padStart(2, '0'); const m = tot % 60 === 0 ? '00' : '30'; return `${h}:${m}`; }).map(t => <option key={t} value={t}>{t}</option>)}
+                    </select>
+                  )).reduce((acc, el, idx) => idx === 0 ? [el] : [...acc, <span key="s" style={{ color: '#9ca3af' }}>עד</span>, el], [])}
+                </div>
+                <input placeholder="סיבה (אופציונלי)" value={blockForm.reason} onChange={e => setBlockForm(f => ({ ...f, reason: e.target.value }))}
+                  style={{ width: '100%', padding: '8px 12px', borderRadius: '10px', border: '1.5px solid #e5e7eb', fontSize: '0.875rem', boxSizing: 'border-box', marginBottom: '1rem', fontFamily: 'Varela Round, sans-serif' }} />
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button onClick={() => setShowBlockModal(false)} style={{ flex: 1, padding: '0.75rem', borderRadius: '12px', background: '#f3f4f6', color: '#374151', fontWeight: 700, border: 'none', cursor: 'pointer' }}>ביטול</button>
+                  <button onClick={async () => {
+                    const token = localStorage.getItem('token');
+                    const dateStr = `${selDay.getFullYear()}-${String(selDay.getMonth()+1).padStart(2,'0')}-${String(selDay.getDate()).padStart(2,'0')}`;
+                    try {
+                      const r = await fetch(BACKEND + '/api/blocked-slots', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify({ date: dateStr, start_time: blockForm.start_time, end_time: blockForm.end_time, reason: blockForm.reason }) });
+                      const created = await r.json();
+                      setBlockedSlots(prev => [...prev, { ...created, start_time: (created.start_time || '').slice(0,5), end_time: (created.end_time || '').slice(0,5) }]);
+                      setShowBlockModal(false);
+                      showToast('✅ החסימה נשמרה');
+                    } catch { showToast('שגיאה בשמירה'); }
+                  }} style={{ flex: 1, padding: '0.75rem', borderRadius: '12px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, border: 'none', cursor: 'pointer' }}>שמור חסימה</button>
+                </div>
+              </div>
+            </div>
+          )}
+
           {tab === 'calendar' && (
             <div>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem' }}>
@@ -1208,14 +1248,19 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                       {Array.from({ length: new Date(calMonth.getFullYear(), calMonth.getMonth(), 1).getDay() }).map((_, i) => <div key={`e${i}`} />)}
                       {Array.from({ length: new Date(calMonth.getFullYear(), calMonth.getMonth() + 1, 0).getDate() }, (_, i) => {
                         const d = new Date(calMonth.getFullYear(), calMonth.getMonth(), i + 1);
+                        const dateStr = `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
                         const hasA = appointments.some(a => new Date(a.appointment_time).toDateString() === d.toDateString() && a.status !== 'cancelled');
+                        const dayBlocks = blockedSlots.filter(b => b.date && b.date.slice(0,10) === dateStr);
+                        const isFullyBlocked = dayBlocks.some(b => b.start_time <= '06:00' && b.end_time >= '22:00');
+                        const hasBlock = dayBlocks.length > 0;
                         const isSel = d.toDateString() === selDay.toDateString();
                         const isToday = d.toDateString() === new Date().toDateString();
                         return (
                           <button key={i} onClick={() => setSelDay(d)}
-                            style={{ aspectRatio: '1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRadius: '10px', fontSize: '0.875rem', fontWeight: 700, border: 'none', cursor: 'pointer', position: 'relative', background: isSel ? 'linear-gradient(135deg,#A11738,#EC6A83)' : isToday ? '#F7C1C3' : 'transparent', color: isSel ? 'white' : '#A11738' }}>
+                            style={{ aspectRatio: '1', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', borderRadius: '10px', fontSize: '0.875rem', fontWeight: 700, border: 'none', cursor: 'pointer', position: 'relative', background: isSel ? 'linear-gradient(135deg,#A11738,#EC6A83)' : isFullyBlocked ? '#e5e7eb' : isToday ? '#F7C1C3' : 'transparent', color: isSel ? 'white' : isFullyBlocked ? '#9ca3af' : '#A11738' }}>
                             {i + 1}
-                            {hasA && <div style={{ position: 'absolute', bottom: '3px', width: '6px', height: '6px', borderRadius: '50%', background: isSel ? 'rgba(255,255,255,0.7)' : '#EC6A83' }} />}
+                            {hasA && <div style={{ position: 'absolute', bottom: '3px', right: '50%', transform: 'translateX(50%)', width: '6px', height: '6px', borderRadius: '50%', background: isSel ? 'rgba(255,255,255,0.7)' : '#EC6A83' }} />}
+                            {hasBlock && !hasA && <div style={{ position: 'absolute', bottom: '3px', right: '50%', transform: 'translateX(50%)', width: '6px', height: '6px', borderRadius: '50%', background: isSel ? 'rgba(255,255,255,0.5)' : '#f59e0b' }} />}
                           </button>
                         );
                       })}
@@ -1223,9 +1268,19 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                   </div>
                 </div>
                 <div style={card}>
-                  <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid #f9fafb' }}>
+                  <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid #f9fafb', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                     <p style={{ fontWeight: 900, color: '#A11738', margin: 0, fontSize: '0.875rem' }}>{selDay.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'short' })}</p>
+                    <button onClick={() => { setBlockForm({ start_time: '09:00', end_time: '10:00', reason: '' }); setShowBlockModal(true); }} style={{ fontSize: '0.7rem', padding: '4px 10px', borderRadius: '8px', background: '#fef3c7', color: '#92400e', fontWeight: 700, border: 'none', cursor: 'pointer' }}>🚫 חסום שעות</button>
                   </div>
+                  {blockedSlots.filter(b => b.date && b.date.slice(0,10) === `${selDay.getFullYear()}-${String(selDay.getMonth()+1).padStart(2,'0')}-${String(selDay.getDate()).padStart(2,'0')}`).map(bl => (
+                    <div key={bl.id} style={{ padding: '0.625rem 1.25rem', borderBottom: '1px solid #fafafa', display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fffbeb' }}>
+                      <div>
+                        <span style={{ fontWeight: 700, fontSize: '0.8rem', color: '#92400e' }}>🚫 {bl.start_time} – {bl.end_time}</span>
+                        {bl.reason && <p style={{ margin: 0, fontSize: '0.72rem', color: '#9ca3af' }}>{bl.reason}</p>}
+                      </div>
+                      <button onClick={async () => { const token = localStorage.getItem('token'); await fetch(BACKEND + `/api/blocked-slots/${bl.id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } }); setBlockedSlots(prev => prev.filter(x => x.id !== bl.id)); showToast('החסימה הוסרה'); }} style={{ fontSize: '0.7rem', padding: '3px 8px', borderRadius: '6px', background: '#fee2e2', color: '#991b1b', fontWeight: 700, border: 'none', cursor: 'pointer' }}>הסר</button>
+                    </div>
+                  ))}
                   {appointments.filter(a => new Date(a.appointment_time).toDateString() === selDay.toDateString() && a.status !== 'cancelled').map(appt => (
                     <div key={appt.id} style={{ padding: '0.875rem 1.25rem', borderBottom: '1px solid #fafafa' }}>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>

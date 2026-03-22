@@ -125,6 +125,7 @@ router.get('/slots/:slug/:serviceId/:date', async (req, res) => {
     if (!availResult.rows.length) return res.json({ slots: [] });
     const { start_time, end_time } = availResult.rows[0];
     const bookedResult = await db.query(`SELECT appointment_time, end_time FROM appointments WHERE business_id=$1 AND status != 'cancelled' AND DATE(appointment_time) = $2::date`, [businessId, date]);
+    const blockedResult = await db.query(`SELECT start_time, end_time FROM blocked_slots WHERE business_id=$1 AND date=$2::date`, [businessId, date]);
     const INTERVAL = 30;
     const [sh, sm] = start_time.split(':').map(Number);
     const [eh, em] = end_time.split(':').map(Number);
@@ -144,7 +145,14 @@ router.get('/slots/:slug/:serviceId/:date', async (req, res) => {
       const slotEnd   = new Date(slotStart.getTime() + duration * 60000);
       if (slotStart <= now) continue;
       const conflict = bookedResult.rows.some(b => slotStart < new Date(b.end_time) && slotEnd > new Date(b.appointment_time));
-      if (!conflict) {
+      const blocked = blockedResult.rows.some(bl => {
+        const [bsh, bsm] = bl.start_time.split(':').map(Number);
+        const [beh, bem] = bl.end_time.split(':').map(Number);
+        const blockStart = new Date(`${date}T${String(bsh - Math.floor(israelOffsetMins/60)).padStart(2,'0')}:${String(bsm).padStart(2,'0')}:00Z`);
+        const blockEnd   = new Date(`${date}T${String(beh - Math.floor(israelOffsetMins/60)).padStart(2,'0')}:${String(bem).padStart(2,'0')}:00Z`);
+        return slotStart < blockEnd && slotEnd > blockStart;
+      });
+      if (!conflict && !blocked) {
         const localH = String(slotStart.getUTCHours() + Math.floor(israelOffsetMins / 60)).padStart(2, '0');
         const localM = String(slotStart.getUTCMinutes()).padStart(2, '0');
         slots.push(`${localH}:${localM}`);
