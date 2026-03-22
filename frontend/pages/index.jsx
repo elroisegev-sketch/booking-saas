@@ -1272,7 +1272,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                           <p style={{ fontWeight: 700, color: '#A11738', margin: 0, fontSize: '0.9rem' }}>{svc.name}</p>
                           <div style={{ display: 'flex', gap: '4px' }}>
                             <button onClick={() => { setEditSvc(svc); setShowModal(true); }} style={{ padding: '5px', borderRadius: '8px', background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="edit" className="w-4 h-4" /></button>
-                            <button onClick={() => { setServices(services.map(s => s.id === svc.id ? { ...s, is_active: false } : s)); showToast('השירות הוסר'); }} style={{ padding: '5px', borderRadius: '8px', background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="trash" className="w-4 h-4" /></button>
+                            <button onClick={async () => { const token = localStorage.getItem('token'); try { await fetch(BACKEND + `/api/services/${svc.id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } }); setServices(prev => prev.filter(s => s.id !== svc.id)); showToast('השירות הוסר'); } catch { showToast('שגיאה בהסרה'); } }} style={{ padding: '5px', borderRadius: '8px', background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="trash" className="w-4 h-4" /></button>
                           </div>
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
@@ -1284,7 +1284,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                   </div>
                 </div>
               ))}
-              {showModal && <ServiceModal service={editSvc} onSave={(data) => { if (editSvc) { setServices(services.map(s => s.id === editSvc.id ? { ...s, ...data } : s)); showToast('השירות עודכן ✅'); } else { setServices([...services, { id: `s${Date.now()}`, ...data, is_active: true }]); showToast('השירות נוסף ✅'); } setShowModal(false); }} onClose={() => setShowModal(false)} />}
+              {showModal && <ServiceModal service={editSvc} onSave={async (data) => { const token = localStorage.getItem('token'); try { if (editSvc) { const r = await fetch(BACKEND + `/api/services/${editSvc.id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify(data) }); const updated = await r.json(); setServices(prev => prev.map(s => s.id === editSvc.id ? updated : s)); showToast('השירות עודכן ✅'); } else { const r = await fetch(BACKEND + '/api/services', { method: 'POST', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token }, body: JSON.stringify(data) }); const created = await r.json(); setServices(prev => [...prev, created]); showToast('השירות נוסף ✅'); } } catch { showToast('שגיאה בשמירה'); } setShowModal(false); }} onClose={() => setShowModal(false)} />}
             </div>
           )}
 
