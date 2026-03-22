@@ -893,6 +893,8 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
       .then(r => r.json()).then(data => { if (Array.isArray(data)) setServices(data); });
     fetch(BACKEND + '/api/appointments', { headers: { 'Authorization': 'Bearer ' + token } })
       .then(r => r.json()).then(data => { if (Array.isArray(data)) setAppointments(data); });
+    fetch(BACKEND + '/api/availability', { headers: { 'Authorization': 'Bearer ' + token } })
+      .then(r => r.json()).then(data => { if (Array.isArray(data)) setAvailability(data); });
   }, []);
 
   useEffect(() => {
