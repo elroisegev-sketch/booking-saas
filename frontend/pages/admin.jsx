@@ -960,7 +960,7 @@ const Dashboard = ({ user, onLogout }) => {
                               const val = e.target.value;
                               const newStart = field === 'start_time' ? val : day.start_time;
                               const newEnd   = field === 'end_time'   ? val : day.end_time;
-                              setAvailability(prev => prev.map((d,j) => j===i ? {...d,[field]:val} : d));
+                              setAvailability(prev => { const next = prev.map((d,j) => j===i ? {...d,[field]:val} : d); availabilityRef.current = next; return next; });
                               try { await apiFetch(`${API}/availability/${day.day_of_week}`, { method:'PUT', body: JSON.stringify({ start_time: newStart, end_time: newEnd, is_active: day.is_active }) }); showToast('✅ נשמר'); } catch(err) { showToast(`שגיאה: ${err.message}`); }
                             }}
                             style={{ padding:'6px 10px', borderRadius:'8px', border:'1.5px solid #e5e7eb', fontSize:'0.875rem', cursor:'pointer', background:'white' }}>
@@ -972,15 +972,7 @@ const Dashboard = ({ user, onLogout }) => {
                   </div>
                 ))}
               </div>
-              <button onClick={async () => {
-                try {
-                  await apiFetch(`${API}/availability/bulk`, { method: 'PUT', body: JSON.stringify({ days: availabilityRef.current }) });
-                  await fetchAvailability();
-                  showToast('שעות הפעילות נשמרו ✅');
-                } catch (e) { showToast(`שגיאה בשמירה: ${e.message}`); }
-              }} style={{ marginTop: '1rem', padding: '0.875rem 1.5rem', borderRadius: '12px', background: 'linear-gradient(135deg,#2d0a1e,#8b2252)', color: '#ffb6c1', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: 'pointer', fontFamily: 'Heebo, sans-serif' }}>
-                שמירת שינויים
-              </button>
+              <p style={{ marginTop: '0.75rem', color: '#9ca3af', fontSize: '0.8rem' }}>השינויים נשמרים אוטומטית</p>
             </div>
           )}
 
