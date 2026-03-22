@@ -5,6 +5,22 @@ const auth = require('../middleware/auth');
 const { sendPush } = require('./push');
 const router = express.Router();
 
+// ── Telegram notification ─────────────────────────────────────
+async function sendTelegram(message) {
+  const token = process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_CHAT_ID;
+  if (!token || !chatId) return;
+  try {
+    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text: message }),
+    });
+  } catch(e) {
+    console.error('Telegram error:', e.message);
+  }
+}
+
 // ── Rate limiter — public booking endpoint ────────────────────
 const bookingLimiter = rateLimit({
   windowMs: 60 * 60 * 1000,
@@ -157,8 +173,12 @@ router.post('/', bookingLimiter, async (req, res) => {
     const conflictResult = await db.query(`SELECT id FROM appointments WHERE business_id = $1 AND status != 'cancelled' AND tstzrange(appointment_time, end_time, '[)') && tstzrange($2::timestamptz, $3::timestamptz, '[)')`, [businessId, startTime.toISOString(), endTime.toISOString()]);
     if (conflictResult.rows.length > 0) return res.status(409).json({ error: 'This time slot is no longer available.' });
     const result = await db.query(`INSERT INTO appointments (business_id, service_id, customer_name, customer_phone, customer_email, appointment_time, end_time, status) VALUES ($1,$2,$3,$4,$5,$6,$7,'pending') RETURNING *`, [businessId, service_id, customer_name.trim(), cleanPhone, customer_email?.trim() || null, startTime.toISOString(), endTime.toISOString()]);
-    const dateHeb = startTime.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' });
-    const timeHeb = startTime.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+    const israelTime = new Date(startTime.toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' }));
+    const dateHeb = israelTime.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' });
+    const timeHeb = `${String(israelTime.getHours()).padStart(2,'0')}:${String(israelTime.getMinutes()).padStart(2,'0')}`;
+    const deposit = Math.ceil(parseFloat(service.price) / 2);
+    const telegramMsg = `🌸 תור חדש!\n\n👤 שם: ${customer_name.trim()}\n💅 טיפול: ${service.name}\n📅 תאריך: ${dateHeb}\n🕐 שעה: ${timeHeb}\n💰 מחיר: ${service.price}₪\n💳 מקדמה: ${deposit}₪`;
+    await sendTelegram(telegramMsg);
     await sendPush({ title: '🌸 תור חדש!', body: `${customer_name} | ${service.name}\n${dateHeb} בשעה ${timeHeb}` });
     notifyBusiness(businessId);
     res.status(201).json(result.rows[0]);

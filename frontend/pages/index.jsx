@@ -181,6 +181,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   const [sel, setSel] = useState({ date: null, time: null, name: '', phone: '', image: null });
   const [calMonth, setCalMonth] = useState(new Date());
   const [booked, setBooked] = useState(false);
+  const [confirmed, setConfirmed] = useState(false);
   const skipFirstSaveRef = useRef(true);
   const [realServices, setRealServices] = useState([]);
   const [realAvailability, setRealAvailability] = useState([]);
@@ -520,7 +521,32 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
         )}
 
         {/* Step 5 - Payment */}
-        {step === 5 && (
+        {confirmed && (
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '60vh', padding: '2rem', textAlign: 'center' }}>
+            <div style={{ width: 90, height: 90, borderRadius: '50%', background: 'linear-gradient(135deg,#22c55e,#16a34a)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem', boxShadow: '0 8px 32px rgba(34,197,94,0.35)' }}>
+              <svg width="44" height="44" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+            </div>
+            <h2 style={{ fontFamily: "'Dancing Script', cursive", fontSize: '2rem', color: '#A11738', margin: '0 0 0.5rem' }}>התור נקבע בהצלחה! 🎉</h2>
+            <p style={{ color: '#6b7280', fontSize: '0.95rem', marginBottom: '1.75rem' }}>ליאור תיצור איתך קשר לאישור סופי</p>
+            <div style={{ background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.85)', borderRadius: '24px', padding: '1.5rem 2rem', width: '100%', maxWidth: 340, boxShadow: '0 8px 32px rgba(161,23,56,0.08)', marginBottom: '2rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span style={{ color: '#9ca3af', fontSize: '0.85rem' }}>טיפול</span>
+                <span style={{ color: '#374151', fontWeight: 600, fontSize: '0.85rem' }}>{serviceNames}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                <span style={{ color: '#9ca3af', fontSize: '0.85rem' }}>תאריך</span>
+                <span style={{ color: '#374151', fontWeight: 600, fontSize: '0.85rem' }}>{dateStr}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#9ca3af', fontSize: '0.85rem' }}>שעה</span>
+                <span style={{ color: '#374151', fontWeight: 600, fontSize: '0.85rem' }}>{sel.time}</span>
+              </div>
+            </div>
+            <button onClick={clearAndBack} style={{ padding: '0.875rem 2.5rem', borderRadius: '999px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, border: 'none', cursor: 'pointer', fontSize: '1rem', boxShadow: '0 6px 24px rgba(161,23,56,0.3)' }}>חזרה לעמוד הבית</button>
+          </div>
+        )}
+
+        {!confirmed && step === 5 && (
           <div>
             <h2 style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '2rem', fontWeight: 300, color: '#3d0c16', marginBottom: '0.2rem' }}>תשלום מקדמה</h2>
             <p style={{ color: '#9ca3af', fontSize: '0.8rem', marginBottom: '1.75rem' }}>להשלמת הרישום יש להעביר מקדמה 🌸</p>
@@ -577,6 +603,8 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                     })
                   });
                 } catch(e) { console.error('booking failed', e); }
+                try { sessionStorage.removeItem(BOOKING_KEY); } catch(e) {}
+                setConfirmed(true);
               }}
               style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', width: '100%', padding: '1rem', borderRadius: '999px', background: 'linear-gradient(135deg, #5B3FD4, #7B5FFF)', color: 'white', fontWeight: 700, fontSize: '1rem', textDecoration: 'none', marginBottom: '12px', boxSizing: 'border-box', boxShadow: '0 6px 24px rgba(91,63,212,0.38)' }}>
               <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="rgba(255,255,255,0.25)"/><text x="12" y="16.5" textAnchor="middle" fontSize="13" fontWeight="800" fill="white" fontFamily="Arial">B</text></svg>
