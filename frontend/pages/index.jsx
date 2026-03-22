@@ -261,7 +261,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   const deposit = Math.ceil(totalPrice / 2);
   const waLink = WHATSAPP_LINK(sel.name, serviceNames, dateStr, sel.time, totalPrice);
 
-  if (booked) { onBack(); return null; }
+  useEffect(() => { if (booked) onBack(); }, [booked]);
 
   if (step === 0) setStep(1);
 
