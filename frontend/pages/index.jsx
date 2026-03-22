@@ -1330,23 +1330,41 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                     <div style={{ width: '80px', textAlign: 'right' }}>
                       <span style={{ fontWeight: 700, fontSize: '0.875rem', color: day.is_active ? '#A11738' : '#9ca3af' }}>יום {DAY_NAMES[day.day_of_week]}</span>
                     </div>
-                    <button onClick={() => setAvailability(availability.map((d, j) => j === i ? { ...d, is_active: !d.is_active } : d))}
+                    <button onClick={async () => {
+                        const newActive = !day.is_active;
+                        setAvailability(prev => prev.map((d, j) => j === i ? { ...d, is_active: newActive } : d));
+                        try {
+                          await fetch(BACKEND + `/api/availability/${day.day_of_week}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') }, body: JSON.stringify({ start_time: day.start_time, end_time: day.end_time, is_active: newActive }) });
+                          showToast(newActive ? '✅ יום הופעל' : '✅ יום כובה');
+                        } catch(err) { showToast('שגיאה בשמירה'); }
+                      }}
                       style={{ width: '40px', height: '20px', borderRadius: '999px', border: 'none', cursor: 'pointer', background: day.is_active ? '#EC6A83' : '#d1d5db', position: 'relative', flexShrink: 0 }}>
                       <div style={{ width: '16px', height: '16px', background: 'white', borderRadius: '50%', position: 'absolute', top: '2px', transition: 'left 0.2s', left: day.is_active ? '22px' : '2px', boxShadow: '0 1px 3px rgba(0,0,0,0.2)' }} />
                     </button>
                     {day.is_active ? (
                       <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                        <input type="time" value={day.start_time} onChange={e => setAvailability(availability.map((d, j) => j === i ? { ...d, start_time: e.target.value } : d))} style={{ padding: '6px 10px', borderRadius: '8px', border: '1.5px solid #e5e7eb', outline: 'none', fontSize: '0.875rem' }} />
-                        <span style={{ color: '#9ca3af', fontSize: '0.875rem' }}>עד</span>
-                        <input type="time" value={day.end_time} onChange={e => setAvailability(availability.map((d, j) => j === i ? { ...d, end_time: e.target.value } : d))} style={{ padding: '6px 10px', borderRadius: '8px', border: '1.5px solid #e5e7eb', outline: 'none', fontSize: '0.875rem' }} />
+                        {['start_time', 'end_time'].map((field, fi) => (
+                          <select key={field} value={day[field]}
+                            onChange={async e => {
+                              const val = e.target.value;
+                              const newStart = field === 'start_time' ? val : day.start_time;
+                              const newEnd   = field === 'end_time'   ? val : day.end_time;
+                              setAvailability(prev => prev.map((d, j) => j === i ? { ...d, [field]: val } : d));
+                              try {
+                                await fetch(BACKEND + `/api/availability/${day.day_of_week}`, { method: 'PUT', headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + localStorage.getItem('token') }, body: JSON.stringify({ start_time: newStart, end_time: newEnd, is_active: day.is_active }) });
+                                showToast('✅ נשמר');
+                              } catch(err) { showToast('שגיאה בשמירה'); }
+                            }}
+                            style={{ padding: '6px 10px', borderRadius: '8px', border: '1.5px solid #e5e7eb', fontSize: '0.875rem', cursor: 'pointer', background: 'white' }}>
+                            {Array.from({ length: 33 }, (_, k) => { const tot = k * 30; const h = String(6 + Math.floor(tot / 60)).padStart(2, '0'); const m = tot % 60 === 0 ? '00' : '30'; return `${h}:${m}`; }).map(t => <option key={t} value={t}>{t}</option>)}
+                          </select>
+                        )).reduce((acc, el, idx) => idx === 0 ? [el] : [...acc, <span key="s" style={{ color: '#9ca3af', fontSize: '0.875rem' }}>עד</span>, el], [])}
                       </div>
                     ) : <span style={{ color: '#d1d5db', fontWeight: 700, fontSize: '0.875rem' }}>סגור</span>}
                   </div>
                 ))}
               </div>
-              <button onClick={() => showToast('שעות הפעילות נשמרו ✅')} style={{ marginTop: '1rem', padding: '0.875rem 1.5rem', borderRadius: '12px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: '#F7C1C3', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: 'pointer', fontFamily: 'Varela Round, sans-serif' }}>
-                שמירת שינויים
-              </button>
+              <p style={{ marginTop: '0.75rem', color: '#9ca3af', fontSize: '0.8rem' }}>השינויים נשמרים אוטומטית</p>
             </div>
           )}
 
