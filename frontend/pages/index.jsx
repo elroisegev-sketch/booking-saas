@@ -1378,7 +1378,13 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
 // ── ROOT ──────────────────────────────────────────────────────
 export default function App() {
   const [user, setUser] = useState(null);
-  const [view, setView] = useState('portfolio');
+  const [view, setView] = useState(() => {
+    // אם יש הזמנה שמורה — חזור ישר לדף ההזמנה
+    try {
+      if (typeof window !== 'undefined' && sessionStorage.getItem(BOOKING_KEY)) return 'booking';
+    } catch(e) {}
+    return 'portfolio';
+  });
   const [appointments, setAppointments] = useState([]);
 
   useEffect(() => {
