@@ -172,6 +172,8 @@ const TermsScreen = ({ termsText, onAccept, onBack }) => (
 );
 
 // ── BOOKING PAGE ──────────────────────────────────────────────
+const BOOKING_KEY = 'lior_booking_state';
+
 const BookingPage = ({ onBack, onAppointmentBooked }) => {
   // steps: 0=terms, 1=services, 2=date, 3=time, 4=details, 5=payment
   const [step, setStep] = useState(1);
@@ -183,6 +185,37 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   const [realAvailability, setRealAvailability] = useState([]);
   const [nailCountModal, setNailCountModal] = useState(false);
   const [nailService, setNailService] = useState(null);
+
+  // Restore state from sessionStorage on mount
+  useEffect(() => {
+    try {
+      const saved = sessionStorage.getItem(BOOKING_KEY);
+      if (saved) {
+        const s = JSON.parse(saved);
+        if (s.step) setStep(s.step);
+        if (s.selectedServices) setSelectedServices(s.selectedServices);
+        if (s.sel) setSel({ ...s.sel, date: s.sel.date ? new Date(s.sel.date) : null });
+        if (s.calMonth) setCalMonth(new Date(s.calMonth));
+      }
+    } catch(e) {}
+  }, []);
+
+  // Save state to sessionStorage on every change
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(BOOKING_KEY, JSON.stringify({
+        step,
+        selectedServices,
+        sel: { ...sel, date: sel.date ? sel.date.toISOString() : null },
+        calMonth: calMonth.toISOString(),
+      }));
+    } catch(e) {}
+  }, [step, selectedServices, sel, calMonth]);
+
+  const clearAndBack = () => {
+    sessionStorage.removeItem(BOOKING_KEY);
+    onBack();
+  };
 
   useEffect(() => {
     fetch('https://booking-saas-production-b9fd.up.railway.app/api/services/public/lior-segev')
@@ -261,7 +294,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   const deposit = Math.ceil(totalPrice / 2);
   const waLink = WHATSAPP_LINK(sel.name, serviceNames, dateStr, sel.time, totalPrice);
 
-  useEffect(() => { if (booked) onBack(); }, [booked]);
+  useEffect(() => { if (booked) { sessionStorage.removeItem(BOOKING_KEY); onBack(); } }, [booked]);
 
   if (step === 0) setStep(1);
 
@@ -270,7 +303,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
 
       {/* Header */}
       <div style={{ background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', borderBottom: '1px solid rgba(255,255,255,0.7)', padding: '0.875rem 1.25rem', display: 'flex', alignItems: 'center', gap: '0.75rem', position: 'sticky', top: 0, zIndex: 10 }}>
-        <button onClick={onBack} style={{ padding: '0.5rem 0.75rem', borderRadius: '12px', background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.6)', cursor: 'pointer', color: '#A11738', display: 'flex' }}>
+        <button onClick={clearAndBack} style={{ padding: '0.5rem 0.75rem', borderRadius: '12px', background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.6)', cursor: 'pointer', color: '#A11738', display: 'flex' }}>
           <Icon name="chevronR" className="w-5 h-5" />
         </button>
         <img src="/symbol.png" alt="LS" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
