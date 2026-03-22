@@ -9,23 +9,29 @@ const router = express.Router();
 function sendTelegram(message) {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
-  if (!token || !chatId) { console.log('Telegram: missing env vars'); return; }
-  const body = JSON.stringify({ chat_id: chatId, text: message });
-  const https = require('https');
-  const options = {
-    hostname: 'api.telegram.org',
-    path: `/bot${token}/sendMessage`,
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) },
-  };
-  const req = https.request(options, res => {
-    let data = '';
-    res.on('data', chunk => data += chunk);
-    res.on('end', () => { if (res.statusCode !== 200) console.error('Telegram error:', res.statusCode, data); });
+  console.log('📨 Telegram: token present=', !!token, 'chatId present=', !!chatId);
+  if (!token || !chatId) return Promise.resolve();
+  return new Promise((resolve) => {
+    const body = JSON.stringify({ chat_id: chatId, text: message });
+    const https = require('https');
+    const options = {
+      hostname: 'api.telegram.org',
+      path: `/bot${token}/sendMessage`,
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(body) },
+    };
+    const req = https.request(options, res => {
+      let data = '';
+      res.on('data', chunk => data += chunk);
+      res.on('end', () => {
+        console.log('📨 Telegram response:', res.statusCode, data);
+        resolve();
+      });
+    });
+    req.on('error', e => { console.error('📨 Telegram error:', e.message); resolve(); });
+    req.write(body);
+    req.end();
   });
-  req.on('error', e => console.error('Telegram error:', e.message));
-  req.write(body);
-  req.end();
 }
 
 // ── Rate limiter — public booking endpoint ────────────────────
