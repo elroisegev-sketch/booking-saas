@@ -936,6 +936,16 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
   const upcoming = appointments.filter(a => new Date(a.appointment_time) > new Date() && a.status !== 'cancelled').length;
   const DAY_NAMES = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
 
+  const openWhatsApp = (appt, type) => {
+    const phone = '972' + appt.customer_phone.replace(/-/g, '').slice(1);
+    const date = fmtDate(appt.appointment_time);
+    const time = fmtTime(appt.appointment_time);
+    const msg = type === 'confirm'
+      ? `היי ${appt.customer_name} 🌸\nהתור שלך אושר!\n📅 תאריך: ${date}\n🕐 שעה: ${time}\n💅 טיפול: ${appt.service_name}\nנתראה! — ליאור שגב ביוטי`
+      : `היי ${appt.customer_name}, לצערי התור שלך ל${date} בשעה ${time} בוטל. ניצור איתך קשר לקביעת תור חדש 🙏`;
+    window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
+  };
+
   const approveAppt = async (id) => {
     const token = localStorage.getItem('token');
     try {
@@ -945,8 +955,10 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
         body: JSON.stringify({ status: 'confirmed' })
       });
     } catch(e) { console.error('approve failed', e); }
+    const appt = appointments.find(a => a.id === id);
     setAppointments(appointments.map(a => a.id === id ? { ...a, status: 'confirmed' } : a));
     showToast('התור אושר ✅');
+    if (appt) openWhatsApp(appt, 'confirm');
   };
   const cancelAppt = async (id) => {
     const token = localStorage.getItem('token');
@@ -957,8 +969,10 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
         body: JSON.stringify({ status: 'cancelled' })
       });
     } catch(e) { console.error('cancel failed', e); }
+    const appt = appointments.find(a => a.id === id);
     setAppointments(appointments.map(a => a.id === id ? { ...a, status: 'cancelled' } : a));
     showToast('התור בוטל');
+    if (appt) openWhatsApp(appt, 'cancel');
   };
 
   const addManualAppt = () => {
