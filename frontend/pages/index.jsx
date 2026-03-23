@@ -573,11 +573,9 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
               <p style={{ color: '#b0b8c4', fontSize: '0.75rem' }}>50% ממחיר הטיפול</p>
             </div>
 
-            {/* כפתור ביט */}
-            <a
-              href={`bit://pay?phoneNumber=0535249688&amount=${deposit}`}
-              target="_blank" rel="noreferrer"
-              onClick={async () => {
+            {/* כפתורי תשלום */}
+            {(() => {
+              const bookAndConfirm = async () => {
                 const rawTime = sel.time.trim();
                 const dateStr2 = `${sel.date.getFullYear()}-${String(sel.date.getMonth()+1).padStart(2,'0')}-${String(sel.date.getDate()).padStart(2,'0')}`;
                 const refDate = new Date(`${dateStr2}T12:00:00Z`);
@@ -605,11 +603,29 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                 } catch(e) { console.error('booking failed', e); }
                 try { sessionStorage.removeItem(BOOKING_KEY); } catch(e) {}
                 setConfirmed(true);
-              }}
-              style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', width: '100%', padding: '1rem', borderRadius: '999px', background: 'linear-gradient(135deg, #5B3FD4, #7B5FFF)', color: 'white', fontWeight: 700, fontSize: '1rem', textDecoration: 'none', marginBottom: '12px', boxSizing: 'border-box', boxShadow: '0 6px 24px rgba(91,63,212,0.38)' }}>
-              <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="rgba(255,255,255,0.25)"/><text x="12" y="16.5" textAnchor="middle" fontSize="13" fontWeight="800" fill="white" fontFamily="Arial">B</text></svg>
-              פתח ביט לתשלום — ₪{deposit}
-            </a>
+              };
+              return (<>
+                {/* ביט */}
+                <a href={`bit://pay?phoneNumber=0535249688&amount=${deposit}`} target="_blank" rel="noreferrer"
+                  onClick={bookAndConfirm}
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', width: '100%', padding: '1rem', borderRadius: '999px', background: 'linear-gradient(135deg, #5B3FD4, #7B5FFF)', color: 'white', fontWeight: 700, fontSize: '1rem', textDecoration: 'none', marginBottom: '10px', boxSizing: 'border-box', boxShadow: '0 6px 24px rgba(91,63,212,0.38)' }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="rgba(255,255,255,0.25)"/><text x="12" y="16.5" textAnchor="middle" fontSize="13" fontWeight="800" fill="white" fontFamily="Arial">B</text></svg>
+                  תשלום בביט — ₪{deposit}
+                </a>
+                {/* פייבוקס */}
+                <a href={`https://payboxapp.page.link/pay?userId=0535249688&sum=${deposit}`} target="_blank" rel="noreferrer"
+                  onClick={bookAndConfirm}
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', width: '100%', padding: '1rem', borderRadius: '999px', background: 'linear-gradient(135deg, #00A86B, #00C97A)', color: 'white', fontWeight: 700, fontSize: '1rem', textDecoration: 'none', marginBottom: '10px', boxSizing: 'border-box', boxShadow: '0 6px 24px rgba(0,168,107,0.35)' }}>
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="rgba(255,255,255,0.25)"/><text x="12" y="16.5" textAnchor="middle" fontSize="12" fontWeight="800" fill="white" fontFamily="Arial">P</text></svg>
+                  תשלום בפייבוקס — ₪{deposit}
+                </a>
+                {/* מזומן */}
+                <button onClick={bookAndConfirm}
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', width: '100%', padding: '1rem', borderRadius: '999px', background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1.5px solid rgba(247,193,195,0.6)', color: '#A11738', fontWeight: 700, fontSize: '1rem', cursor: 'pointer', marginBottom: '10px', boxSizing: 'border-box' }}>
+                  💵 אשלם במזומן בהגעה
+                </button>
+              </>);
+            })()}
 
             <button onClick={() => setStep(4)} style={{ width: '100%', padding: '0.875rem', borderRadius: '999px', background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.7)', color: '#A11738', fontWeight: 500, cursor: 'pointer' }}>חזרה</button>
           </div>
