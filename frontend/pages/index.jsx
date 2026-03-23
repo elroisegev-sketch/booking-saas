@@ -693,6 +693,7 @@ const GALLERY_IMAGES = [
   '/gallery/IMG_9674.JPG',
   '/gallery/לק פיגוז -1 .png',
 ];
+const TOTAL_IMAGES = GALLERY_IMAGES.length;
 
 const FAN_CONFIG = {
   '-2': { x: -105, rotate: -26, scale: 0.70, z: 1, opacity: 0.52 },
