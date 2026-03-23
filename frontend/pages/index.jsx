@@ -666,8 +666,33 @@ const ServiceModal = ({ service, onSave, onClose }) => {
 };
 
 // ── FAN GALLERY ───────────────────────────────────────────────
-const TOTAL_IMAGES = 21;
-const GALLERY_IMAGES = Array.from({ length: TOTAL_IMAGES }, (_, i) => `/gallery/1 - ${i + 1}.jpeg`);
+const GALLERY_IMAGES = [
+  ...Array.from({ length: 21 }, (_, i) => `/gallery/1 - ${i + 1}.jpeg`),
+  '/gallery/26C7B032-40D9-43E1-9BCF-8DBB8B14284E.JPG',
+  '/gallery/7F27DFF2-0FDA-4E72-93BE-D0A6093C84F1.JPG',
+  '/gallery/FullSizeRender 2.JPG',
+  '/gallery/FullSizeRender.JPG',
+  '/gallery/IMG_0331.JPG',
+  '/gallery/IMG_0926.jpg',
+  '/gallery/IMG_1216.jpg',
+  '/gallery/IMG_1318.JPG',
+  '/gallery/IMG_2511.JPG',
+  '/gallery/IMG_4191.JPG',
+  '/gallery/IMG_4209 2.JPG',
+  '/gallery/IMG_4211.JPG',
+  '/gallery/IMG_4212.JPG',
+  '/gallery/IMG_4414.JPG',
+  '/gallery/IMG_4416.JPG',
+  '/gallery/IMG_4455.JPG',
+  '/gallery/IMG_4464 2.JPG',
+  '/gallery/IMG_4484 2.JPG',
+  '/gallery/IMG_4822 2.JPG',
+  '/gallery/IMG_6254 2.JPG',
+  '/gallery/IMG_7816.JPG',
+  '/gallery/IMG_8406.JPG',
+  '/gallery/IMG_9674.JPG',
+  '/gallery/לק פיגוז -1 .png',
+];
 
 const FAN_CONFIG = {
   '-2': { x: -105, rotate: -26, scale: 0.70, z: 1, opacity: 0.52 },
