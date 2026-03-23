@@ -900,6 +900,15 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
       .then(r => r.json()).then(data => { if (Array.isArray(data)) setAvailability(data.map(d => ({ ...d, start_time: (d.start_time || '').slice(0, 5), end_time: (d.end_time || '').slice(0, 5) }))); });
     fetch(BACKEND + '/api/blocked-slots', { headers: { 'Authorization': 'Bearer ' + token } })
       .then(r => r.json()).then(data => { if (Array.isArray(data)) setBlockedSlots(data.map(b => ({ ...b, start_time: (b.start_time || '').slice(0, 5), end_time: (b.end_time || '').slice(0, 5) }))); });
+
+    const es = new EventSource(BACKEND + '/api/appointments/stream?token=' + token);
+    es.onmessage = (e) => {
+      if (e.data === 'refresh') {
+        fetch(BACKEND + '/api/appointments', { headers: { 'Authorization': 'Bearer ' + token } })
+          .then(r => r.json()).then(data => { if (Array.isArray(data)) setAppointments(data); });
+      }
+    };
+    return () => es.close();
   }, []);
 
   useEffect(() => {
