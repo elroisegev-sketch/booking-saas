@@ -789,7 +789,7 @@ const FanGallery = () => {
 };
 
 // ── PORTFOLIO PAGE ────────────────────────────────────────────
-const PortfolioPage = ({ onBook, onAdmin }) => {
+const PortfolioPage = ({ onBook }) => {
   useEffect(() => {
     const initGSAP = async () => {
       try {
@@ -904,7 +904,6 @@ const PortfolioPage = ({ onBook, onAdmin }) => {
         </div>
 
         <div style={{ textAlign: 'center' }}>
-          <button onClick={onAdmin} style={{ color: 'rgba(156,163,175,0.3)', fontSize: '0.58rem', background: 'none', border: 'none', cursor: 'pointer', letterSpacing: '0.1em' }}>ניהול</button>
         </div>
       </div>
     </div>
@@ -1548,9 +1547,9 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
 export default function App() {
   const [user, setUser] = useState(null);
   const [view, setView] = useState(() => {
-    // אם יש הזמנה שמורה — חזור ישר לדף ההזמנה
     try {
       if (typeof window !== 'undefined' && sessionStorage.getItem(BOOKING_KEY)) return 'booking';
+      if (typeof window !== 'undefined' && window.location.pathname === '/admin') return 'auth';
     } catch(e) {}
     return 'portfolio';
   });
@@ -1697,7 +1696,7 @@ export default function App() {
           .admin-bottom-nav button svg { width: 18px !important; height: 18px !important; }
         }
       `}</style>
-      {view === 'portfolio' && <PortfolioPage onBook={() => setView('booking')} onAdmin={() => setView('auth')} />}
+      {view === 'portfolio' && <PortfolioPage onBook={() => setView('booking')} />}
       {view === 'booking' && <BookingPage onBack={() => setView('portfolio')} onAppointmentBooked={(appt) => { setAppointments(prev => [...prev, appt]); }} />}
       {view === 'auth' && <AuthScreen onLogin={(u) => { setUser(u); setView('dashboard'); }} />}
       {view === 'dashboard' && user && <Dashboard user={user} onLogout={() => { setUser(null); setView('portfolio'); }} appointments={appointments} setAppointments={setAppointments} />}
