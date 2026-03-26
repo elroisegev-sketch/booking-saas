@@ -148,7 +148,7 @@ const AuthScreen = ({ onLogin }) => {
   );
 };
 // ── TERMS SCREEN ──────────────────────────────────────────────
-const TermsScreen = ({ termsText, onAccept, onBack }) => (
+const TermsScreen = ({ termsText, onAccept, onBack, externalNail, onExternalNailChange }) => (
   <div dir="rtl" style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #fff5f7 0%, #fce8f3 40%, #f3eeff 80%, #fff5f7 100%)', fontFamily: 'Varela Round, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
     <div style={{ width: '100%', maxWidth: '520px' }}>
       <div style={{ background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.8)', borderRadius: '28px', overflow: 'hidden', boxShadow: '0 8px 32px rgba(161,23,56,0.08), inset 0 1px 0 rgba(255,255,255,0.9)' }}>
@@ -160,6 +160,18 @@ const TermsScreen = ({ termsText, onAccept, onBack }) => (
         <div style={{ padding: '1.5rem', maxHeight: '380px', overflowY: 'auto' }}>
           <pre style={{ whiteSpace: 'pre-wrap', fontSize: '0.875rem', color: '#374151', lineHeight: 1.7, fontFamily: 'Varela Round, sans-serif' }}>{termsText}</pre>
         </div>
+        {onExternalNailChange && (
+          <div style={{ padding: '0 1.5rem 1rem' }}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', background: externalNail ? 'rgba(161,23,56,0.06)' : 'rgba(247,193,195,0.15)', border: `1.5px solid ${externalNail ? '#A11738' : 'rgba(247,193,195,0.4)'}`, borderRadius: '14px', padding: '0.875rem 1rem', transition: 'all 0.2s' }}>
+              <input type="checkbox" checked={externalNail} onChange={e => onExternalNailChange(e.target.checked)}
+                style={{ width: '18px', height: '18px', accentColor: '#A11738', cursor: 'pointer', flexShrink: 0 }} />
+              <span style={{ fontSize: '0.875rem', color: '#374151', lineHeight: 1.5 }}>
+                יש לי לק קיים מסלון אחר
+                <span style={{ display: 'block', fontSize: '0.75rem', color: '#A11738', fontWeight: 700, marginTop: '2px' }}>תוספת הסרה: +10 ₪</span>
+              </span>
+            </label>
+          </div>
+        )}
         <div style={{ padding: '1.25rem', borderTop: '1px solid rgba(247,193,195,0.2)', display: 'flex', gap: '12px' }}>
           <button onClick={onBack} style={{ flex: 1, padding: '0.875rem', borderRadius: '999px', background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.7)', color: '#374151', fontWeight: 700, cursor: 'pointer' }}>חזרה</button>
           <button onClick={onAccept} style={{ flex: 2, padding: '0.875rem', borderRadius: '999px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, border: 'none', cursor: 'pointer', boxShadow: '0 8px 24px rgba(161,23,56,0.32)' }}>
@@ -178,6 +190,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   // steps: 0=terms, 1=services, 2=date, 3=time, 4=details, 5=payment
   const [step, setStep] = useState(1);
   const [selectedServices, setSelectedServices] = useState([]);
+  const [externalNail, setExternalNail] = useState(false);
   const [sel, setSel] = useState({ date: null, time: null, name: '', phone: '', image: null });
   const [calMonth, setCalMonth] = useState(new Date());
   const [booked, setBooked] = useState(false);
@@ -294,8 +307,9 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
 
   const dateStr = sel.date?.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' });
   const serviceNames = selectedServices.map(s => s.name).join(', ');
-  const deposit = Math.ceil(totalPrice / 2);
-  const waLink = WHATSAPP_LINK(sel.name, serviceNames, dateStr, sel.time, totalPrice);
+  const finalPrice = totalPrice + (externalNail && hasGel ? 10 : 0);
+  const deposit = Math.ceil(finalPrice / 2);
+  const waLink = WHATSAPP_LINK(sel.name, serviceNames + (externalNail && hasGel ? ' + הסרת לק מסלון אחר' : ''), dateStr, sel.time, finalPrice);
 
   useEffect(() => { if (booked) { sessionStorage.removeItem(BOOKING_KEY); onBack(); } }, [booked]);
 
@@ -378,7 +392,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
               <div style={{ position: 'sticky', bottom: '1rem', background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1.5px solid rgba(255,255,255,0.8)', borderRadius: '24px', padding: '1rem 1.25rem', marginTop: '1rem', boxShadow: '0 8px 32px rgba(161,23,56,0.14), inset 0 1px 0 rgba(255,255,255,0.9)' }}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '5px' }}>
                   <span style={{ fontWeight: 600, color: '#A11738', fontSize: '0.8rem' }}>{selectedServices.length} שירות{selectedServices.length > 1 ? 'ים' : ''} נבחר{selectedServices.length > 1 ? 'ו' : ''}</span>
-                  <span style={{ fontFamily: "'Varela Round', sans-serif", fontWeight: 400, fontSize: '1.3rem', color: '#EC6A83',}}>סה"כ: {fmtPrice(totalPrice)}</span>
+                  <span style={{ fontFamily: "'Varela Round', sans-serif", fontWeight: 400, fontSize: '1.3rem', color: '#EC6A83',}}>סה"כ: {fmtPrice(externalNail && hasGel ? totalPrice + 10 : totalPrice)}</span>
                 </div>
                 <div style={{ fontSize: '0.7rem', color: '#9ca3af', marginBottom: '10px' }}>{selectedServices.map(s => s.name).join(' + ')} · {totalDuration} דקות</div>
                 <button className="lux-btn" onClick={() => { const hasKishut = selectedServices.some(s => s.name === 'קישוט'); if (hasKishut) { setStep('kishut_info'); } else if (hasGel) { setStep('terms_gel'); } else { setStep(2); } }}
@@ -412,7 +426,8 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
         )}
 
         {step === 'terms_gel' && (
-          <TermsScreen termsText={TERMS_GEL} onAccept={() => setStep(2)} onBack={() => setStep(1)} />
+          <TermsScreen termsText={TERMS_GEL} onAccept={() => setStep(2)} onBack={() => setStep(1)}
+            externalNail={externalNail} onExternalNailChange={setExternalNail} />
         )}
 
         {/* Step 2 - Date */}
