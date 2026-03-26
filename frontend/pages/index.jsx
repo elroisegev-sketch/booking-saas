@@ -148,40 +148,79 @@ const AuthScreen = ({ onLogin }) => {
   );
 };
 // ── TERMS SCREEN ──────────────────────────────────────────────
-const TermsScreen = ({ termsText, onAccept, onBack, externalNail, onExternalNailChange }) => (
-  <div dir="rtl" style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #fff5f7 0%, #fce8f3 40%, #f3eeff 80%, #fff5f7 100%)', fontFamily: 'Varela Round, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
-    <div style={{ width: '100%', maxWidth: '520px' }}>
-      <div style={{ background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.8)', borderRadius: '28px', overflow: 'hidden', boxShadow: '0 8px 32px rgba(161,23,56,0.08), inset 0 1px 0 rgba(255,255,255,0.9)' }}>
-        <div style={{ background: 'linear-gradient(135deg,#A11738,#EC6A83)', padding: '1.5rem', textAlign: 'center', color: 'white', borderRadius: '28px 28px 0 0' }}>
-          <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>📋</div>
-          <h2 style={{ fontWeight: 900, fontSize: '1.5rem', margin: 0 }}>תקנון</h2>
-          <p style={{ opacity: 0.7, fontSize: '0.875rem', marginTop: '4px' }}>יש לקרוא ולאשר לפני קביעת התור</p>
-        </div>
-        <div style={{ padding: '1.5rem', maxHeight: '380px', overflowY: 'auto' }}>
-          <pre style={{ whiteSpace: 'pre-wrap', fontSize: '0.875rem', color: '#374151', lineHeight: 1.7, fontFamily: 'Varela Round, sans-serif' }}>{termsText}</pre>
-        </div>
-        {onExternalNailChange && (
-          <div style={{ padding: '0 1.5rem 1rem' }}>
-            <label style={{ display: 'flex', alignItems: 'center', gap: '12px', cursor: 'pointer', background: externalNail ? 'rgba(161,23,56,0.06)' : 'rgba(247,193,195,0.15)', border: `1.5px solid ${externalNail ? '#A11738' : 'rgba(247,193,195,0.4)'}`, borderRadius: '14px', padding: '0.875rem 1rem', transition: 'all 0.2s' }}>
-              <input type="checkbox" checked={externalNail} onChange={e => onExternalNailChange(e.target.checked)}
-                style={{ width: '18px', height: '18px', accentColor: '#A11738', cursor: 'pointer', flexShrink: 0 }} />
-              <span style={{ fontSize: '0.875rem', color: '#374151', lineHeight: 1.5 }}>
-                יש לי לק קיים מסלון אחר
-                <span style={{ display: 'block', fontSize: '0.75rem', color: '#A11738', fontWeight: 700, marginTop: '2px' }}>תוספת הסרה: +10 ₪</span>
-              </span>
-            </label>
+const TermsScreen = ({ termsText, onAccept, onBack, externalNail, onExternalNailChange }) => {
+  const [showPopup, setShowPopup] = useState(false);
+
+  const handleAccept = () => {
+    if (onExternalNailChange && externalNail === null) {
+      setShowPopup(true);
+      return;
+    }
+    onAccept();
+  };
+
+  return (
+    <div dir="rtl" style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #fff5f7 0%, #fce8f3 40%, #f3eeff 80%, #fff5f7 100%)', fontFamily: 'Varela Round, sans-serif', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1.5rem' }}>
+      <div style={{ width: '100%', maxWidth: '520px' }}>
+        <div style={{ background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.8)', borderRadius: '28px', overflow: 'hidden', boxShadow: '0 8px 32px rgba(161,23,56,0.08), inset 0 1px 0 rgba(255,255,255,0.9)' }}>
+          <div style={{ background: 'linear-gradient(135deg,#A11738,#EC6A83)', padding: '1.5rem', textAlign: 'center', color: 'white', borderRadius: '28px 28px 0 0' }}>
+            <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>📋</div>
+            <h2 style={{ fontWeight: 900, fontSize: '1.5rem', margin: 0 }}>תקנון</h2>
+            <p style={{ opacity: 0.7, fontSize: '0.875rem', marginTop: '4px' }}>יש לקרוא ולאשר לפני קביעת התור</p>
           </div>
-        )}
-        <div style={{ padding: '1.25rem', borderTop: '1px solid rgba(247,193,195,0.2)', display: 'flex', gap: '12px' }}>
-          <button onClick={onBack} style={{ flex: 1, padding: '0.875rem', borderRadius: '999px', background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.7)', color: '#374151', fontWeight: 700, cursor: 'pointer' }}>חזרה</button>
-          <button onClick={onAccept} style={{ flex: 2, padding: '0.875rem', borderRadius: '999px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, border: 'none', cursor: 'pointer', boxShadow: '0 8px 24px rgba(161,23,56,0.32)' }}>
-            קראתי ומאשרת ✅
-          </button>
+          <div style={{ padding: '1.5rem', maxHeight: '320px', overflowY: 'auto' }}>
+            <pre style={{ whiteSpace: 'pre-wrap', fontSize: '0.875rem', color: '#374151', lineHeight: 1.7, fontFamily: 'Varela Round, sans-serif' }}>{termsText}</pre>
+          </div>
+
+          {onExternalNailChange && (
+            <div style={{ padding: '0 1.5rem 1.25rem' }}>
+              <div style={{ background: 'rgba(247,193,195,0.2)', border: '1.5px solid rgba(247,193,195,0.5)', borderRadius: '16px', padding: '1rem 1.25rem' }}>
+                <p style={{ fontSize: '0.875rem', fontWeight: 700, color: '#374151', margin: '0 0 0.75rem' }}>
+                  האם יש לך לק קיים מסלון אחר?
+                  <span style={{ display: 'block', fontSize: '0.75rem', color: '#A11738', fontWeight: 400, marginTop: '2px' }}>הסרה ממקום אחר כרוכה בתוספת של 10 ₪</span>
+                </p>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <button onClick={() => onExternalNailChange(true)}
+                    style={{ flex: 1, padding: '0.6rem', borderRadius: '999px', border: `2px solid ${externalNail === true ? '#A11738' : 'rgba(247,193,195,0.5)'}`, background: externalNail === true ? 'linear-gradient(135deg,#A11738,#EC6A83)' : 'white', color: externalNail === true ? 'white' : '#374151', fontWeight: 700, fontSize: '0.875rem', cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'Varela Round, sans-serif' }}>
+                    כן, יש לי (+10 ₪)
+                  </button>
+                  <button onClick={() => onExternalNailChange(false)}
+                    style={{ flex: 1, padding: '0.6rem', borderRadius: '999px', border: `2px solid ${externalNail === false ? '#A11738' : 'rgba(247,193,195,0.5)'}`, background: externalNail === false ? 'linear-gradient(135deg,#A11738,#EC6A83)' : 'white', color: externalNail === false ? 'white' : '#374151', fontWeight: 700, fontSize: '0.875rem', cursor: 'pointer', transition: 'all 0.2s', fontFamily: 'Varela Round, sans-serif' }}>
+                    לא, אין לי
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div style={{ padding: '1.25rem', borderTop: '1px solid rgba(247,193,195,0.2)', display: 'flex', gap: '12px' }}>
+            <button onClick={onBack} style={{ flex: 1, padding: '0.875rem', borderRadius: '999px', background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.7)', color: '#374151', fontWeight: 700, cursor: 'pointer' }}>חזרה</button>
+            <button onClick={handleAccept} style={{ flex: 2, padding: '0.875rem', borderRadius: '999px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, border: 'none', cursor: 'pointer', boxShadow: '0 8px 24px rgba(161,23,56,0.32)' }}>
+              קראתי ומאשרת ✅
+            </button>
+          </div>
         </div>
       </div>
+
+      {showPopup && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 100, padding: '1.5rem' }}>
+          <div dir="rtl" style={{ background: 'white', borderRadius: '24px', padding: '2rem', maxWidth: '320px', width: '100%', textAlign: 'center', boxShadow: '0 24px 64px rgba(0,0,0,0.2)' }}>
+            <div style={{ fontSize: '2.5rem', marginBottom: '0.75rem' }}>💅</div>
+            <h3 style={{ fontWeight: 900, color: '#A11738', marginBottom: '0.5rem', fontFamily: 'Varela Round, sans-serif' }}>רגע לפני שממשיכים</h3>
+            <p style={{ fontSize: '0.875rem', color: '#374151', lineHeight: 1.6, marginBottom: '1.25rem', fontFamily: 'Varela Round, sans-serif' }}>
+              שכחת לענות — האם יש לך לק קיים מסלון אחר?<br />
+              <span style={{ color: '#A11738', fontWeight: 700 }}>הסרה ממקום אחר כרוכה בתוספת של 10 ₪</span>
+            </p>
+            <button onClick={() => setShowPopup(false)}
+              style={{ width: '100%', padding: '0.875rem', borderRadius: '999px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, border: 'none', cursor: 'pointer', fontFamily: 'Varela Round, sans-serif' }}>
+              חזרה לבחירה
+            </button>
+          </div>
+        </div>
+      )}
     </div>
-  </div>
-);
+  );
+};
 
 // ── BOOKING PAGE ──────────────────────────────────────────────
 const BOOKING_KEY = 'lior_booking_state';
@@ -190,7 +229,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   // steps: 0=terms, 1=services, 2=date, 3=time, 4=details, 5=payment
   const [step, setStep] = useState(1);
   const [selectedServices, setSelectedServices] = useState([]);
-  const [externalNail, setExternalNail] = useState(false);
+  const [externalNail, setExternalNail] = useState(null);
   const [sel, setSel] = useState({ date: null, time: null, name: '', phone: '', image: null });
   const [calMonth, setCalMonth] = useState(new Date());
   const [booked, setBooked] = useState(false);
