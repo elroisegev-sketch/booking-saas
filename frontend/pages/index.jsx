@@ -374,10 +374,10 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
         </div>
       </div>
 
-      {/* כפתור וואטסאפ צף */}
+      {/* כפתור וואטסאפ צף — תמונת ליאור */}
       <a href={`https://wa.me/972${LIOR_PHONE.slice(1)}?text=${encodeURIComponent('היי ליאור 🌸 אני צריכה עזרה עם קביעת התור')}`} target="_blank" rel="noreferrer"
-        style={{ position: 'fixed', bottom: '1.5rem', left: '1.5rem', zIndex: 50, width: '52px', height: '52px', borderRadius: '50%', background: '#25D366', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 20px rgba(37,211,102,0.45)', textDecoration: 'none' }}>
-        <Icon name="whatsapp" className="w-6 h-6" style={{ color: 'white' }} />
+        style={{ position: 'fixed', bottom: '1.5rem', left: '1.5rem', zIndex: 50, width: '58px', height: '58px', borderRadius: '50%', overflow: 'hidden', border: '3px solid #25D366', boxShadow: '0 4px 20px rgba(37,211,102,0.5)', textDecoration: 'none', display: 'block' }}>
+        <img src="/lior-profile.png" alt="ליאור" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%' }} />
       </a>
 
       <div style={{ maxWidth: '520px', margin: '0 auto', padding: '2rem 1.5rem' }}>
