@@ -374,6 +374,12 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
         </div>
       </div>
 
+      {/* כפתור וואטסאפ צף */}
+      <a href={`https://wa.me/972${LIOR_PHONE.slice(1)}?text=${encodeURIComponent('היי ליאור 🌸 אני צריכה עזרה עם קביעת התור')}`} target="_blank" rel="noreferrer"
+        style={{ position: 'fixed', bottom: '1.5rem', left: '1.5rem', zIndex: 50, width: '52px', height: '52px', borderRadius: '50%', background: '#25D366', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 20px rgba(37,211,102,0.45)', textDecoration: 'none' }}>
+        <Icon name="whatsapp" className="w-6 h-6" style={{ color: 'white' }} />
+      </a>
+
       <div style={{ maxWidth: '520px', margin: '0 auto', padding: '2rem 1.5rem' }}>
 
         {/* Step 1 - Services */}
@@ -672,11 +678,6 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                   style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', width: '100%', padding: '1rem', borderRadius: '999px', background: 'linear-gradient(135deg, #00A86B, #00C97A)', color: 'white', fontWeight: 700, fontSize: '1rem', textDecoration: 'none', marginBottom: '10px', boxSizing: 'border-box', boxShadow: '0 6px 24px rgba(0,168,107,0.35)' }}>
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="rgba(255,255,255,0.25)"/><text x="12" y="16.5" textAnchor="middle" fontSize="12" fontWeight="800" fill="white" fontFamily="Arial">P</text></svg>
                   תשלום בפייבוקס — ₪{deposit}
-                </a>
-                {/* וואטסאפ לתמיכה */}
-                <a href={`https://wa.me/972${LIOR_PHONE.slice(1)}?text=${encodeURIComponent('היי ליאור 🌸 אני צריכה עזרה עם קביעת התור')}`} target="_blank" rel="noreferrer"
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', width: '100%', padding: '0.875rem', borderRadius: '999px', background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1.5px solid rgba(37,211,102,0.4)', color: '#16a34a', fontWeight: 700, fontSize: '0.9rem', textDecoration: 'none', marginBottom: '10px', boxSizing: 'border-box' }}>
-                  <Icon name="whatsapp" className="w-5 h-5" /> צריכה עזרה? דברי עם ליאור
                 </a>
               </>);
             })()}
