@@ -877,7 +877,11 @@ const PortfolioPage = ({ onBook }) => {
 
       {/* ── HERO ── */}
       <div style={{ paddingTop: '80px', paddingBottom: '3rem', textAlign: 'center', padding: '80px 1.75rem 3rem', animation: 'fadeUp 0.9s 0.1s cubic-bezier(0.22,1,0.36,1) both' }}>
-        <img src="/symbol.png" alt="LS" style={{ height: '36px', objectFit: 'contain', opacity: 0.7, display: 'block', margin: '0 auto 1.25rem' }} />
+        <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
+          <div style={{ width: '100px', height: '100px', borderRadius: '50%', overflow: 'hidden', border: '3px solid rgba(161,23,56,0.2)', boxShadow: '0 8px 32px rgba(161,23,56,0.18)' }}>
+            <img src="/lior-profile.png" alt="ליאור שגב" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center top' }} />
+          </div>
+        </div>
         <h1 style={{ fontFamily: "'Varela Round', sans-serif", fontSize: 'clamp(2.8rem, 11vw, 5rem)', fontWeight: 700, color: '#A11738', lineHeight: 1.1, marginBottom: '0.5rem', letterSpacing: '0.01em', animation: 'breathe 4s ease-in-out infinite', display: 'inline-block' }}>
           היופי שלך
         </h1>
