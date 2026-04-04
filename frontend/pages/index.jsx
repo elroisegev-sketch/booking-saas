@@ -47,7 +47,7 @@ const TERMS_GEL = `✨ הפרטים הקטנים שעושים את כל ההבד
 
 💅🏽 במקרה של ביטול פחות מ-24 שעות לפני התור, המקדמה לא תוחזר מאחר והזמן כבר נשמר עבורך 🎀
 
-💅🏽 התשלום מתבצע בסיום הטיפול במזומן / פייבוקס / ביט 🎀
+💅🏽 התשלום מתבצע בסיום הטיפול בפייבוקס / ביט 🎀
 
 💅🏽 הסרת עבודה קיימת ממקום אחר כרוכה בתוספת של 10₪ 🎀
 
@@ -673,11 +673,11 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="rgba(255,255,255,0.25)"/><text x="12" y="16.5" textAnchor="middle" fontSize="12" fontWeight="800" fill="white" fontFamily="Arial">P</text></svg>
                   תשלום בפייבוקס — ₪{deposit}
                 </a>
-                {/* מזומן */}
-                <button onClick={bookAndConfirm}
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', width: '100%', padding: '1rem', borderRadius: '999px', background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1.5px solid rgba(247,193,195,0.6)', color: '#A11738', fontWeight: 700, fontSize: '1rem', cursor: 'pointer', marginBottom: '10px', boxSizing: 'border-box' }}>
-                  💵 אשלם במזומן בהגעה
-                </button>
+                {/* וואטסאפ לתמיכה */}
+                <a href={`https://wa.me/972${LIOR_PHONE.slice(1)}?text=${encodeURIComponent('היי ליאור 🌸 אני צריכה עזרה עם קביעת התור')}`} target="_blank" rel="noreferrer"
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', width: '100%', padding: '0.875rem', borderRadius: '999px', background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1.5px solid rgba(37,211,102,0.4)', color: '#16a34a', fontWeight: 700, fontSize: '0.9rem', textDecoration: 'none', marginBottom: '10px', boxSizing: 'border-box' }}>
+                  <Icon name="whatsapp" className="w-5 h-5" /> צריכה עזרה? דברי עם ליאור
+                </a>
               </>);
             })()}
 
