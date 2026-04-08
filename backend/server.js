@@ -7,7 +7,27 @@ const rateLimit = require('express-rate-limit');
 const app = express();
 
 // ── Security headers ──────────────────────────────────────────
-app.use(helmet());
+app.use(helmet({
+  // 1. Content Security Policy
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "https://authentic-wisdom-production.up.railway.app"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      imgSrc: ["'self'", "data:", "https:"],
+      connectSrc: ["'self'", "https://booking-saas-production-b9fd.up.railway.app"],
+      frameSrc: ["'none'"],
+      objectSrc: ["'none'"],
+    },
+  },
+  // 2. Anti-clickjacking
+  frameguard: { action: 'deny' },
+  // 3. Remove X-Powered-By
+  hidePoweredBy: true,
+  // 4. X-Content-Type-Options: nosniff
+  noSniff: true,
+}));
 
 // ── CORS — whitelist only known origins ───────────────────────
 const ALLOWED_ORIGINS = [
@@ -32,14 +52,24 @@ app.use(cors({
 // ── Body size limit (prevent oversized JSON DoS) ──────────────
 app.use(express.json({ limit: '50kb' }));
 
-// ── Global rate limit — 200 req / 15 min per IP ───────────────
+// ── Global rate limit — 100 req / 15 min per IP ───────────────
 app.use(rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 200,
+  max: 100,
   standardHeaders: true,
   legacyHeaders: false,
   message: { error: 'יותר מדי בקשות, נסה שוב בעוד מעט' },
 }));
+
+// ── Admin rate limit — 10 req / 15 min per IP ─────────────────
+const adminLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 10,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'יותר מדי בקשות לאדמין, נסה שוב בעוד מעט' },
+});
+app.use('/api/admin', adminLimiter);
 
 // ── Routes ────────────────────────────────────────────────────
 app.use('/api', require('./routes/auth'));
