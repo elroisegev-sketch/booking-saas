@@ -27,7 +27,7 @@ export default function Maintenance() {
           <img
             src="/logo-pink.png"
             alt="ליאור שגב"
-            style={{ height: '64px', objectFit: 'contain', marginBottom: '2rem' }}
+            style={{ height: '64px', objectFit: 'contain', marginBottom: '2rem', maxWidth: '200px', display: 'block', margin: '0 auto 2rem' }}
           />
 
           {/* כרטיס */}
@@ -59,7 +59,7 @@ export default function Maintenance() {
             }}>
               ההזמנות פתוחות בין השעות
               <br />
-              <span style={{ fontWeight: 700, color: '#A11738' }}>10:00 עד 21:30</span>
+              <span style={{ fontWeight: 700, color: '#A11738' }}>10:00 עד 21:00</span>
               <br />
               מחכים לראותך מחר בבוקר 🌸
             </p>

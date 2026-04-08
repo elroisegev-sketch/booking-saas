@@ -16,7 +16,7 @@ function isMaintenanceTime(): boolean {
 
   // חלון תחזוקה: 21:30 עד 10:00 (עובר חצות)
   const totalMinutes = hour * 60 + minute;
-  return totalMinutes >= 21 * 60 + 30 || totalMinutes < 10 * 60;
+  return totalMinutes >= 21 * 60 || totalMinutes < 10 * 60;
 }
 
 export function middleware(request: NextRequest) {
