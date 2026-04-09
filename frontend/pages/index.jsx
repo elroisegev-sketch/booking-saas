@@ -1061,6 +1061,9 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
   const [toast, setToast] = useState(null);
   const [viewImage, setViewImage] = useState(null);
   const [showAddAppt, setShowAddAppt] = useState(false);
+  const [quickText, setQuickText] = useState('');
+  const [quickLoading, setQuickLoading] = useState(false);
+  const [quickResult, setQuickResult] = useState(null);
   const [newAppt, setNewAppt] = useState({ customer_name: '', service_name: '', date: '', time: '', deposit: '', price: '', rawText: '' });
   const [parsingAI, setParsingAI] = useState(false);
   const [noteModal, setNoteModal] = useState({ open: false, apptId: null, text: '' });
@@ -1190,6 +1193,38 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
       showToast('התור נשמר ✅');
     } catch (e) {
       showToast('שגיאת רשת ❌');
+    }
+  };
+
+  const handleQuickAdd = async () => {
+    if (!quickText.trim()) return;
+    setQuickLoading(true);
+    setQuickResult(null);
+    const token = localStorage.getItem('token');
+    try {
+      const r = await fetch(BACKEND + '/api/appointments/quick-add', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ text: quickText }),
+      });
+      const data = await r.json();
+      if (r.status === 201) {
+        setAppointments(function(prev) { return prev.concat([data.appointment]); });
+        const p = data.parsed;
+        const dt = new Date(data.appointment.appointment_time);
+        const dateStr = dt.toLocaleDateString('he-IL', { day: 'numeric', month: 'long' });
+        const timeStr = dt.toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
+        setQuickResult({ type: 'success', msg: 'נוסף: ' + p.customer_name + ' — ' + p.service_name + ' — ' + dateStr + ' ב-' + timeStr });
+        setQuickText('');
+      } else if (r.status === 409) {
+        setQuickResult({ type: 'conflict', msg: 'השעה תפוסה (' + data.conflictWith + ')', freeSlots: data.freeSlots || [] });
+      } else {
+        setQuickResult({ type: 'error', msg: data.error || 'שגיאה' });
+      }
+    } catch (e) {
+      setQuickResult({ type: 'error', msg: 'שגיאת רשת' });
+    } finally {
+      setQuickLoading(false);
     }
   };
 
@@ -1484,6 +1519,42 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                   <Icon name="plus" className="w-4 h-4" /> הוסף תור
                 </button>
               </div>
+              {/* ── Quick-add card ─────────────────────────────── */}
+              <div style={{ ...card, marginBottom: '1.25rem', padding: '1rem 1.25rem' }}>
+                <div style={{ fontWeight: 900, color: '#A11738', fontSize: '0.95rem', marginBottom: '0.75rem' }}>⚡ תור מהיר</div>
+                <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                  <input
+                    value={quickText}
+                    onChange={function(e) { setQuickText(e.target.value); setQuickResult(null); }}
+                    onKeyDown={function(e) { if (e.key === 'Enter') handleQuickAdd(); }}
+                    placeholder='למשל: "דנה כהן מניקור מחר ב-11"'
+                    style={{ flex: 1, padding: '0.625rem 0.875rem', borderRadius: '10px', border: '1.5px solid #e5e7eb', fontSize: '0.9rem', fontFamily: 'Varela Round, sans-serif', direction: 'rtl', outline: 'none' }}
+                  />
+                  <button
+                    onClick={handleQuickAdd}
+                    disabled={quickLoading || !quickText.trim()}
+                    style={{ padding: '0.625rem 1.1rem', borderRadius: '10px', background: (quickLoading || !quickText.trim()) ? '#d1d5db' : 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: (quickLoading || !quickText.trim()) ? 'not-allowed' : 'pointer', whiteSpace: 'nowrap', fontFamily: 'Varela Round, sans-serif' }}
+                  >
+                    {quickLoading ? '...' : 'קבע תור'}
+                  </button>
+                </div>
+                {quickResult && (
+                  <div style={{ marginTop: '0.625rem', padding: '0.5rem 0.75rem', borderRadius: '8px', fontSize: '0.875rem', fontWeight: 600,
+                    background: quickResult.type === 'success' ? '#d1fae5' : quickResult.type === 'conflict' ? '#fef3c7' : '#fee2e2',
+                    color: quickResult.type === 'success' ? '#065f46' : quickResult.type === 'conflict' ? '#92400e' : '#991b1b' }}>
+                    {quickResult.type === 'success' && '✅ ' + quickResult.msg}
+                    {quickResult.type === 'error' && '❌ ' + quickResult.msg}
+                    {quickResult.type === 'conflict' && (
+                      <span>⛔ {quickResult.msg}
+                        {quickResult.freeSlots && quickResult.freeSlots.length > 0 && (
+                          <span> | שעות פנויות: {quickResult.freeSlots.join(', ')}</span>
+                        )}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
+
               <div className="admin-calendar-grid" style={{ display: 'grid', gridTemplateColumns: '3fr 2fr', gap: '1.25rem' }}>
                 <div style={card}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '1rem 1.5rem', borderBottom: '1px solid #f9fafb' }}>

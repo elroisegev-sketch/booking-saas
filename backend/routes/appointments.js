@@ -5,6 +5,101 @@ const auth = require('../middleware/auth');
 const { sendPush } = require('./push');
 const router = express.Router();
 
+// ── Hebrew natural-language appointment parser ─────────────────
+function parseHebrewText(text) {
+  let rem = text.trim();
+
+  // 1. Extract definite time patterns first (HH:MM)
+  let hour = null, minute = 0;
+  let m = rem.match(/ב[-–]?(\d{1,2}):(\d{2})/);
+  if (m) { hour = parseInt(m[1]); minute = parseInt(m[2]); rem = rem.replace(m[0], ' '); }
+
+  if (hour === null) {
+    m = rem.match(/בשעה\s+(\d{1,2})(?::(\d{2}))?/);
+    if (m) { hour = parseInt(m[1]); minute = m[2] ? parseInt(m[2]) : 0; rem = rem.replace(m[0], ' '); }
+  }
+
+  // 2. Extract date
+  const todayBase = new Date(); todayBase.setHours(0, 0, 0, 0);
+  let date = null;
+
+  if (/מחרתיים/.test(rem)) {
+    date = new Date(todayBase); date.setDate(date.getDate() + 2);
+    rem = rem.replace(/מחרתיים/, ' ');
+  } else if (/מחר/.test(rem)) {
+    date = new Date(todayBase); date.setDate(date.getDate() + 1);
+    rem = rem.replace(/מחר/, ' ');
+  } else if (/היום/.test(rem)) {
+    date = new Date(todayBase);
+    rem = rem.replace(/היום/, ' ');
+  }
+
+  const dayMap = [['ראשון',0],['שני',1],['שלישי',2],['רביעי',3],['חמישי',4],['שישי',5],['שבת',6]];
+  if (!date) {
+    for (const [name, dow] of dayMap) {
+      const re = new RegExp('ביום ' + name + '|יום ' + name);
+      if (re.test(rem)) {
+        const diff = ((dow - todayBase.getDay() + 7) % 7) || 7;
+        date = new Date(todayBase); date.setDate(date.getDate() + diff);
+        rem = rem.replace(re, ' '); break;
+      }
+    }
+  }
+
+  const monthMap = {'ינואר':1,'פברואר':2,'מרץ':3,'מארס':3,'אפריל':4,'מאי':5,'יוני':6,'יולי':7,'אוגוסט':8,'ספטמבר':9,'אוקטובר':10,'נובמבר':11,'דצמבר':12};
+  if (!date) {
+    for (const [mn, mo] of Object.entries(monthMap)) {
+      m = rem.match(new RegExp('ב[-–]?(\\d{1,2})\\s*ל?' + mn));
+      if (m) {
+        const yr = todayBase.getFullYear();
+        date = new Date(yr, mo - 1, parseInt(m[1]));
+        if (date < todayBase) date.setFullYear(yr + 1);
+        rem = rem.replace(m[0], ' '); break;
+      }
+    }
+  }
+
+  if (!date) {
+    m = rem.match(/(\d{1,2})[\/.](\d{1,2})(?!\d)/);
+    if (m) {
+      const d = parseInt(m[1]), mo = parseInt(m[2]);
+      if (d >= 1 && d <= 31 && mo >= 1 && mo <= 12) {
+        const yr = todayBase.getFullYear();
+        date = new Date(yr, mo - 1, d);
+        if (date < todayBase) date.setFullYear(yr + 1);
+        rem = rem.replace(m[0], ' ');
+      }
+    }
+  }
+
+  // 3. Ambiguous ב-N (time only if not next to month keyword and hour not found yet)
+  if (hour === null) {
+    m = rem.match(/ב[-–](\d{1,2})(?!\d|[\/.]|\s*ל[\u05d0-\u05ea])/);
+    if (m) { hour = parseInt(m[1]); minute = 0; rem = rem.replace(m[0], ' '); }
+  }
+
+  // Default date: today if time is in future, else tomorrow
+  if (!date) {
+    const now = new Date();
+    date = new Date(todayBase);
+    if (hour !== null && (hour < now.getHours() || (hour === now.getHours() && minute <= now.getMinutes()))) {
+      date.setDate(date.getDate() + 1);
+    }
+  }
+
+  // 4. Extract service (longest match first)
+  const services = ["לק ג'ל",'לק גל','מניקור','פדיקור','עיצוב גבות','הרמת ריסים','קישוט','ריסים','גבות',"ג'ל",'ג\'ל','ספא ידיים','ספא רגליים'];
+  let service_name = null;
+  for (const svc of services) {
+    if (rem.includes(svc)) { service_name = svc; rem = rem.replace(svc, ' '); break; }
+  }
+
+  // 5. Name = what's left
+  const customer_name = rem.replace(/\s+/g, ' ').trim().replace(/^[-–,\s]+|[-–,\s]+$/g, '');
+
+  return { customer_name: customer_name || null, service_name: service_name || 'טיפול', date, hour, minute };
+}
+
 // ── Telegram notification ─────────────────────────────────────
 function sendTelegram(message) {
   const token = process.env.TELEGRAM_BOT_TOKEN;
@@ -241,6 +336,70 @@ router.patch('/:id/status', auth, async (req, res) => {
     if (!result.rows.length) return res.status(404).json({ error: 'Appointment not found' });
     res.json(result.rows[0]);
   } catch (err) { res.status(500).json({ error: 'Server error' }); }
+});
+
+// POST /api/appointments/quick-add — parse Hebrew text, check conflicts, create appointment
+router.post('/quick-add', auth, async (req, res) => {
+  const { text } = req.body;
+  if (!text || typeof text !== 'string' || text.trim().length === 0)
+    return res.status(400).json({ error: 'טקסט ריק' });
+
+  const parsed = parseHebrewText(text);
+
+  if (!parsed.customer_name)
+    return res.status(400).json({ error: 'לא זיהיתי שם לקוחה', parsed });
+  if (parsed.hour === null)
+    return res.status(400).json({ error: 'לא זיהיתי שעה', parsed });
+
+  const apptTime = new Date(parsed.date);
+  apptTime.setHours(parsed.hour, parsed.minute, 0, 0);
+  const apptEnd = new Date(apptTime.getTime() + 60 * 60 * 1000);
+
+  try {
+    // Check conflict
+    const conflict = await db.query(
+      `SELECT customer_name, service_name, appointment_time FROM appointments
+       WHERE business_id=$1 AND status!='cancelled'
+         AND appointment_time < $2 AND (appointment_time + interval '60 minutes') > $3`,
+      [req.user.id, apptEnd.toISOString(), apptTime.toISOString()]
+    );
+
+    if (conflict.rows.length > 0) {
+      // Find free slots that day
+      const dayStart = new Date(parsed.date); dayStart.setHours(9, 0, 0, 0);
+      const dayEnd   = new Date(parsed.date); dayEnd.setHours(21, 0, 0, 0);
+      const taken = await db.query(
+        `SELECT appointment_time FROM appointments
+         WHERE business_id=$1 AND status!='cancelled'
+           AND appointment_time >= $2 AND appointment_time < $3
+         ORDER BY appointment_time`,
+        [req.user.id, dayStart.toISOString(), dayEnd.toISOString()]
+      );
+      const takenHours = new Set(taken.rows.map(r => new Date(r.appointment_time).getHours()));
+      const free = [];
+      for (let h = 9; h <= 20; h++) {
+        if (!takenHours.has(h)) free.push(h < 10 ? '0' + h + ':00' : h + ':00');
+      }
+      return res.status(409).json({
+        error: 'השעה תפוסה',
+        conflictWith: conflict.rows[0].customer_name + ' — ' + conflict.rows[0].service_name,
+        freeSlots: free.slice(0, 6),
+        parsed,
+      });
+    }
+
+    // Create
+    const result = await db.query(
+      `INSERT INTO appointments (business_id, customer_name, service_name, appointment_time, end_time, status, price)
+       VALUES ($1,$2,$3,$4,$5,'confirmed',0) RETURNING *`,
+      [req.user.id, parsed.customer_name, parsed.service_name, apptTime.toISOString(), apptEnd.toISOString()]
+    );
+    notifyBusiness(req.user.id);
+    res.status(201).json({ appointment: result.rows[0], parsed });
+  } catch (err) {
+    console.error('quick-add error:', err);
+    res.status(500).json({ error: 'שגיאת שרת' });
+  }
 });
 
 // POST /api/appointments/parse-text — AI appointment parser (uses ANTHROPIC_API_KEY from backend env)
