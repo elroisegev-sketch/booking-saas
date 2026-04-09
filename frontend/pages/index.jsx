@@ -1185,7 +1185,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
           deposit: parseFloat(newAppt.deposit) || 0,
         }),
       });
-      if (!r.ok) { showToast('שגיאה בשמירת התור ❌'); return; }
+      if (!r.ok) { const errData = await r.json().catch(() => ({})); showToast((errData.error || 'שגיאה בשמירת התור') + ' ❌'); return; }
       const saved = await r.json();
       setAppointments(function(prev) { return prev.concat([saved]); });
       setNewAppt({ customer_name: '', service_name: '', date: '', time: '', deposit: '', price: '', rawText: '' });
