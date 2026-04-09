@@ -1361,9 +1361,10 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                       if (!newAppt.rawText || !newAppt.rawText.trim()) return;
                       setParsingAI(true);
                       try {
-                        const r = await fetch('/api/parse-appointment', {
+                        const token = localStorage.getItem('token');
+                        const r = await fetch(BACKEND + '/api/appointments/parse-text', {
                           method: 'POST',
-                          headers: { 'Content-Type': 'application/json' },
+                          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
                           body: JSON.stringify({ text: newAppt.rawText }),
                         });
                         const data = await r.json();
