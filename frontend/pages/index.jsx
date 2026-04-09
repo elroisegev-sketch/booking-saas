@@ -327,15 +327,12 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
     const dateStr = `${sel.date.getFullYear()}-${String(sel.date.getMonth()+1).padStart(2,'0')}-${String(sel.date.getDate()).padStart(2,'0')}`;
     setLoadingSlots(true);
     fetch(`https://booking-saas-production-b9fd.up.railway.app/api/appointments/slots/lior-segev/${firstService.id}/${dateStr}?totalDuration=${totalDuration}`)
-      .then(r => r.json())
-      .then(data => {
-        if (data.slots) {
-          const times = data.slots;
-          setAvailableSlots(times);
-        }
+      .then(function(r) { return r.json(); })
+      .then(function(data) {
+        setAvailableSlots(Array.isArray(data.slots) ? data.slots : []);
         setLoadingSlots(false);
       })
-      .catch(() => setLoadingSlots(false));
+      .catch(function() { setAvailableSlots([]); setLoadingSlots(false); });
   }, [sel.date, selectedServices.length, totalDuration]);
 
   const slots = () => availableSlots;
@@ -346,7 +343,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   const S = { fontFamily: 'Varela Round, sans-serif' };
   const btn = (active) => ({ padding: '0.75rem', borderRadius: '12px', fontWeight: 700, fontSize: '0.875rem', border: `2px solid ${active ? '#EC6A83' : '#f0f0f0'}`, background: active ? 'linear-gradient(135deg,#A11738,#EC6A83)' : 'white', color: active ? 'white' : '#A11738', cursor: 'pointer' });
 
-  const dateStr = sel.date?.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' });
+  const dateStr = sel.date ? sel.date.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' }) : '';
   const serviceNames = selectedServices.map(s => s.name).join(', ');
   const finalPrice = totalPrice + (externalNail && hasGel ? 10 : 0);
   const deposit = Math.ceil(finalPrice / 2);
@@ -556,7 +553,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
         {step === 3 && (
           <div>
             <h2 style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '2rem', fontWeight: 300, color: '#3d0c16', marginBottom: '0.2rem' }}>בחרי שעה</h2>
-            <p style={{ color: '#9ca3af', fontSize: '0.8rem', marginBottom: '1.75rem' }}>{sel.date?.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' })}</p>
+            <p style={{ color: '#9ca3af', fontSize: '0.8rem', marginBottom: '1.75rem' }}>{sel.date ? sel.date.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' }) : ''}</p>
             {loadingSlots ? (
               <div style={{ textAlign: 'center', padding: '3rem' }}>
                 <div style={{ width: '32px', height: '32px', borderRadius: '50%', border: '2.5px solid rgba(236,106,131,0.2)', borderTopColor: '#EC6A83', margin: '0 auto 0.75rem', animation: 'spin 0.8s linear infinite' }} />
@@ -736,7 +733,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                       business_slug: 'lior-segev',
-                      service_id: selectedServices[0]?.id,
+                      service_id: selectedServices[0] ? selectedServices[0].id : null,
                       customer_name: sel.name,
                       customer_phone: sel.phone,
                       appointment_time: startUTC.toISOString(),

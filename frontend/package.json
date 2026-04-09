@@ -19,6 +19,15 @@
     "react-dom": "^18.2.0",
     "react-hot-toast": "^2.4.1"
   },
+  "browserslist": [
+    "chrome >= 67",
+    "edge >= 79",
+    "firefox >= 68",
+    "opera >= 54",
+    "safari >= 14",
+    "samsung >= 10",
+    "android >= 67"
+  ],
   "devDependencies": {
     "@types/node": "^20.10.6",
     "@types/react": "^18.2.46",
