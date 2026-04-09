@@ -417,8 +417,8 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
         <a href={`https://wa.me/972${LIOR_PHONE.slice(1)}?text=${encodeURIComponent('היי ליאור 🌸 אני צריכה עזרה עם קביעת התור')}`}
           target="_blank" rel="noreferrer"
           onClick={() => setShowWaBubble(false)}
-          style={{ width: '58px', height: '58px', borderRadius: '50%', overflow: 'hidden', border: '3px solid #25D366', boxShadow: '0 4px 20px rgba(37,211,102,0.5)', textDecoration: 'none', display: 'block' }}>
-          <img src="/lior-profile.png" alt="ליאור" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%' }} />
+          style={{ width: '58px', height: '58px', borderRadius: '50%', background: '#25D366', boxShadow: '0 4px 20px rgba(37,211,102,0.5)', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ color: 'white', display: 'flex' }}><Icon name="whatsapp" className="w-8 h-8" /></span>
         </a>
       </div>
 
