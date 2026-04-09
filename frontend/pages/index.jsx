@@ -1383,54 +1383,27 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                   <h2 style={{ fontWeight: 900, color: '#A11738', fontSize: '1.25rem', margin: 0 }}>הוסף תור ידני</h2>
                   <button onClick={() => setShowAddAppt(false)} style={{ padding: '6px', background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="x" className="w-5 h-5" /></button>
                 </div>
-                <div style={{ marginBottom: '1rem' }}>
-                  <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>כתבי את פרטי התור בחופשיות ✍️</label>
-                  <textarea
-                    style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '14px', border: '1.5px solid rgba(247,193,195,0.5)', outline: 'none', fontSize: '0.8rem', direction: 'rtl', boxSizing: 'border-box', minHeight: '120px', resize: 'vertical', fontFamily: 'Varela Round, sans-serif', lineHeight: 1.6, background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(8px)' }}
-                    placeholder={"לדוגמה:\nאתל חיים, לק גל, בשעה 12 ב-16 למאי\nשרה כהן, הרמת ריסים, 20/5 ב-14:30, 200₪"}
-                    value={newAppt.rawText || ''}
-                    onChange={e => setNewAppt({ ...newAppt, rawText: e.target.value })}
-                  />
-                  <button
-                    onClick={async () => {
-                      if (!newAppt.rawText || !newAppt.rawText.trim()) return;
-                      setParsingAI(true);
-                      try {
-                        const token = localStorage.getItem('token');
-                        const r = await fetch(BACKEND + '/api/appointments/parse-text', {
-                          method: 'POST',
-                          headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-                          body: JSON.stringify({ text: newAppt.rawText }),
-                        });
-                        const data = await r.json();
-                        if (!r.ok) { showToast((data.error || 'שגיאה בפרסור') + (data.status ? ' [' + data.status + ']' : '') + (data.detail ? ': ' + data.detail.slice(0,80) : '')); return; }
-                        setNewAppt(prev => ({
-                          ...prev,
-                          customer_name: data.customer_name || prev.customer_name,
-                          service_name: data.service_name || prev.service_name,
-                          date: data.date || prev.date,
-                          time: data.time || prev.time,
-                          price: data.price != null ? String(data.price) : prev.price,
-                          deposit: data.deposit != null ? String(data.deposit) : prev.deposit,
-                        }));
-                        showToast('פורסר בהצלחה ✨');
-                      } catch { showToast('שגיאה בפרסור'); }
-                      finally { setParsingAI(false); }
-                    }}
-                    disabled={parsingAI}
-                    style={{ marginTop: '8px', width: '100%', padding: '0.625rem', borderRadius: '14px', background: parsingAI ? '#d1d5db' : 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: parsingAI ? 'not-allowed' : 'pointer', fontFamily: 'Varela Round, sans-serif' }}
-                  >
-                    {parsingAI ? '⏳ מפרסר...' : '✨ פרסור חכם'}
-                  </button>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '1rem' }}>
+                  {[
+                    { key: 'customer_name', label: 'שם לקוחה *', placeholder: 'דנה כהן', type: 'text' },
+                    { key: 'service_name',  label: 'שירות',       placeholder: 'לק גל',   type: 'text' },
+                    { key: 'date',          label: 'תאריך *',     placeholder: '',         type: 'date' },
+                    { key: 'time',          label: 'שעה *',       placeholder: '',         type: 'time' },
+                    { key: 'price',         label: 'מחיר (₪)',    placeholder: '0',        type: 'number' },
+                    { key: 'deposit',       label: 'מקדמה (₪)',   placeholder: '0',        type: 'number' },
+                  ].map(f => (
+                    <div key={f.key}>
+                      <label style={{ display: 'block', fontSize: '0.75rem', fontWeight: 700, color: '#6b7280', marginBottom: '3px' }}>{f.label}</label>
+                      <input
+                        type={f.type}
+                        placeholder={f.placeholder}
+                        value={newAppt[f.key] || ''}
+                        onChange={e => setNewAppt(prev => ({ ...prev, [f.key]: e.target.value }))}
+                        style={{ width: '100%', padding: '0.6rem 0.875rem', borderRadius: '12px', border: '1.5px solid rgba(247,193,195,0.6)', outline: 'none', fontSize: '0.9rem', direction: 'rtl', boxSizing: 'border-box', fontFamily: 'Varela Round, sans-serif', background: 'rgba(255,255,255,0.8)' }}
+                      />
+                    </div>
+                  ))}
                 </div>
-                {(newAppt.customer_name || newAppt.date) && (
-                  <div style={{ background: '#F7C1C3', borderRadius: '12px', padding: '0.75rem 1rem', marginBottom: '1rem', fontSize: '0.8rem', color: '#A11738' }}>
-                    {newAppt.customer_name && <p style={{ margin: '2px 0', fontWeight: 700 }}>👤 {newAppt.customer_name}</p>}
-                    {newAppt.service_name && <p style={{ margin: '2px 0' }}>💅 {newAppt.service_name}</p>}
-                    {newAppt.date && <p style={{ margin: '2px 0' }}>📅 {newAppt.date} בשעה {newAppt.time}</p>}
-                    {newAppt.price && <p style={{ margin: '2px 0' }}>💰 סה״כ: ₪{newAppt.price} | מקדמה: ₪{newAppt.deposit}</p>}
-                  </div>
-                )}
                 <div style={{ display: 'flex', gap: '12px' }}>
                   <button onClick={() => { setShowAddAppt(false); setNewAppt({ customer_name: '', service_name: '', date: '', time: '', deposit: '', price: '', rawText: '' }); setParsingAI(false); }} style={{ flex: 1, padding: '0.875rem', background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1.5px solid rgba(247,193,195,0.5)', borderRadius: '14px', color: '#A11738', fontWeight: 700, cursor: 'pointer' }}>ביטול</button>
                   <button onClick={addManualAppt} disabled={!newAppt.customer_name || !newAppt.date || !newAppt.time} style={{ flex: 1, padding: '0.875rem', borderRadius: '999px', background: (!newAppt.customer_name || !newAppt.date || !newAppt.time) ? '#d1d5db' : 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, border: 'none', cursor: (!newAppt.customer_name || !newAppt.date || !newAppt.time) ? 'not-allowed' : 'pointer' }}>
