@@ -236,7 +236,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   const [confirmed, setConfirmed] = useState(false);
   const skipFirstSaveRef = useRef(true);
   const [realServices, setRealServices] = useState([]);
-  const [realAvailability, setRealAvailability] = useState([]);
+  const [realAvailability, setRealAvailability] = useState(null);
   const [nailCountModal, setNailCountModal] = useState(false);
   const [nailService, setNailService] = useState(null);
   const [showWaBubble, setShowWaBubble] = useState(true);
@@ -309,8 +309,9 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
     const today = new Date(); today.setHours(0, 0, 0, 0);
     if (date < today) return false;
     const dow = date.getDay();
-    if (realAvailability.length > 0) {
-      // public endpoint מחזיר רק ימים פעילים — אם קיים, הוא פעיל
+    // public endpoint מחזיר רק ימים פעילים — אם קיים, הוא פעיל
+    // אם הנתונים טרם נטענו (null) — fallback למוק. אם נטענו ריק — לא עובדת אף יום
+    if (realAvailability !== null) {
       return !!realAvailability.find(x => x.day_of_week === dow);
     }
     const a = MOCK_AVAILABILITY.find(x => x.day_of_week === dow);
