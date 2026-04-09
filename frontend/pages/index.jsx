@@ -240,6 +240,10 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   const [nailCountModal, setNailCountModal] = useState(false);
   const [nailService, setNailService] = useState(null);
   const [showWaBubble, setShowWaBubble] = useState(true);
+  useEffect(() => {
+    const t = setTimeout(() => setShowWaBubble(false), 4000);
+    return () => clearTimeout(t);
+  }, []);
 
   // Restore state from sessionStorage on mount
   useEffect(() => {
@@ -381,36 +385,31 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
         {showWaBubble && (
           <div style={{
             position: 'relative',
-            background: 'rgba(255,255,255,0.95)',
-            backdropFilter: 'blur(16px)',
-            WebkitBackdropFilter: 'blur(16px)',
-            border: '1.5px solid rgba(37,211,102,0.3)',
-            borderRadius: '16px',
-            padding: '0.6rem 0.9rem',
-            boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
-            maxWidth: '200px',
-            animation: 'fadeUp 0.4s cubic-bezier(0.22,1,0.36,1) both',
+            background: 'rgba(255,255,255,0.97)',
+            backdropFilter: 'blur(12px)',
+            WebkitBackdropFilter: 'blur(12px)',
+            border: '1.5px solid rgba(37,211,102,0.25)',
+            borderRadius: '14px',
+            padding: '0.45rem 0.75rem 0.45rem 1.8rem',
+            boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
+            whiteSpace: 'nowrap',
+            animation: 'fadeUp 0.35s cubic-bezier(0.22,1,0.36,1) both',
           }}>
-            {/* כפתור סגירה */}
             <button onClick={() => setShowWaBubble(false)} style={{
-              position: 'absolute', top: '4px', left: '6px',
+              position: 'absolute', top: '50%', left: '6px', transform: 'translateY(-50%)',
               background: 'none', border: 'none', cursor: 'pointer',
-              color: '#9ca3af', fontSize: '0.75rem', lineHeight: 1, padding: '2px',
+              color: '#9ca3af', fontSize: '0.65rem', lineHeight: 1, padding: '2px',
             }}>✕</button>
-            <p style={{ margin: 0, fontSize: '0.8rem', fontWeight: 700, color: '#111827', lineHeight: 1.5, textAlign: 'right', fontFamily: 'Varela Round, sans-serif', paddingLeft: '14px' }}>
-              יש לך שאלה? 💬
+            <p style={{ margin: 0, fontSize: '0.78rem', fontWeight: 700, color: '#111827', fontFamily: 'Varela Round, sans-serif', direction: 'rtl' }}>
+              שאלה? דברי עם ליאור 💬
             </p>
-            <p style={{ margin: '2px 0 0', fontSize: '0.72rem', color: '#6b7280', textAlign: 'right', fontFamily: 'Varela Round, sans-serif', lineHeight: 1.4 }}>
-              לחצי לשאול את ליאור ישירות בוואטסאפ
-            </p>
-            {/* זנב הבועה — מצביע למטה לכיוון הכפתור */}
+            {/* זנב */}
             <div style={{
-              position: 'absolute', bottom: '-8px', left: '22px',
+              position: 'absolute', bottom: '-7px', left: '20px',
               width: 0, height: 0,
-              borderLeft: '8px solid transparent',
-              borderRight: '8px solid transparent',
-              borderTop: '8px solid rgba(255,255,255,0.95)',
-              filter: 'drop-shadow(0 2px 2px rgba(0,0,0,0.08))',
+              borderLeft: '7px solid transparent',
+              borderRight: '7px solid transparent',
+              borderTop: '7px solid rgba(255,255,255,0.97)',
             }} />
           </div>
         )}
