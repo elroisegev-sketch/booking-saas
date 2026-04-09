@@ -376,7 +376,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
       </div>
 
       {/* כפתור וואטסאפ צף — תמונת ליאור + בועת ענן */}
-      <div style={{ position: 'fixed', bottom: '1.5rem', left: '1.5rem', zIndex: 50, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '8px' }}>
+      <div style={{ position: 'fixed', bottom: '1.5rem', left: '1.5rem', zIndex: 50, display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: '8px', direction: 'ltr' }}>
         {/* בועת ענן */}
         {showWaBubble && (
           <div style={{
