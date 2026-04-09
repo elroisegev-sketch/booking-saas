@@ -206,6 +206,31 @@ router.post('/', bookingLimiter, async (req, res) => {
   } catch (err) { console.error('Book appointment error:', err); res.status(500).json({ error: 'Server error while booking appointment' }); }
 });
 
+// POST /api/appointments/manual — admin manual booking (no service_id required)
+router.post('/manual', auth, async (req, res) => {
+  const { customer_name, service_name, appointment_time, price, deposit, notes } = req.body;
+  if (!customer_name || !appointment_time) return res.status(400).json({ error: 'Missing required fields' });
+  if (typeof customer_name !== 'string' || customer_name.trim().length < 2) return res.status(400).json({ error: 'שם לא תקין' });
+  if (!isValidISODate(appointment_time)) return res.status(400).json({ error: 'תאריך לא תקין' });
+  try {
+    const result = await db.query(
+      `INSERT INTO appointments (business_id, customer_name, service_name, appointment_time, end_time, status, price, notes)
+       VALUES ($1,$2,$3,$4,$5,'confirmed',$6,$7) RETURNING *`,
+      [
+        req.user.id,
+        customer_name.trim(),
+        service_name || 'טיפול',
+        new Date(appointment_time).toISOString(),
+        new Date(new Date(appointment_time).getTime() + 60 * 60000).toISOString(),
+        parseFloat(price) || 0,
+        notes || null,
+      ]
+    );
+    notifyBusiness(req.user.id);
+    res.status(201).json(result.rows[0]);
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Server error' }); }
+});
+
 // PATCH /api/appointments/:id/status
 router.patch('/:id/status', auth, async (req, res) => {
   const { status } = req.body;

@@ -1166,22 +1166,31 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
     if (appt) openWhatsApp(appt, 'cancel');
   };
 
-  const addManualAppt = () => {
+  const addManualAppt = async () => {
     if (!newAppt.customer_name || !newAppt.date || !newAppt.time) return;
+    const token = localStorage.getItem('token');
     const dt = new Date(newAppt.date + 'T' + newAppt.time);
-    const appt = {
-      id: 'manual_' + Date.now(),
-      customer_name: newAppt.customer_name,
-      service_name: newAppt.service_name || 'טיפול',
-      appointment_time: dt.toISOString(),
-      status: 'confirmed',
-      price: parseFloat(newAppt.price) || 0,
-      deposit: parseFloat(newAppt.deposit) || 0,
-    };
-    setAppointments([...appointments, appt]);
-    setNewAppt({ customer_name: '', service_name: '', date: '', time: '', deposit: '', price: '' });
-    setShowAddAppt(false);
-    showToast('התור נוסף ✅');
+    try {
+      const r = await fetch(BACKEND + '/api/appointments/manual', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({
+          customer_name: newAppt.customer_name,
+          service_name: newAppt.service_name || 'טיפול',
+          appointment_time: dt.toISOString(),
+          price: parseFloat(newAppt.price) || 0,
+          deposit: parseFloat(newAppt.deposit) || 0,
+        }),
+      });
+      if (!r.ok) { showToast('שגיאה בשמירת התור ❌'); return; }
+      const saved = await r.json();
+      setAppointments(function(prev) { return prev.concat([saved]); });
+      setNewAppt({ customer_name: '', service_name: '', date: '', time: '', deposit: '', price: '', rawText: '' });
+      setShowAddAppt(false);
+      showToast('התור נשמר ✅');
+    } catch (e) {
+      showToast('שגיאת רשת ❌');
+    }
   };
 
   const navItems = [
