@@ -218,4 +218,16 @@ router.patch('/:id/status', auth, async (req, res) => {
   } catch (err) { res.status(500).json({ error: 'Server error' }); }
 });
 
+// PATCH /api/appointments/:id/notes
+router.patch('/:id/notes', auth, async (req, res) => {
+  const { notes } = req.body;
+  if (typeof notes !== 'string') return res.status(400).json({ error: 'notes must be a string' });
+  if (notes.length > 1000) return res.status(400).json({ error: 'notes too long (max 1000 chars)' });
+  try {
+    const result = await db.query('UPDATE appointments SET notes=$1 WHERE id=$2 AND business_id=$3 RETURNING *', [notes, req.params.id, req.user.id]);
+    if (!result.rows.length) return res.status(404).json({ error: 'Appointment not found' });
+    res.json(result.rows[0]);
+  } catch (err) { res.status(500).json({ error: 'Server error' }); }
+});
+
 module.exports = router;
