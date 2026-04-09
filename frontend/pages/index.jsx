@@ -240,10 +240,6 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   const [nailCountModal, setNailCountModal] = useState(false);
   const [nailService, setNailService] = useState(null);
   const [showWaBubble, setShowWaBubble] = useState(true);
-  useEffect(() => {
-    const t = setTimeout(() => setShowWaBubble(false), 4000);
-    return () => clearTimeout(t);
-  }, []);
 
   // Restore state from sessionStorage on mount
   useEffect(() => {
