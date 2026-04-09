@@ -641,6 +641,50 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                 <span style={{ color: '#374151', fontWeight: 600, fontSize: '0.85rem' }}>{sel.time}</span>
               </div>
             </div>
+            {/* כפתורי הוסף ליומן */}
+            {(() => {
+              const getCalDates = () => {
+                const dateStr2 = `${sel.date.getFullYear()}-${String(sel.date.getMonth()+1).padStart(2,'0')}-${String(sel.date.getDate()).padStart(2,'0')}`;
+                const refDate = new Date(`${dateStr2}T12:00:00Z`);
+                const israelLocal = new Date(refDate.toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' }));
+                const offsetMins = Math.round((israelLocal - refDate) / 60000);
+                const [th, tm] = sel.time.split(':').map(Number);
+                const startMins = th * 60 + tm - offsetMins;
+                const startH = String(Math.floor(((startMins % 1440) + 1440) % 1440 / 60)).padStart(2, '0');
+                const startM = String(((startMins % 60) + 60) % 60).padStart(2, '0');
+                const startUTC = new Date(`${dateStr2}T${startH}:${startM}:00Z`);
+                const endUTC = new Date(startUTC.getTime() + totalDuration * 60000);
+                return { startUTC, endUTC };
+              };
+              const toGCal = (d) => d.toISOString().replace(/[-:]/g,'').replace('.000','');
+              const addGoogle = () => {
+                const { startUTC, endUTC } = getCalDates();
+                const url = `https://www.google.com/calendar/render?action=TEMPLATE&text=${encodeURIComponent('תור - ליאור שגב ביוטי 💅')}&dates=${toGCal(startUTC)}/${toGCal(endUTC)}&details=${encodeURIComponent(`טיפול: ${serviceNames}`)}&location=${encodeURIComponent('ליאור שגב ביוטי')}`;
+                window.open(url, '_blank');
+              };
+              const addApple = () => {
+                const { startUTC, endUTC } = getCalDates();
+                const fmt = (d) => d.toISOString().replace(/[-:]/g,'').replace('.000','');
+                const ics = [`BEGIN:VCALENDAR`,`VERSION:2.0`,`PRODID:-//Lior Segev Beauty//IL`,`BEGIN:VEVENT`,`DTSTART:${fmt(startUTC)}`,`DTEND:${fmt(endUTC)}`,`SUMMARY:תור - ליאור שגב ביוטי 💅`,`DESCRIPTION:טיפול: ${serviceNames}`,`STATUS:CONFIRMED`,`END:VEVENT`,`END:VCALENDAR`].join('\r\n');
+                const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+                const link = document.createElement('a');
+                link.href = URL.createObjectURL(blob);
+                link.download = 'tor-lior-segev.ics';
+                link.click();
+              };
+              return (
+                <div style={{ display: 'flex', gap: '10px', marginBottom: '1rem', width: '100%', maxWidth: 340 }}>
+                  <button onClick={addApple} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '0.75rem', borderRadius: '999px', background: 'rgba(0,0,0,0.85)', color: 'white', fontWeight: 700, fontSize: '0.82rem', border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(0,0,0,0.2)' }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.8-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.73-.83 1.94-1.46 2.94-1.5.13 1.17-.34 2.35-1.04 3.19-.69.85-1.83 1.51-2.95 1.42-.15-1.15.41-2.35 1.05-3.11z"/></svg>
+                    Apple Calendar
+                  </button>
+                  <button onClick={addGoogle} style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '0.75rem', borderRadius: '999px', background: '#4285F4', color: 'white', fontWeight: 700, fontSize: '0.82rem', border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(66,133,244,0.35)' }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M19 4h-1V2h-2v2H8V2H6v2H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 16H5V10h14v10zM9 14H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2zm-8 4H7v-2h2v2zm4 0h-2v-2h2v2zm4 0h-2v-2h2v2z"/></svg>
+                    Google Calendar
+                  </button>
+                </div>
+              );
+            })()}
             <button onClick={clearAndBack} style={{ padding: '0.875rem 2.5rem', borderRadius: '999px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, border: 'none', cursor: 'pointer', fontSize: '1rem', boxShadow: '0 6px 24px rgba(161,23,56,0.3)' }}>חזרה לעמוד הבית</button>
           </div>
         )}
