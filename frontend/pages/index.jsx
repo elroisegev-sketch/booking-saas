@@ -1368,7 +1368,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                           body: JSON.stringify({ text: newAppt.rawText }),
                         });
                         const data = await r.json();
-                        if (!r.ok) { showToast(data.error || 'שגיאה בפרסור'); return; }
+                        if (!r.ok) { showToast((data.error || 'שגיאה בפרסור') + (data.status ? ' [' + data.status + ']' : '') + (data.detail ? ': ' + data.detail.slice(0,80) : '')); return; }
                         setNewAppt(prev => ({
                           ...prev,
                           customer_name: data.customer_name || prev.customer_name,

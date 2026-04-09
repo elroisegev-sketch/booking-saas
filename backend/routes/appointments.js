@@ -252,6 +252,7 @@ router.post('/parse-text', auth, async (req, res) => {
     return res.status(400).json({ error: 'הטקסט ארוך מדי (מקסימום 1000 תווים)' });
 
   const apiKey = process.env.ANTHROPIC_API_KEY;
+  console.log('[parse-text] apiKey present:', !!apiKey, 'length:', apiKey ? apiKey.length : 0);
   if (!apiKey)
     return res.status(500).json({ error: 'ANTHROPIC_API_KEY לא מוגדר' });
 
@@ -290,8 +291,8 @@ ${text}`,
 
     if (!response.ok) {
       const errBody = await response.text();
-      console.error('Anthropic API error:', response.status, errBody);
-      return res.status(500).json({ error: 'שגיאה בקריאה ל-AI' });
+      console.error('[parse-text] Anthropic error:', response.status, errBody);
+      return res.status(500).json({ error: 'שגיאה בקריאה ל-AI', status: response.status, detail: errBody });
     }
 
     const data = await response.json();
