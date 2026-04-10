@@ -793,7 +793,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
 
 // ── SERVICE MODAL ─────────────────────────────────────────────
 const ServiceModal = ({ service, onSave, onClose }) => {
-  const [form, setForm] = useState({ name: service?.name || '', duration: service?.duration || 30, price: service?.price || 0, category: service?.category || "לק ג'ל 💅" });
+  const [form, setForm] = useState({ name: (service ? service.name : '') || '', duration: (service ? service.duration : 0) || 30, price: (service ? service.price : 0) || 0, category: (service ? service.category : '') || "לק ג'ל 💅" });
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(161,23,56,0.2)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', fontFamily: 'Varela Round, sans-serif' }}>
       <div dir="rtl" style={{ background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(32px)', WebkitBackdropFilter: 'blur(32px)', border: '1px solid rgba(255,255,255,0.9)', borderRadius: '28px', padding: '1.5rem', width: '100%', maxWidth: '420px', margin: '1rem', boxShadow: '0 8px 32px rgba(161,23,56,0.08), inset 0 1px 0 rgba(255,255,255,0.9)' }}>
