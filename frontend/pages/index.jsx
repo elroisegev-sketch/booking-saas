@@ -434,7 +434,13 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
       <div style={{ maxWidth: '520px', margin: '0 auto', padding: '2rem 1.5rem' }}>
 
         {/* Step 1 - Services */}
-        {step === 1 && (
+        {step === 1 && dataLoading && (
+          <div style={{ textAlign: 'center', padding: '3rem 1rem', fontFamily: "'Varela Round', sans-serif" }}>
+            <div style={{ fontSize: '2rem', marginBottom: '1rem', animation: 'spin 1s linear infinite', display: 'inline-block' }}>💅</div>
+            <p style={{ color: '#A11738', fontWeight: 700 }}>טוענת שירותים...</p>
+          </div>
+        )}
+        {step === 1 && !dataLoading && (
           <div>
             <h2 style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '2rem', fontWeight: 300, color: '#3d0c16', marginBottom: '0.2rem' }}>בחרי שירותים</h2>
             <p style={{ color: '#9ca3af', fontSize: '0.8rem', marginBottom: '1.75rem' }}>ניתן לבחור מספר שירותים</p>
