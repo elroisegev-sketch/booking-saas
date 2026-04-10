@@ -237,6 +237,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   const skipFirstSaveRef = useRef(true);
   const [realServices, setRealServices] = useState([]);
   const [realAvailability, setRealAvailability] = useState(null);
+  const [dataLoading, setDataLoading] = useState(true);
   const [nailCountModal, setNailCountModal] = useState(false);
   const [nailService, setNailService] = useState(null);
   const [showWaBubble, setShowWaBubble] = useState(true);
@@ -274,14 +275,28 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   };
 
   useEffect(() => {
-    fetch('https://booking-saas-production-b9fd.up.railway.app/api/services/public/lior-segev')
-      .then(r => r.json())
-      .then(data => { if (Array.isArray(data)) setRealServices(data); else if (data.services) setRealServices(data.services); })
-      .catch(() => {});
-    fetch('https://booking-saas-production-b9fd.up.railway.app/api/availability/public/lior-segev')
-      .then(r => r.json())
-      .then(data => { if (Array.isArray(data)) setRealAvailability(data); })
-      .catch(() => {});
+    const fetchWithRetry = (url, onSuccess, retries) => {
+      fetch(url)
+        .then(function(r) { return r.json(); })
+        .then(onSuccess)
+        .catch(function() {
+          if (retries > 0) setTimeout(function() { fetchWithRetry(url, onSuccess, retries - 1); }, 2000);
+        });
+    };
+    let servicesLoaded = false, availLoaded = false;
+    const checkDone = () => { if (servicesLoaded && availLoaded) setDataLoading(false); };
+    fetchWithRetry(
+      'https://booking-saas-production-b9fd.up.railway.app/api/services/public/lior-segev',
+      function(data) { if (Array.isArray(data)) setRealServices(data); else if (data && data.services) setRealServices(data.services); servicesLoaded = true; checkDone(); },
+      3
+    );
+    fetchWithRetry(
+      'https://booking-saas-production-b9fd.up.railway.app/api/availability/public/lior-segev',
+      function(data) { if (Array.isArray(data)) setRealAvailability(data); availLoaded = true; checkDone(); },
+      3
+    );
+    // fallback: show UI after 12s even if retries haven't finished
+    setTimeout(function() { setDataLoading(false); }, 12000);
   }, []);
 
   const displayServices = (realServices.length > 0 ? realServices : MOCK_SERVICES)
@@ -512,7 +527,13 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
         )}
 
         {/* Step 2 - Date */}
-        {step === 2 && (
+        {step === 2 && dataLoading && (
+          <div style={{ textAlign: 'center', padding: '3rem 1rem', fontFamily: "'Varela Round', sans-serif" }}>
+            <div style={{ fontSize: '2rem', marginBottom: '1rem', animation: 'spin 1s linear infinite', display: 'inline-block' }}>💅</div>
+            <p style={{ color: '#A11738', fontWeight: 700 }}>טוענת תורים פנויים...</p>
+          </div>
+        )}
+        {step === 2 && !dataLoading && (
           <div>
             <h2 style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '2rem', fontWeight: 300, color: '#3d0c16', marginBottom: '0.2rem' }}>בחרי תאריך</h2>
             <p style={{ color: '#9ca3af', fontSize: '0.8rem', marginBottom: '1.75rem' }}>{selectedServices.map(s => s.name).join(' + ')}</p>
