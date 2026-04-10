@@ -84,6 +84,10 @@ app.get('/health', (_, res) => res.json({ status: 'ok', service: 'BookSlot API' 
 // Auto-migrate notes column on appointments
 require('./db').query(`ALTER TABLE appointments ADD COLUMN IF NOT EXISTS notes TEXT`).catch(() => {});
 
+// Multi-service names text column
+require('./db').query(`ALTER TABLE appointments ADD COLUMN IF NOT EXISTS service_names_text TEXT`).catch(() => {});
+require('./db').query(`ALTER TABLE appointments ADD COLUMN IF NOT EXISTS total_price NUMERIC`).catch(() => {});
+
 // Allow manual appointments without service_id (make it nullable)
 require('./db').query(`ALTER TABLE appointments ALTER COLUMN service_id DROP NOT NULL`).catch(() => {});
 

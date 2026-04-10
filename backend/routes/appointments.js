@@ -259,7 +259,7 @@ router.get('/slots/:slug/:serviceId/:date', async (req, res) => {
 
 // POST /api/appointments (public booking)
 router.post('/', bookingLimiter, async (req, res) => {
-  const { business_slug, service_id, customer_name, customer_phone, customer_email, appointment_time } = req.body;
+  const { business_slug, service_id, customer_name, customer_phone, customer_email, appointment_time, service_names, total_price } = req.body;
   if (!business_slug || !service_id || !customer_name || !customer_phone || !appointment_time)
     return res.status(400).json({ error: 'Missing required fields' });
   if (typeof customer_name !== 'string' || customer_name.trim().length < 2 || customer_name.trim().length > 100)
@@ -288,14 +288,16 @@ router.post('/', bookingLimiter, async (req, res) => {
     const endTime = new Date(startTime.getTime() + service.duration * 60000);
     const conflictResult = await db.query(`SELECT id FROM appointments WHERE business_id = $1 AND status != 'cancelled' AND tstzrange(appointment_time, end_time, '[)') && tstzrange($2::timestamptz, $3::timestamptz, '[)')`, [businessId, startTime.toISOString(), endTime.toISOString()]);
     if (conflictResult.rows.length > 0) return res.status(409).json({ error: 'This time slot is no longer available.' });
-    const result = await db.query(`INSERT INTO appointments (business_id, service_id, customer_name, customer_phone, customer_email, appointment_time, end_time, status) VALUES ($1,$2,$3,$4,$5,$6,$7,'pending') RETURNING *`, [businessId, service_id, customer_name.trim(), cleanPhone, customer_email?.trim() || null, startTime.toISOString(), endTime.toISOString()]);
+    const displayNames = service_names || service.name;
+    const displayPrice = parseFloat(total_price) || parseFloat(service.price);
+    const result = await db.query(`INSERT INTO appointments (business_id, service_id, customer_name, customer_phone, customer_email, appointment_time, end_time, status, service_names_text, total_price) VALUES ($1,$2,$3,$4,$5,$6,$7,'pending',$8,$9) RETURNING *`, [businessId, service_id, customer_name.trim(), cleanPhone, customer_email?.trim() || null, startTime.toISOString(), endTime.toISOString(), displayNames, displayPrice]);
     const israelTime = new Date(startTime.toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' }));
     const dateHeb = israelTime.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' });
     const timeHeb = `${String(israelTime.getHours()).padStart(2,'0')}:${String(israelTime.getMinutes()).padStart(2,'0')}`;
-    const deposit = Math.ceil(parseFloat(service.price) / 2);
-    const telegramMsg = `🌸 תור חדש!\n\n👤 שם: ${customer_name.trim()}\n💅 טיפול: ${service.name}\n📅 תאריך: ${dateHeb}\n🕐 שעה: ${timeHeb}\n💰 מחיר: ${service.price}₪\n💳 מקדמה: ${deposit}₪`;
+    const deposit = Math.ceil(displayPrice / 2);
+    const telegramMsg = `🌸 תור חדש!\n\n👤 שם: ${customer_name.trim()}\n💅 טיפול: ${displayNames}\n📅 תאריך: ${dateHeb}\n🕐 שעה: ${timeHeb}\n💰 מחיר: ${displayPrice}₪\n💳 מקדמה: ${deposit}₪`;
     await sendTelegram(telegramMsg);
-    await sendPush({ title: '🌸 תור חדש!', body: `${customer_name} | ${service.name}\n${dateHeb} בשעה ${timeHeb}` });
+    await sendPush({ title: '🌸 תור חדש!', body: `${customer_name} | ${displayNames}\n${dateHeb} בשעה ${timeHeb}` });
     notifyBusiness(businessId);
     res.status(201).json(result.rows[0]);
   } catch (err) { console.error('Book appointment error:', err); res.status(500).json({ error: 'Server error while booking appointment' }); }

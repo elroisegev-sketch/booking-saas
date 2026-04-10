@@ -765,6 +765,8 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                       customer_phone: sel.phone,
                       appointment_time: startUTC.toISOString(),
                       end_time: endUTC.toISOString(),
+                      service_names: selectedServices.map(function(s) { return s.name; }).join(', '),
+                      total_price: totalPrice,
                     })
                   });
                 } catch(e) { console.error('booking failed', e); }
@@ -1162,7 +1164,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
     const date = fmtDate(appt.appointment_time);
     const time = fmtTime(appt.appointment_time);
     const msg = type === 'confirm'
-      ? `היי ${appt.customer_name} 🌸\nהתור שלך אושר!\n📅 תאריך: ${date}\n🕐 שעה: ${time}\n💅 טיפול: ${appt.service_name}\nנתראה! — ליאור שגב ביוטי`
+      ? `היי ${appt.customer_name} 🌸\nהתור שלך אושר!\n📅 תאריך: ${date}\n🕐 שעה: ${time}\n💅 טיפול: ${appt.service_names_text || appt.service_name}\nנתראה! — ליאור שגב ביוטי`
       : `היי ${appt.customer_name}, לצערי התור שלך ל${date} בשעה ${time} בוטל. ניצור איתך קשר לקביעת תור חדש 🙏`;
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
   };
@@ -1345,7 +1347,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                     <div style={{ width: '3px', height: '36px', borderRadius: '999px', flexShrink: 0, background: '#F7C1C3' }} />
                     <div style={{ flex: 1 }}>
                       <p style={{ fontWeight: 700, color: '#A11738', margin: 0, fontSize: '0.875rem' }}>{appt.customer_name}</p>
-                      <p style={{ color: '#9ca3af', fontSize: '0.75rem', margin: '2px 0 0' }}>{appt.service_name}</p>
+                      <p style={{ color: '#9ca3af', fontSize: '0.75rem', margin: '2px 0 0' }}>{appt.service_names_text || appt.service_name}</p>
                     </div>
                     {appt.image && <img src={appt.image} alt="ins" onClick={() => setViewImage(appt.image)} style={{ width: '36px', height: '36px', borderRadius: '8px', objectFit: 'cover', border: '2px solid #F7C1C3', cursor: 'pointer' }} />}
                     <span style={{ fontSize: '0.75rem', fontWeight: 700, padding: '3px 10px', borderRadius: '999px', background: appt.status === 'completed' ? '#d1fae5' : appt.status === 'pending' ? '#fef3c7' : '#F7C1C3', color: appt.status === 'completed' ? '#059669' : appt.status === 'pending' ? '#92400e' : '#A11738' }}>
@@ -1377,7 +1379,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                     </div>
                     <span style={{ fontSize: '0.75rem', fontWeight: 700, padding: '3px 10px', borderRadius: '999px', background: '#fef3c7', color: '#92400e' }}>ממתין</span>
                   </div>
-                  <p style={{ fontWeight: 700, color: '#EC6A83', margin: '0 0 4px' }}>{appt.service_name}</p>
+                  <p style={{ fontWeight: 700, color: '#EC6A83', margin: '0 0 4px' }}>{appt.service_names_text || appt.service_name}</p>
                   <p style={{ color: '#6b7280', fontSize: '0.875rem', margin: '0 0 4px' }}>{fmtDate(appt.appointment_time)} | {fmtTime(appt.appointment_time)}</p>
                   <p style={{ fontWeight: 900, color: '#EC6A83', margin: '0 0 12px' }}>{fmtPrice(appt.price)}</p>
                   {appt.notes && <p style={{ color: '#6b7280', fontSize: '0.75rem', margin: '0 0 8px', fontStyle: 'italic' }}>📝 {appt.notes}</p>}
@@ -1389,7 +1391,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                   )}
                   <div style={{ display: 'flex', gap: '10px' }}>
                     <button onClick={() => setNoteModal({ open: true, apptId: appt.id, text: appt.notes || '' })} style={{ padding: '0.625rem', borderRadius: '10px', background: appt.notes ? '#fef3c7' : '#f3f4f6', color: appt.notes ? '#92400e' : '#6b7280', fontWeight: 700, fontSize: '0.8rem', border: 'none', cursor: 'pointer' }}>📝</button>
-                    <a href={`https://wa.me/972${appt.customer_phone.replace(/-/g,'').slice(1)}?text=${encodeURIComponent(`היי ${appt.customer_name} 🌸\nהתור שלך ל${appt.service_name} ב${fmtDate(appt.appointment_time)} בשעה ${fmtTime(appt.appointment_time)} אושר! מחכה לך 💅`)}`}
+                    <a href={`https://wa.me/972${appt.customer_phone.replace(/-/g,'').slice(1)}?text=${encodeURIComponent(`היי ${appt.customer_name} 🌸\nהתור שלך ל${appt.service_names_text || appt.service_name} ב${fmtDate(appt.appointment_time)} בשעה ${fmtTime(appt.appointment_time)} אושר! מחכה לך 💅`)}`}
                       target="_blank" rel="noreferrer"
                       style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '0.625rem', borderRadius: '10px', background: '#dcfce7', color: '#166534', fontWeight: 700, fontSize: '0.8rem', textDecoration: 'none' }}>
                       <Icon name="whatsapp" className="w-4 h-4" /> וואטסאפ
@@ -1572,7 +1574,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                         <div style={{ flex: 1 }}>
                           <p style={{ fontWeight: 700, color: '#A11738', margin: 0, fontSize: '0.875rem' }}>{appt.customer_name}</p>
-                          <p style={{ color: '#9ca3af', fontSize: '0.75rem', margin: '2px 0 4px' }}>{fmtTime(appt.appointment_time)} · {appt.service_name}</p>
+                          <p style={{ color: '#9ca3af', fontSize: '0.75rem', margin: '2px 0 4px' }}>{fmtTime(appt.appointment_time)} · {appt.service_names_text || appt.service_name}</p>
                           {appt.deposit > 0 && <p style={{ color: '#EC6A83', fontSize: '0.7rem', margin: '0 0 4px', fontWeight: 700 }}>מקדמה: ₪{appt.deposit}</p>}
                           <span style={{ fontSize: '0.7rem', fontWeight: 700, padding: '2px 8px', borderRadius: '999px', background: appt.status === 'completed' ? '#d1fae5' : appt.status === 'pending' ? '#fef3c7' : '#F7C1C3', color: appt.status === 'completed' ? '#059669' : appt.status === 'pending' ? '#92400e' : '#A11738', display: 'inline-block' }}>
                             {appt.status === 'completed' ? 'הושלם' : appt.status === 'pending' ? 'ממתין' : 'מאושר'}
