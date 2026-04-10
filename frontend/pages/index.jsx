@@ -670,8 +670,8 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
               const getCalDates = () => {
                 const dateStr2 = `${sel.date.getFullYear()}-${String(sel.date.getMonth()+1).padStart(2,'0')}-${String(sel.date.getDate()).padStart(2,'0')}`;
                 const refDate = new Date(`${dateStr2}T12:00:00Z`);
-                const israelLocal = new Date(refDate.toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' }));
-                const offsetMins = Math.round((israelLocal - refDate) / 60000);
+                const ilParts = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Jerusalem', hour: 'numeric', hour12: false }).formatToParts(refDate);
+                const offsetMins = (parseInt(ilParts.find(function(p) { return p.type === 'hour'; }).value) - 12) * 60;
                 const [th, tm] = sel.time.split(':').map(Number);
                 const startMins = th * 60 + tm - offsetMins;
                 const startH = String(Math.floor(((startMins % 1440) + 1440) % 1440 / 60)).padStart(2, '0');
@@ -746,8 +746,8 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                 const rawTime = sel.time.trim();
                 const dateStr2 = `${sel.date.getFullYear()}-${String(sel.date.getMonth()+1).padStart(2,'0')}-${String(sel.date.getDate()).padStart(2,'0')}`;
                 const refDate = new Date(`${dateStr2}T12:00:00Z`);
-                const israelLocal = new Date(refDate.toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' }));
-                const israelOffsetMins = Math.round((israelLocal - refDate) / 60000);
+                const ilParts = new Intl.DateTimeFormat('en-US', { timeZone: 'Asia/Jerusalem', hour: 'numeric', hour12: false }).formatToParts(refDate);
+                const israelOffsetMins = (parseInt(ilParts.find(function(p) { return p.type === 'hour'; }).value) - 12) * 60;
                 const [th, tm] = rawTime.split(':').map(Number);
                 const startMins = th * 60 + tm - israelOffsetMins;
                 const startH = String(Math.floor(((startMins % 1440) + 1440) % 1440 / 60)).padStart(2, '0');
