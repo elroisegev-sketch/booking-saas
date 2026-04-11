@@ -767,6 +767,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                       end_time: endUTC.toISOString(),
                       service_names: selectedServices.map(function(s) { return s.name; }).join(', '),
                       total_price: totalPrice,
+                      total_duration: totalDuration,
                     })
                   });
                 } catch(e) { console.error('booking failed', e); }

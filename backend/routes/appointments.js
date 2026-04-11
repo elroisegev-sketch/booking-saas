@@ -259,7 +259,7 @@ router.get('/slots/:slug/:serviceId/:date', async (req, res) => {
 
 // POST /api/appointments (public booking)
 router.post('/', bookingLimiter, async (req, res) => {
-  const { business_slug, service_id, customer_name, customer_phone, customer_email, appointment_time, service_names, total_price } = req.body;
+  const { business_slug, service_id, customer_name, customer_phone, customer_email, appointment_time, service_names, total_price, total_duration } = req.body;
   if (!business_slug || !service_id || !customer_name || !customer_phone || !appointment_time)
     return res.status(400).json({ error: 'Missing required fields' });
   if (typeof customer_name !== 'string' || customer_name.trim().length < 2 || customer_name.trim().length > 100)
@@ -285,7 +285,8 @@ router.post('/', bookingLimiter, async (req, res) => {
     if (!serviceResult.rows.length) return res.status(404).json({ error: 'Service not found' });
     const service = serviceResult.rows[0];
     const startTime = new Date(appointment_time);
-    const endTime = new Date(startTime.getTime() + service.duration * 60000);
+    const durationMins = (total_duration && parseInt(total_duration) > 0) ? parseInt(total_duration) : service.duration;
+    const endTime = new Date(startTime.getTime() + durationMins * 60000);
     const conflictResult = await db.query(`SELECT id FROM appointments WHERE business_id = $1 AND status != 'cancelled' AND tstzrange(appointment_time, end_time, '[)') && tstzrange($2::timestamptz, $3::timestamptz, '[)')`, [businessId, startTime.toISOString(), endTime.toISOString()]);
     if (conflictResult.rows.length > 0) return res.status(409).json({ error: 'This time slot is no longer available.' });
     const displayNames = service_names || service.name;
