@@ -1292,7 +1292,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
     } catch { showToast('שגיאה בעדכון'); }
   };
 
-  const addManualAppt = async ()
+  const addManualAppt = async () => {
     if (!newAppt.customer_name || !newAppt.date || !newAppt.time) return;
     const token = localStorage.getItem('token');
     const dt = new Date(newAppt.date + 'T' + newAppt.time);
