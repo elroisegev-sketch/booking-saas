@@ -71,6 +71,21 @@ const WHATSAPP_LINK = (name, services, date, time, total) =>
 const fmtTime = (iso) => new Date(iso).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
 const fmtDate = (iso) => new Date(iso).toLocaleDateString('he-IL', { weekday: 'short', month: 'short', day: 'numeric' });
 const fmtPrice = (n) => parseFloat(n || 0) === 0 ? 'משתנה' : `₪${parseFloat(n).toFixed(0)}`;
+const fmtDuration = (mins) => {
+  const h = Math.floor(mins / 60), m = mins % 60;
+  const hStr = h === 1 ? 'שעה' : h === 2 ? 'שעתיים' : h > 2 ? `${h} שעות` : '';
+  if (h === 0) return m === 15 ? 'רבע שעה' : m === 30 ? 'חצי שעה' : m === 45 ? 'שלושת רבעי שעה' : '';
+  if (m === 0) return hStr;
+  if (m === 15) return `${hStr} ורבע`;
+  if (m === 30) return `${hStr} וחצי`;
+  if (m === 45) return `${hStr} ושלושת רבעים`;
+  return hStr;
+};
+const addMins = (time, mins) => {
+  const [h, m] = time.split(':').map(Number);
+  const t = h * 60 + m + mins;
+  return `${String(Math.floor(t / 60) % 24).padStart(2,'0')}:${String(t % 60).padStart(2,'0')}`;
+};
 
 const Icon = ({ name, className = 'w-5 h-5' }) => {
   const icons = {
@@ -597,9 +612,13 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                 <span style={{ color: '#9ca3af', fontSize: '0.85rem' }}>תאריך</span>
                 <span style={{ color: '#374151', fontWeight: 600, fontSize: '0.85rem' }}>{dateStr}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <span style={{ color: '#9ca3af', fontSize: '0.85rem' }}>שעה</span>
                 <span style={{ color: '#374151', fontWeight: 600, fontSize: '0.85rem' }}>{sel.time}</span>
+              </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#9ca3af', fontSize: '0.85rem' }}>משך הטיפול</span>
+                <span style={{ color: '#374151', fontWeight: 600, fontSize: '0.85rem' }}>{totalDuration} דקות</span>
               </div>
             </div>
             <button onClick={clearAndBack} style={{ padding: '0.875rem 2.5rem', borderRadius: '999px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, border: 'none', cursor: 'pointer', fontSize: '1rem', boxShadow: '0 6px 24px rgba(161,23,56,0.3)' }}>חזרה לעמוד הבית</button>
@@ -623,7 +642,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                 <span style={{ fontWeight: 700, color: '#A11738', fontSize: '0.85rem' }}>סה"כ</span>
                 <span style={{ fontFamily: "'Varela Round', sans-serif", fontWeight: 300, fontSize: '1.5rem', color: '#EC6A83' }}>{fmtPrice(totalPrice)}</span>
               </div>
-              <p style={{ color: '#9ca3af', fontSize: '0.7rem', marginTop: '6px' }}>{dateStr} · {sel.time}</p>
+              <p style={{ color: '#9ca3af', fontSize: '0.7rem', marginTop: '6px' }}>{dateStr} · {sel.time}–{addMins(sel.time, totalDuration)} · {fmtDuration(totalDuration)}</p>
             </div>
 
             {/* כרטיס מקדמה */}
@@ -729,6 +748,62 @@ const ServiceModal = ({ service, onSave, onClose }) => {
           <button onClick={onClose} style={{ flex: 1, padding: '0.875rem', borderRadius: '999px', background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1.5px solid rgba(247,193,195,0.5)', color: '#A11738', fontWeight: 700, cursor: 'pointer' }}>ביטול</button>
           <button onClick={() => form.name && onSave(form)} style={{ flex: 1, padding: '0.875rem', borderRadius: '999px', background: form.name ? 'linear-gradient(135deg,#A11738,#EC6A83)' : '#d1d5db', color: 'white', fontWeight: 700, border: 'none', cursor: form.name ? 'pointer' : 'not-allowed', boxShadow: form.name ? '0 8px 24px rgba(161,23,56,0.32)' : 'none' }}>
             {service ? 'שמירה' : 'הוספה'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ── EDIT APPOINTMENT MODAL ────────────────────────────────────
+const EditAppointmentModal = ({ appt, services, onSave, onClose }) => {
+  const apptDate = new Date(appt.appointment_time);
+  const [form, setForm] = useState({
+    date: apptDate.toLocaleDateString('en-CA', { timeZone: 'Asia/Jerusalem' }),
+    time: apptDate.toLocaleTimeString('en-GB', { timeZone: 'Asia/Jerusalem', hour: '2-digit', minute: '2-digit' }),
+    service_id: String(appt.service_id),
+    customer_name: appt.customer_name,
+    customer_phone: appt.customer_phone,
+  });
+  const [saving, setSaving] = useState(false);
+  const inp = { width: '100%', padding: '0.75rem 1rem', borderRadius: '14px', border: '1.5px solid rgba(247,193,195,0.5)', outline: 'none', fontSize: '0.875rem', direction: 'rtl', boxSizing: 'border-box', background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(8px)', fontFamily: 'Varela Round, sans-serif' };
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(161,23,56,0.2)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', fontFamily: 'Varela Round, sans-serif' }}>
+      <div dir="rtl" style={{ background: 'rgba(255,255,255,0.88)', backdropFilter: 'blur(32px)', WebkitBackdropFilter: 'blur(32px)', border: '1px solid rgba(255,255,255,0.9)', borderRadius: '28px', padding: '1.5rem', width: '100%', maxWidth: '420px', margin: '1rem', boxShadow: '0 8px 32px rgba(161,23,56,0.08), inset 0 1px 0 rgba(255,255,255,0.9)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+          <h2 style={{ fontWeight: 900, color: '#A11738', fontSize: '1.25rem', margin: 0 }}>עריכת תור ✏️</h2>
+          <button onClick={onClose} style={{ padding: '6px', borderRadius: '8px', background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="x" className="w-5 h-5" /></button>
+        </div>
+        <div style={{ marginBottom: '1rem' }}>
+          <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>שם לקוחה</label>
+          <input style={inp} value={form.customer_name} onChange={e => setForm({ ...form, customer_name: e.target.value })} />
+        </div>
+        <div style={{ marginBottom: '1rem' }}>
+          <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>טלפון</label>
+          <input style={inp} value={form.customer_phone} onChange={e => setForm({ ...form, customer_phone: e.target.value })} />
+        </div>
+        <div style={{ marginBottom: '1rem' }}>
+          <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>שירות</label>
+          <select style={inp} value={form.service_id} onChange={e => setForm({ ...form, service_id: e.target.value })}>
+            {services.filter(s => s.is_active).map(s => (
+              <option key={s.id} value={String(s.id)}>{s.name} ({s.duration} דק׳)</option>
+            ))}
+          </select>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '1.25rem' }}>
+          <div>
+            <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>תאריך</label>
+            <input type="date" style={{ ...inp, direction: 'ltr' }} value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>שעה</label>
+            <input type="time" style={{ ...inp, direction: 'ltr' }} value={form.time} onChange={e => setForm({ ...form, time: e.target.value })} />
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button onClick={onClose} style={{ flex: 1, padding: '0.875rem', borderRadius: '999px', background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(8px)', border: '1.5px solid rgba(247,193,195,0.5)', color: '#A11738', fontWeight: 700, cursor: 'pointer', fontFamily: 'Varela Round, sans-serif' }}>ביטול</button>
+          <button disabled={saving} onClick={async () => { setSaving(true); await onSave(form); setSaving(false); }} style={{ flex: 1, padding: '0.875rem', borderRadius: '999px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, border: 'none', cursor: 'pointer', boxShadow: '0 8px 24px rgba(161,23,56,0.32)', fontFamily: 'Varela Round, sans-serif' }}>
+            {saving ? '...' : 'שמירה'}
           </button>
         </div>
       </div>
@@ -985,6 +1060,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
   const [blockedSlots, setBlockedSlots] = useState([]);
   const [showBlockModal, setShowBlockModal] = useState(false);
   const [blockForm, setBlockForm] = useState({ start_time: '09:00', end_time: '10:00', reason: '' });
+  const [editAppt, setEditAppt] = useState(null);
 
   const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'https://booking-saas-production-b9fd.up.railway.app';
   const VAPID_PUBLIC = 'BJruLIZOsClN97fYdg9i5G52FyTQGEVD_5pSAW6BWQNPKO5lecZhhOn58DCnS1aEkPX1qWQIKcA9INApaRiW1X0';
@@ -1082,6 +1158,23 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
     setAppointments(appointments.map(a => a.id === id ? { ...a, status: 'cancelled' } : a));
     showToast('התור בוטל');
     if (appt) openWhatsApp(appt, 'cancel');
+  };
+
+  const saveEditAppt = async (form) => {
+    const token = localStorage.getItem('token');
+    try {
+      const utcISO = new Date(`${form.date}T${form.time}:00`).toISOString();
+      const r = await fetch(BACKEND + `/api/appointments/${editAppt.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ appointment_time: utcISO, service_id: form.service_id, customer_name: form.customer_name, customer_phone: form.customer_phone }),
+      });
+      if (!r.ok) { const err = await r.json(); showToast(err.error || 'שגיאה בעדכון'); return; }
+      const data = await fetch(BACKEND + '/api/appointments', { headers: { 'Authorization': 'Bearer ' + token } }).then(r => r.json());
+      if (Array.isArray(data)) setAppointments(data);
+      setEditAppt(null);
+      showToast('התור עודכן ✅');
+    } catch { showToast('שגיאה בעדכון'); }
   };
 
   const addManualAppt = () => {
@@ -1313,6 +1406,8 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
             </div>
           )}
 
+          {editAppt && <EditAppointmentModal appt={editAppt} services={services} onSave={saveEditAppt} onClose={() => setEditAppt(null)} />}
+
           {showBlockModal && (
             <div style={{ position: 'fixed', inset: 0, zIndex: 60, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(0,0,0,0.4)', fontFamily: 'Varela Round, sans-serif' }}>
               <div dir="rtl" style={{ background: 'white', borderRadius: '24px', padding: '1.5rem', width: '100%', maxWidth: '380px', margin: '1rem', boxShadow: '0 8px 32px rgba(0,0,0,0.15)' }}>
@@ -1417,6 +1512,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           {appt.image && <img src={appt.image} alt="ins" onClick={() => setViewImage(appt.image)} style={{ width: '32px', height: '32px', borderRadius: '8px', objectFit: 'cover', cursor: 'pointer' }} />}
+                          <button onClick={() => setEditAppt(appt)} style={{ padding: '4px 8px', borderRadius: '8px', background: '#ede9fe', color: '#6d28d9', fontWeight: 700, fontSize: '0.7rem', border: 'none', cursor: 'pointer' }}>ערוך</button>
                           <button onClick={() => cancelAppt(appt.id)} style={{ padding: '4px 8px', borderRadius: '8px', background: '#fee2e2', color: '#991b1b', fontWeight: 700, fontSize: '0.7rem', border: 'none', cursor: 'pointer' }}>ביטול</button>
                         </div>
                       </div>

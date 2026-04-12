@@ -130,4 +130,18 @@ router.get('/me', require('../middleware/auth'), async (req, res) => {
   }
 });
 
+// POST /api/change-password (auth required)
+router.post('/change-password', require('../middleware/auth'), async (req, res) => {
+  const { new_password } = req.body;
+  if (!new_password || new_password.length < 8)
+    return res.status(400).json({ error: 'סיסמה חייבת להיות לפחות 8 תווים' });
+  try {
+    const hash = await bcrypt.hash(new_password, 12);
+    await db.query('UPDATE users SET password_hash=$1 WHERE id=$2', [hash, req.user.id]);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+});
+
 module.exports = router;
