@@ -654,11 +654,15 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
               </div>
               <p style={{ color: '#9ca3af', fontSize: '0.7rem', marginTop: '6px' }}>{dateStr} · {sel.time} · {totalDuration} דקות</p>
             </div>
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button onClick={() => setStep(3)} style={{ flex: 1, padding: '0.875rem', borderRadius: '999px', background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.7)', color: '#A11738', fontWeight: 500, cursor: 'pointer', fontSize: '0.875rem' }}>חזרה</button>
-              <button className="lux-btn" onClick={() => (sel.name && sel.phone) && setStep(5)} disabled={!sel.name || !sel.phone}
-                style={{ flex: 2, padding: '0.875rem', borderRadius: '999px', background: (sel.name && sel.phone) ? 'linear-gradient(135deg,#A11738,#EC6A83)' : 'rgba(209,213,219,0.5)', color: (sel.name && sel.phone) ? 'white' : '#9ca3af', fontWeight: 600, border: 'none', cursor: (sel.name && sel.phone) ? 'pointer' : 'not-allowed', boxShadow: (sel.name && sel.phone) ? '0 4px 16px rgba(161,23,56,0.25)' : 'none', fontSize: '0.875rem' }}>
-                המשך לתשלום 💳
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <button onClick={() => setStep(3)} style={{ flexShrink: 0, padding: '0.875rem 1.1rem', borderRadius: '999px', background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.7)', color: '#A11738', fontWeight: 500, cursor: 'pointer', fontSize: '0.875rem' }}>חזרה</button>
+              <button
+                className="deposit-btn"
+                onClick={() => (sel.name && sel.phone) && setStep(5)}
+                disabled={!sel.name || !sel.phone}
+                style={{ flex: 1, padding: '1rem 1.5rem', borderRadius: '999px', color: (sel.name && sel.phone) ? 'white' : '#9ca3af', fontWeight: 700, border: 'none', cursor: (sel.name && sel.phone) ? 'pointer' : 'not-allowed', fontFamily: 'Varela Round, sans-serif', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+                <span style={{ fontSize: '1rem', letterSpacing: '0.02em' }}>המשיכי לשריון התור 🌸</span>
+                <span style={{ fontSize: '0.72rem', fontWeight: 400, opacity: 0.88 }}>תשלום מקדמה · {Math.ceil(finalPrice / 2)}₪</span>
               </button>
             </div>
           </div>
