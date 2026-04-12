@@ -33,6 +33,8 @@ app.use(helmet({
 const ALLOWED_ORIGINS = [
   process.env.FRONTEND_URL,
   'https://authentic-wisdom-production.up.railway.app',
+  'https://www.lioryourbeauty.com',
+  'https://lioryourbeauty.com',
   'http://localhost:3000',
   'http://localhost:3001',
 ].filter(Boolean);

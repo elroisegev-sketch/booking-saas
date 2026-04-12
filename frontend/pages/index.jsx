@@ -290,28 +290,34 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   };
 
   useEffect(() => {
+    const BACKEND = 'https://booking-saas-production-b9fd.up.railway.app';
     const fetchWithRetry = (url, onSuccess, retries) => {
       fetch(url)
         .then(function(r) { return r.json(); })
         .then(onSuccess)
         .catch(function() {
-          if (retries > 0) setTimeout(function() { fetchWithRetry(url, onSuccess, retries - 1); }, 2000);
+          if (retries > 0) setTimeout(function() { fetchWithRetry(url, onSuccess, retries - 1); }, 3000);
         });
     };
     let servicesLoaded = false, availLoaded = false;
     const checkDone = () => { if (servicesLoaded && availLoaded) setDataLoading(false); };
+    // Wake up the server first, then load data
+    fetch(BACKEND + '/health').catch(() => {});
     fetchWithRetry(
-      'https://booking-saas-production-b9fd.up.railway.app/api/services/public/lior-segev',
+      BACKEND + '/api/services/public/lior-segev',
       function(data) { if (Array.isArray(data)) setRealServices(data); else if (data && data.services) setRealServices(data.services); servicesLoaded = true; checkDone(); },
-      3
+      8
     );
     fetchWithRetry(
-      'https://booking-saas-production-b9fd.up.railway.app/api/availability/public/lior-segev',
+      BACKEND + '/api/availability/public/lior-segev',
       function(data) { if (Array.isArray(data)) setRealAvailability(data); availLoaded = true; checkDone(); },
-      3
+      8
     );
-    // fallback: show UI after 12s even if retries haven't finished
-    setTimeout(function() { setDataLoading(false); }, 12000);
+    // fallback: show UI after 30s even if retries haven't finished
+    setTimeout(function() { setDataLoading(false); }, 30000);
+    // Keep server awake — ping every 10 minutes
+    const keepAlive = setInterval(function() { fetch(BACKEND + '/health').catch(() => {}); }, 10 * 60 * 1000);
+    return function() { clearInterval(keepAlive); };
   }, []);
 
   const displayServices = (realServices.length > 0 ? realServices : MOCK_SERVICES)
@@ -871,12 +877,26 @@ const EditAppointmentModal = ({ appt, services, onSave, onClose }) => {
   const [form, setForm] = useState({
     date: apptDate.toLocaleDateString('en-CA', { timeZone: 'Asia/Jerusalem' }),
     time: apptDate.toLocaleTimeString('en-GB', { timeZone: 'Asia/Jerusalem', hour: '2-digit', minute: '2-digit' }),
-    service_id: String(appt.service_id),
+    service_ids: appt.service_id ? [String(appt.service_id)] : [],
     customer_name: appt.customer_name,
     customer_phone: appt.customer_phone,
   });
   const [saving, setSaving] = useState(false);
   const inp = { width: '100%', padding: '0.75rem 1rem', borderRadius: '14px', border: '1.5px solid rgba(247,193,195,0.5)', outline: 'none', fontSize: '0.875rem', direction: 'rtl', boxSizing: 'border-box', background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(8px)', fontFamily: 'Varela Round, sans-serif' };
+  const activeServices = services.filter(s => s.is_active);
+  const selectedServices = form.service_ids.map(id => activeServices.find(s => String(s.id) === id)).filter(Boolean);
+  const unselectedServices = activeServices.filter(s => !form.service_ids.includes(String(s.id)));
+  const totalDuration = selectedServices.reduce((sum, s) => sum + (s?.duration || 0), 0);
+
+  const removeService = (id) => {
+    if (form.service_ids.length <= 1) return;
+    setForm({ ...form, service_ids: form.service_ids.filter(i => i !== id) });
+  };
+  const addService = (id) => {
+    if (!id || form.service_ids.includes(id)) return;
+    setForm({ ...form, service_ids: [...form.service_ids, id] });
+  };
+
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(161,23,56,0.2)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', fontFamily: 'Varela Round, sans-serif' }}>
       <div dir="rtl" style={{ background: 'rgba(255,255,255,0.88)', backdropFilter: 'blur(32px)', WebkitBackdropFilter: 'blur(32px)', border: '1px solid rgba(255,255,255,0.9)', borderRadius: '28px', padding: '1.5rem', width: '100%', maxWidth: '420px', margin: '1rem', boxShadow: '0 8px 32px rgba(161,23,56,0.08), inset 0 1px 0 rgba(255,255,255,0.9)' }}>
@@ -893,12 +913,33 @@ const EditAppointmentModal = ({ appt, services, onSave, onClose }) => {
           <input style={inp} value={form.customer_phone} onChange={e => setForm({ ...form, customer_phone: e.target.value })} />
         </div>
         <div style={{ marginBottom: '1rem' }}>
-          <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>שירות</label>
-          <select style={inp} value={form.service_id} onChange={e => setForm({ ...form, service_id: e.target.value })}>
-            {services.filter(s => s.is_active).map(s => (
-              <option key={s.id} value={String(s.id)}>{s.name} ({s.duration} דק׳)</option>
+          <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>
+            שירותים
+            {totalDuration > 0 && <span style={{ fontWeight: 400, color: '#6B7280', marginRight: '6px' }}>({totalDuration} דק׳ סה״כ)</span>}
+          </label>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '8px' }}>
+            {selectedServices.map(s => (
+              <div key={s.id} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'linear-gradient(135deg,rgba(161,23,56,0.1),rgba(236,106,131,0.1))', border: '1px solid rgba(161,23,56,0.2)', borderRadius: '999px', padding: '4px 10px', fontSize: '0.8rem', color: '#A11738', fontWeight: 600 }}>
+                <span>{s.name}</span>
+                <span style={{ fontSize: '0.75rem', color: '#9CA3AF' }}>({s.duration} דק׳)</span>
+                {form.service_ids.length > 1 && (
+                  <button onClick={() => removeService(String(s.id))} style={{ marginRight: '2px', background: 'none', border: 'none', cursor: 'pointer', color: '#A11738', fontSize: '0.9rem', lineHeight: 1, padding: '0 2px' }}>×</button>
+                )}
+              </div>
             ))}
-          </select>
+          </div>
+          {unselectedServices.length > 0 && (
+            <select
+              style={{ ...inp, color: unselectedServices.length ? '#374151' : '#9CA3AF' }}
+              value=""
+              onChange={e => { addService(e.target.value); e.target.value = ''; }}
+            >
+              <option value="">+ הוסף שירות</option>
+              {unselectedServices.map(s => (
+                <option key={s.id} value={String(s.id)}>{s.name} ({s.duration} דק׳)</option>
+              ))}
+            </select>
+          )}
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '1.25rem' }}>
           <div>
@@ -1282,7 +1323,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
       const r = await fetch(BACKEND + `/api/appointments/${editAppt.id}`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
-        body: JSON.stringify({ appointment_time: utcISO, service_id: form.service_id, customer_name: form.customer_name, customer_phone: form.customer_phone }),
+        body: JSON.stringify({ appointment_time: utcISO, service_ids: form.service_ids, customer_name: form.customer_name, customer_phone: form.customer_phone }),
       });
       if (!r.ok) { const err = await r.json(); showToast(err.error || 'שגיאה בעדכון'); return; }
       const data = await fetch(BACKEND + '/api/appointments', { headers: { 'Authorization': 'Bearer ' + token } }).then(r => r.json());

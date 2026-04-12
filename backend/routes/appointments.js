@@ -306,7 +306,8 @@ router.post('/', bookingLimiter, async (req, res) => {
 
 // PATCH /api/appointments/:id  (edit full appointment, auth required)
 router.patch('/:id', auth, async (req, res) => {
-  const { appointment_time, service_id, customer_name, customer_phone } = req.body;
+  const { appointment_time, service_id, service_ids, customer_name, customer_phone } = req.body;
+  const ids = service_ids?.length ? service_ids : (service_id ? [service_id] : null);
   try {
     const curr = await db.query(
       `SELECT a.*, s.duration FROM appointments a JOIN services s ON a.service_id = s.id WHERE a.id=$1 AND a.business_id=$2`,
@@ -315,18 +316,27 @@ router.patch('/:id', auth, async (req, res) => {
     if (!curr.rows.length) return res.status(404).json({ error: 'Appointment not found' });
     const appt = curr.rows[0];
 
-    let duration = appt.duration;
+    let totalDuration = appt.duration;
     let newServiceId = appt.service_id;
-    if (service_id && String(service_id) !== String(appt.service_id)) {
-      const svc = await db.query('SELECT duration FROM services WHERE id=$1 AND business_id=$2', [service_id, req.user.id]);
-      if (!svc.rows.length) return res.status(404).json({ error: 'Service not found' });
-      duration = svc.rows[0].duration;
-      newServiceId = service_id;
+    let serviceNamesText = appt.service_names_text;
+
+    if (ids) {
+      const svcResult = await db.query(
+        `SELECT id, name, duration FROM services WHERE id = ANY($1::int[]) AND business_id=$2`,
+        [ids, req.user.id]
+      );
+      if (svcResult.rows.length !== ids.length) return res.status(404).json({ error: 'שירות לא נמצא' });
+      // preserve order as sent
+      const svcMap = Object.fromEntries(svcResult.rows.map(s => [String(s.id), s]));
+      const ordered = ids.map(i => svcMap[String(i)]).filter(Boolean);
+      totalDuration = ordered.reduce((sum, s) => sum + s.duration, 0);
+      newServiceId = ordered[0].id;
+      serviceNamesText = ordered.map(s => s.name).join(' + ');
     }
 
     const newStart = appointment_time ? new Date(appointment_time) : new Date(appt.appointment_time);
     if (appointment_time && isNaN(newStart.getTime())) return res.status(400).json({ error: 'תאריך לא תקין' });
-    const newEnd = new Date(newStart.getTime() + duration * 60000);
+    const newEnd = new Date(newStart.getTime() + totalDuration * 60000);
 
     const conflict = await db.query(
       `SELECT id FROM appointments WHERE business_id=$1 AND id!=$2 AND status!='cancelled' AND tstzrange(appointment_time,end_time,'[)') && tstzrange($3::timestamptz,$4::timestamptz,'[)')`,
@@ -338,8 +348,8 @@ router.patch('/:id', auth, async (req, res) => {
     const newPhone = customer_phone ? customer_phone.replace(/[-\s]/g, '') : appt.customer_phone;
 
     const result = await db.query(
-      `UPDATE appointments SET appointment_time=$1, end_time=$2, service_id=$3, customer_name=$4, customer_phone=$5 WHERE id=$6 AND business_id=$7 RETURNING *`,
-      [newStart.toISOString(), newEnd.toISOString(), newServiceId, newName, newPhone, req.params.id, req.user.id]
+      `UPDATE appointments SET appointment_time=$1, end_time=$2, service_id=$3, service_names_text=$4, customer_name=$5, customer_phone=$6 WHERE id=$7 AND business_id=$8 RETURNING *`,
+      [newStart.toISOString(), newEnd.toISOString(), newServiceId, serviceNamesText, newName, newPhone, req.params.id, req.user.id]
     );
     res.json(result.rows[0]);
   } catch (err) {
