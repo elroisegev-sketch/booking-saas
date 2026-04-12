@@ -878,10 +878,26 @@ const ServiceModal = ({ service, onSave, onClose }) => {
 // ── EDIT APPOINTMENT MODAL ────────────────────────────────────
 const EditAppointmentModal = ({ appt, services, onSave, onClose }) => {
   const apptDate = new Date(appt.appointment_time);
+
+  // Try to match service_names_text back to service IDs
+  const initServiceIds = () => {
+    const activeServices = services.filter(s => s.is_active);
+    if (appt.service_names_text) {
+      const names = appt.service_names_text.split(/\s*[,+]\s*/);
+      const matched = [];
+      for (const name of names) {
+        const found = activeServices.find(s => name.trim() === s.name || name.trim().startsWith(s.name));
+        if (found && !matched.includes(String(found.id))) matched.push(String(found.id));
+      }
+      if (matched.length > 0) return matched;
+    }
+    return appt.service_id ? [String(appt.service_id)] : [];
+  };
+
   const [form, setForm] = useState({
     date: apptDate.toLocaleDateString('en-CA', { timeZone: 'Asia/Jerusalem' }),
     time: apptDate.toLocaleTimeString('en-GB', { timeZone: 'Asia/Jerusalem', hour: '2-digit', minute: '2-digit' }),
-    service_ids: appt.service_id ? [String(appt.service_id)] : [],
+    service_ids: initServiceIds(),
     customer_name: appt.customer_name,
     customer_phone: appt.customer_phone,
   });
