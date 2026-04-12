@@ -322,7 +322,7 @@ router.patch('/:id', auth, async (req, res) => {
 
     if (ids) {
       const svcResult = await db.query(
-        `SELECT id, name, duration FROM services WHERE id = ANY($1::int[]) AND business_id=$2`,
+        `SELECT id, name, duration FROM services WHERE id = ANY($1::uuid[]) AND business_id=$2`,
         [ids, req.user.id]
       );
       if (svcResult.rows.length !== ids.length) return res.status(404).json({ error: 'שירות לא נמצא' });
