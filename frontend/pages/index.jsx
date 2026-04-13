@@ -733,6 +733,15 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                 <span style={{ color: '#374151', fontWeight: 600, fontSize: '0.85rem' }}>{totalDuration} דקות</span>
               </div>
             </div>
+            {/* כתובת הקליניקה */}
+            <a href="https://maps.apple.com/?address=רחוב+הרב+הרצוג+25,+גבעת+שמואל" target="_blank" rel="noreferrer"
+              style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%', maxWidth: 340, background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.85)', borderRadius: '18px', padding: '1rem 1.25rem', marginBottom: '1.25rem', textDecoration: 'none', boxShadow: '0 4px 16px rgba(161,23,56,0.06)' }}>
+              <span style={{ fontSize: '1.5rem' }}>📍</span>
+              <div style={{ textAlign: 'right' }}>
+                <p style={{ margin: 0, fontWeight: 700, color: '#A11738', fontSize: '0.875rem' }}>רחוב הרב הרצוג 25, גבעת שמואל</p>
+                <p style={{ margin: '2px 0 0', color: '#9ca3af', fontSize: '0.75rem' }}>לחצי לניווט במפות</p>
+              </div>
+            </a>
             {/* כפתורי הוסף ליומן */}
             {(() => {
               const getCalDates = () => {
