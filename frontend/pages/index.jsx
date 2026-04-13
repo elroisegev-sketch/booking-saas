@@ -357,19 +357,22 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   const [availableSlots, setAvailableSlots] = useState([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
 
+  const firstServiceId = selectedServices[0]?.id;
   useEffect(() => {
-    if (!sel.date || selectedServices.length === 0) { setAvailableSlots([]); return; }
-    const firstService = selectedServices[0];
+    if (!sel.date || !firstServiceId) { setAvailableSlots([]); return; }
     const dateStr = `${sel.date.getFullYear()}-${String(sel.date.getMonth()+1).padStart(2,'0')}-${String(sel.date.getDate()).padStart(2,'0')}`;
     setLoadingSlots(true);
-    fetch(`https://booking-saas-production-b9fd.up.railway.app/api/appointments/slots/lior-segev/${firstService.id}/${dateStr}?totalDuration=${totalDuration}`)
-      .then(function(r) { return r.json(); })
+    fetch(`https://booking-saas-production-b9fd.up.railway.app/api/appointments/slots/lior-segev/${firstServiceId}/${dateStr}?totalDuration=${totalDuration}`)
+      .then(function(r) {
+        if (!r.ok) throw new Error('slots fetch failed: ' + r.status);
+        return r.json();
+      })
       .then(function(data) {
         setAvailableSlots(Array.isArray(data.slots) ? data.slots : []);
         setLoadingSlots(false);
       })
-      .catch(function() { setAvailableSlots([]); setLoadingSlots(false); });
-  }, [sel.date, selectedServices.length, totalDuration]);
+      .catch(function(err) { console.error('slots fetch error:', err); setAvailableSlots([]); setLoadingSlots(false); });
+  }, [sel.date, firstServiceId, totalDuration]);
 
   const slots = () => availableSlots;
 
