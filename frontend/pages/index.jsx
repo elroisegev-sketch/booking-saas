@@ -71,6 +71,42 @@ const WHATSAPP_LINK = (name, services, date, time, total) =>
 const fmtTime = (iso) => new Date(iso).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
 const fmtDate = (iso) => new Date(iso).toLocaleDateString('he-IL', { weekday: 'short', month: 'short', day: 'numeric' });
 const fmtPrice = (n) => parseFloat(n || 0) === 0 ? 'משתנה' : `₪${parseFloat(n).toFixed(0)}`;
+
+const toICSDate = (iso) => {
+  const d = new Date(iso);
+  return d.getUTCFullYear() +
+    String(d.getUTCMonth() + 1).padStart(2, '0') +
+    String(d.getUTCDate()).padStart(2, '0') + 'T' +
+    String(d.getUTCHours()).padStart(2, '0') +
+    String(d.getUTCMinutes()).padStart(2, '0') + '00Z';
+};
+
+const addToCalendar = (appt) => {
+  const start = toICSDate(appt.appointment_time);
+  const end = toICSDate(appt.end_time || new Date(new Date(appt.appointment_time).getTime() + 60 * 60000).toISOString());
+  const service = appt.service_names_text || appt.service_name || 'טיפול';
+  const ics = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Lior Beauty//BookSlot//HE',
+    'BEGIN:VEVENT',
+    `DTSTART:${start}`,
+    `DTEND:${end}`,
+    `SUMMARY:${appt.customer_name} - ${service}`,
+    `DESCRIPTION:לקוחה: ${appt.customer_name}\\nטיפול: ${service}`,
+    'LOCATION:ליאור שגב ביוטי',
+    `UID:${appt.id}@liorbeauty`,
+    'END:VEVENT',
+    'END:VCALENDAR',
+  ].join('\r\n');
+  const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `תור-${appt.customer_name}.ics`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
 const fmtDuration = (mins) => {
   const h = Math.floor(mins / 60), m = mins % 60;
   const hStr = h === 1 ? 'שעה' : h === 2 ? 'שעתיים' : h > 2 ? `${h} שעות` : '';
@@ -1745,6 +1781,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                           {appt.image && <img src={appt.image} alt="ins" onClick={() => setViewImage(appt.image)} style={{ width: '32px', height: '32px', borderRadius: '8px', objectFit: 'cover', cursor: 'pointer' }} />}
                           <button onClick={() => setEditAppt(appt)} style={{ padding: '4px 8px', borderRadius: '8px', background: '#ede9fe', color: '#6d28d9', fontWeight: 700, fontSize: '0.7rem', border: 'none', cursor: 'pointer' }}>ערוך</button>
                           <button onClick={() => setNoteModal({ open: true, apptId: appt.id, text: appt.notes || '' })} style={{ padding: '4px 8px', borderRadius: '8px', background: appt.notes ? '#fef3c7' : 'rgba(255,255,255,0.6)', color: appt.notes ? '#92400e' : '#9ca3af', fontWeight: 700, fontSize: '0.75rem', border: '1px solid rgba(247,193,195,0.4)', cursor: 'pointer' }} title="הוסף הערה">📝</button>
+                          <button onClick={() => addToCalendar(appt)} style={{ padding: '4px 8px', borderRadius: '8px', background: '#dbeafe', color: '#1d4ed8', fontWeight: 700, fontSize: '0.75rem', border: 'none', cursor: 'pointer' }} title="הוסף ליומן">📅</button>
                           <button onClick={() => cancelAppt(appt.id)} style={{ padding: '4px 8px', borderRadius: '8px', background: '#fee2e2', color: '#991b1b', fontWeight: 700, fontSize: '0.7rem', border: 'none', cursor: 'pointer' }}>ביטול</button>
                         </div>
                       </div>
