@@ -842,8 +842,8 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                       customer_phone: sel.phone,
                       appointment_time: startUTC.toISOString(),
                       end_time: endUTC.toISOString(),
-                      service_names: selectedServices.map(function(s) { return s.name; }).join(', '),
-                      total_price: totalPrice,
+                      service_names: selectedServices.map(function(s) { return s.name; }).join(', ') + (externalNail && hasGel ? ' + הסרת לק מסלון אחר (+10₪)' : ''),
+                      total_price: finalPrice,
                       total_duration: totalDuration,
                     })
                   });
