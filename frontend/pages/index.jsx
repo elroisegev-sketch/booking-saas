@@ -1350,7 +1350,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
     const date = fmtDate(appt.appointment_time);
     const time = fmtTime(appt.appointment_time);
     const msg = type === 'confirm'
-      ? `היי ${appt.customer_name} 🌸\nהתור שלך אושר!\n📅 תאריך: ${date}\n🕐 שעה: ${time}\n💅 טיפול: ${appt.service_names_text || appt.service_name}\nנתראה! — ליאור שגב ביוטי`
+      ? `קיבלתי את העברת המקדמה שלך ❤️\nאז נפגש בעז״ה בתאריך ${date} , בשעה ${time} ברחוב הרצוג 25 גבעת שמואל 🌸\nמחכה לפגוש אותך 🫶🏼\nלכל שאלה , התייעצות וכו׳ אני פה בשבילך 💞\nנפגש 🥳💅🏽\nליאור שגב , היופי שלך !🌺\nלעמוד האינסטגרם :\nhttps://www.instagram.com/liors_beauty?igsh=ZnY3aGV2YjlsNzQ4&utm_source=qr\nלעמוד הפייסבוק :\nhttps://www.facebook.com/share/1DLKLrkWFb/?mibextid=wwXIfr`
       : `היי ${appt.customer_name}, לצערי התור שלך ל${date} בשעה ${time} בוטל. ניצור איתך קשר לקביעת תור חדש 🙏`;
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
   };
