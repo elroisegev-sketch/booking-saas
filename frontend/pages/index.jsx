@@ -815,6 +815,10 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
               <p style={{ fontWeight: 600, fontSize: '0.78rem', color: '#9ca3af', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.75rem' }}>תשלום מקדמה</p>
               <p style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '3rem', fontWeight: 700, color: '#A11738', margin: '0 0 0.4rem', lineHeight: 1 }}>₪{deposit}</p>
               <p style={{ color: '#b0b8c4', fontSize: '0.75rem' }}>50% ממחיר הטיפול</p>
+              <div style={{ marginTop: '1rem', padding: '0.6rem 1rem', background: 'rgba(161,23,56,0.06)', borderRadius: '12px' }}>
+                <p style={{ color: '#9ca3af', fontSize: '0.72rem', marginBottom: '2px' }}>להעברה ידנית — מספר הנייד של ליאור</p>
+                <p style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '1.3rem', fontWeight: 700, color: '#A11738', letterSpacing: '0.05em', direction: 'ltr' }}>053-524-9688</p>
+              </div>
             </div>
 
             {/* כפתורי תשלום */}
