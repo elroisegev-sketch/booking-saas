@@ -1598,7 +1598,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                   )}
                   <div style={{ display: 'flex', gap: '10px' }}>
                     <button onClick={() => setNoteModal({ open: true, apptId: appt.id, text: appt.notes || '' })} style={{ padding: '0.625rem', borderRadius: '10px', background: appt.notes ? '#fef3c7' : '#f3f4f6', color: appt.notes ? '#92400e' : '#6b7280', fontWeight: 700, fontSize: '0.8rem', border: 'none', cursor: 'pointer' }}>📝</button>
-                    <a href={`https://wa.me/972${appt.customer_phone.replace(/-/g,'').slice(1)}?text=${encodeURIComponent(`היי ${appt.customer_name} 🌸\nהתור שלך ל${appt.service_names_text || appt.service_name} ב${fmtDate(appt.appointment_time)} בשעה ${fmtTime(appt.appointment_time)} אושר! מחכה לך 💅`)}`}
+                    <a href={`https://wa.me/972${appt.customer_phone.replace(/-/g,'').slice(1)}?text=${encodeURIComponent(`קיבלתי את העברת המקדמה שלך ❤️\nאז נפגש בעז״ה בתאריך ${fmtDate(appt.appointment_time)} , בשעה ${fmtTime(appt.appointment_time)} ברחוב הרצוג 25 גבעת שמואל 🌸\nמחכה לפגוש אותך 🫶🏼\nלכל שאלה , התייעצות וכו׳ אני פה בשבילך 💞\nנפגש 🥳💅🏽\n*ליאור שגב , היופי שלך !🌺*\nלעמוד האינסטגרם :\nhttps://www.instagram.com/liors_beauty?igsh=ZnY3aGV2YjlsNzQ4&utm_source=qr\nלעמוד הפייסבוק :\nhttps://www.facebook.com/share/1DLKLrkWFb/?mibextid=wwXIfr`)}`}
                       target="_blank" rel="noreferrer"
                       style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '0.625rem', borderRadius: '10px', background: '#dcfce7', color: '#166534', fontWeight: 700, fontSize: '0.8rem', textDecoration: 'none' }}>
                       <Icon name="whatsapp" className="w-4 h-4" /> וואטסאפ
