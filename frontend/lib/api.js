@@ -29,6 +29,7 @@ export const deleteService = (id) => api.delete(`/services/${id}`);
 export const getAppointments = (params) => api.get('/appointments', { params });
 export const bookAppointment = (data) => api.post('/appointments', data);
 export const updateAppointmentStatus = (id, status) => api.patch(`/appointments/${id}/status`, { status });
+export const updateAppointment = (id, data) => api.patch(`/appointments/${id}`, data);
 export const getCustomers = () => api.get('/appointments/customers');
 export const getAvailableSlots = (slug, serviceId, date) =>
   api.get(`/appointments/slots/${slug}/${serviceId}/${date}`);

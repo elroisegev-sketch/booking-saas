@@ -5,6 +5,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 
 const app = express();
+app.set('trust proxy', 1);
 
 // ── Security headers ──────────────────────────────────────────
 app.use(helmet({
@@ -32,7 +33,11 @@ app.use(helmet({
 // ── CORS — whitelist only known origins ───────────────────────
 const ALLOWED_ORIGINS = [
   process.env.FRONTEND_URL,
+  'https://www.lioryourbeauty.com',
+  'https://lioryourbeauty.com',
   'https://authentic-wisdom-production.up.railway.app',
+  'https://www.lioryourbeauty.com',
+  'https://lioryourbeauty.com',
   'http://localhost:3000',
   'http://localhost:3001',
 ].filter(Boolean);

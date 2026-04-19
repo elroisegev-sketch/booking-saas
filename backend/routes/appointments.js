@@ -180,7 +180,7 @@ router.get('/', auth, async (req, res) => {
   if (from && !isValidISODate(from)) return res.status(400).json({ error: 'Invalid from date' });
   if (to && !isValidISODate(to)) return res.status(400).json({ error: 'Invalid to date' });
   try {
-    let query = `SELECT a.*, s.name AS service_name, s.duration, s.price FROM appointments a JOIN services s ON a.service_id = s.id WHERE a.business_id = $1`;
+    let query = `SELECT a.*, s.name AS service_name, s.duration, COALESCE(a.total_price, s.price) AS price FROM appointments a JOIN services s ON a.service_id = s.id WHERE a.business_id = $1`;
     const params = [req.user.id];
     if (status) { params.push(status); query += ` AND a.status = $${params.length}`; }
     else { query += ` AND a.status != 'cancelled'`; }
@@ -298,10 +298,64 @@ router.post('/', bookingLimiter, async (req, res) => {
     const deposit = Math.ceil(displayPrice / 2);
     const telegramMsg = `🌸 תור חדש!\n\n👤 שם: ${customer_name.trim()}\n💅 טיפול: ${displayNames}\n📅 תאריך: ${dateHeb}\n🕐 שעה: ${timeHeb}\n💰 מחיר: ${displayPrice}₪\n💳 מקדמה: ${deposit}₪`;
     await sendTelegram(telegramMsg);
-    await sendPush({ title: '🌸 תור חדש!', body: `${customer_name} | ${displayNames}\n${dateHeb} בשעה ${timeHeb}` });
+    await sendPush(businessId, { title: '🌸 תור חדש!', body: `${customer_name} | ${displayNames}\n${dateHeb} בשעה ${timeHeb}` });
     notifyBusiness(businessId);
     res.status(201).json(result.rows[0]);
   } catch (err) { console.error('Book appointment error:', err); res.status(500).json({ error: 'Server error while booking appointment' }); }
+});
+
+// PATCH /api/appointments/:id  (edit full appointment, auth required)
+router.patch('/:id', auth, async (req, res) => {
+  const { appointment_time, service_id, service_ids, customer_name, customer_phone } = req.body;
+  const ids = service_ids?.length ? service_ids : (service_id ? [service_id] : null);
+  try {
+    const curr = await db.query(
+      `SELECT a.*, s.duration FROM appointments a JOIN services s ON a.service_id = s.id WHERE a.id=$1 AND a.business_id=$2`,
+      [req.params.id, req.user.id]
+    );
+    if (!curr.rows.length) return res.status(404).json({ error: 'Appointment not found' });
+    const appt = curr.rows[0];
+
+    let totalDuration = appt.duration;
+    let newServiceId = appt.service_id;
+    let serviceNamesText = appt.service_names_text;
+
+    if (ids) {
+      const svcResult = await db.query(
+        `SELECT id, name, duration FROM services WHERE id = ANY($1::uuid[]) AND business_id=$2`,
+        [ids, req.user.id]
+      );
+      if (svcResult.rows.length !== ids.length) return res.status(404).json({ error: 'שירות לא נמצא' });
+      // preserve order as sent
+      const svcMap = Object.fromEntries(svcResult.rows.map(s => [String(s.id), s]));
+      const ordered = ids.map(i => svcMap[String(i)]).filter(Boolean);
+      totalDuration = ordered.reduce((sum, s) => sum + s.duration, 0);
+      newServiceId = ordered[0].id;
+      serviceNamesText = ordered.map(s => s.name).join(' + ');
+    }
+
+    const newStart = appointment_time ? new Date(appointment_time) : new Date(appt.appointment_time);
+    if (appointment_time && isNaN(newStart.getTime())) return res.status(400).json({ error: 'תאריך לא תקין' });
+    const newEnd = new Date(newStart.getTime() + totalDuration * 60000);
+
+    const conflict = await db.query(
+      `SELECT id FROM appointments WHERE business_id=$1 AND id!=$2 AND status!='cancelled' AND tstzrange(appointment_time,end_time,'[)') && tstzrange($3::timestamptz,$4::timestamptz,'[)')`,
+      [req.user.id, req.params.id, newStart.toISOString(), newEnd.toISOString()]
+    );
+    if (conflict.rows.length) return res.status(409).json({ error: 'השעה הזו תפוסה' });
+
+    const newName = customer_name?.trim() || appt.customer_name;
+    const newPhone = customer_phone ? customer_phone.replace(/[-\s]/g, '') : appt.customer_phone;
+
+    const result = await db.query(
+      `UPDATE appointments SET appointment_time=$1, end_time=$2, service_id=$3, service_names_text=$4, customer_name=$5, customer_phone=$6 WHERE id=$7 AND business_id=$8 RETURNING *`,
+      [newStart.toISOString(), newEnd.toISOString(), newServiceId, serviceNamesText, newName, newPhone, req.params.id, req.user.id]
+    );
+    res.json(result.rows[0]);
+  } catch (err) {
+    console.error('Edit appointment error:', err);
+    res.status(500).json({ error: 'Server error' });
+  }
 });
 
 // POST /api/appointments/manual — admin manual booking (no service_id required)

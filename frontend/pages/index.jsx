@@ -100,6 +100,57 @@ const fmtTime = (iso) => new Date(iso).toLocaleTimeString('he-IL', { hour: '2-di
 const fmtDate = (iso) => new Date(iso).toLocaleDateString('he-IL', { weekday: 'short', month: 'short', day: 'numeric' });
 const fmtPrice = (n) => parseFloat(n || 0) === 0 ? 'משתנה' : `₪${parseFloat(n).toFixed(0)}`;
 
+const toICSDate = (iso) => {
+  const d = new Date(iso);
+  return d.getUTCFullYear() +
+    String(d.getUTCMonth() + 1).padStart(2, '0') +
+    String(d.getUTCDate()).padStart(2, '0') + 'T' +
+    String(d.getUTCHours()).padStart(2, '0') +
+    String(d.getUTCMinutes()).padStart(2, '0') + '00Z';
+};
+
+const addToCalendar = (appt) => {
+  const start = toICSDate(appt.appointment_time);
+  const end = toICSDate(appt.end_time || new Date(new Date(appt.appointment_time).getTime() + 60 * 60000).toISOString());
+  const service = appt.service_names_text || appt.service_name || 'טיפול';
+  const ics = [
+    'BEGIN:VCALENDAR',
+    'VERSION:2.0',
+    'PRODID:-//Lior Beauty//BookSlot//HE',
+    'BEGIN:VEVENT',
+    `DTSTART:${start}`,
+    `DTEND:${end}`,
+    `SUMMARY:${appt.customer_name} - ${service}`,
+    `DESCRIPTION:לקוחה: ${appt.customer_name}\\nטיפול: ${service}`,
+    'LOCATION:ליאור שגב ביוטי',
+    `UID:${appt.id}@liorbeauty`,
+    'END:VEVENT',
+    'END:VCALENDAR',
+  ].join('\r\n');
+  const blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `תור-${appt.customer_name}.ics`;
+  a.click();
+  URL.revokeObjectURL(url);
+};
+const fmtDuration = (mins) => {
+  const h = Math.floor(mins / 60), m = mins % 60;
+  const hStr = h === 1 ? 'שעה' : h === 2 ? 'שעתיים' : h > 2 ? `${h} שעות` : '';
+  if (h === 0) return m === 15 ? 'רבע שעה' : m === 30 ? 'חצי שעה' : m === 45 ? 'שלושת רבעי שעה' : '';
+  if (m === 0) return hStr;
+  if (m === 15) return `${hStr} ורבע`;
+  if (m === 30) return `${hStr} וחצי`;
+  if (m === 45) return `${hStr} ושלושת רבעים`;
+  return hStr;
+};
+const addMins = (time, mins) => {
+  const [h, m] = time.split(':').map(Number);
+  const t = h * 60 + m + mins;
+  return `${String(Math.floor(t / 60) % 24).padStart(2,'0')}:${String(t % 60).padStart(2,'0')}`;
+};
+
 const Icon = ({ name, className = 'w-5 h-5' }) => {
   const icons = {
     calendar: <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>,
@@ -303,28 +354,34 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   };
 
   useEffect(() => {
+    const BACKEND = 'https://booking-saas-production-b9fd.up.railway.app';
     const fetchWithRetry = (url, onSuccess, retries) => {
       fetch(url)
         .then(function(r) { return r.json(); })
         .then(onSuccess)
         .catch(function() {
-          if (retries > 0) setTimeout(function() { fetchWithRetry(url, onSuccess, retries - 1); }, 2000);
+          if (retries > 0) setTimeout(function() { fetchWithRetry(url, onSuccess, retries - 1); }, 3000);
         });
     };
     let servicesLoaded = false, availLoaded = false;
     const checkDone = () => { if (servicesLoaded && availLoaded) setDataLoading(false); };
+    // Wake up the server first, then load data
+    fetch(BACKEND + '/health').catch(() => {});
     fetchWithRetry(
-      'https://booking-saas-production-b9fd.up.railway.app/api/services/public/lior-segev',
+      BACKEND + '/api/services/public/lior-segev',
       function(data) { if (Array.isArray(data)) setRealServices(data); else if (data && data.services) setRealServices(data.services); servicesLoaded = true; checkDone(); },
-      3
+      8
     );
     fetchWithRetry(
-      'https://booking-saas-production-b9fd.up.railway.app/api/availability/public/lior-segev',
+      BACKEND + '/api/availability/public/lior-segev',
       function(data) { if (Array.isArray(data)) setRealAvailability(data); availLoaded = true; checkDone(); },
-      3
+      8
     );
-    // fallback: show UI after 12s even if retries haven't finished
-    setTimeout(function() { setDataLoading(false); }, 12000);
+    // fallback: show UI after 30s even if retries haven't finished
+    setTimeout(function() { setDataLoading(false); }, 30000);
+    // Keep server awake — ping every 10 minutes
+    const keepAlive = setInterval(function() { fetch(BACKEND + '/health').catch(() => {}); }, 10 * 60 * 1000);
+    return function() { clearInterval(keepAlive); };
   }, []);
 
   const displayServices = (realServices.length > 0 ? realServices : MOCK_SERVICES)
@@ -376,19 +433,22 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   const [availableSlots, setAvailableSlots] = useState([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
 
+  const firstServiceId = selectedServices[0]?.id;
   useEffect(() => {
-    if (!sel.date || selectedServices.length === 0) { setAvailableSlots([]); return; }
-    const firstService = selectedServices[0];
+    if (!sel.date || !firstServiceId) { setAvailableSlots([]); return; }
     const dateStr = `${sel.date.getFullYear()}-${String(sel.date.getMonth()+1).padStart(2,'0')}-${String(sel.date.getDate()).padStart(2,'0')}`;
     setLoadingSlots(true);
-    fetch(`https://booking-saas-production-b9fd.up.railway.app/api/appointments/slots/lior-segev/${firstService.id}/${dateStr}?totalDuration=${totalDuration}`)
-      .then(function(r) { return r.json(); })
+    fetch(`https://booking-saas-production-b9fd.up.railway.app/api/appointments/slots/lior-segev/${firstServiceId}/${dateStr}?totalDuration=${totalDuration}`)
+      .then(function(r) {
+        if (!r.ok) throw new Error('slots fetch failed: ' + r.status);
+        return r.json();
+      })
       .then(function(data) {
         setAvailableSlots(Array.isArray(data.slots) ? data.slots : []);
         setLoadingSlots(false);
       })
-      .catch(function() { setAvailableSlots([]); setLoadingSlots(false); });
-  }, [sel.date, selectedServices.length, totalDuration]);
+      .catch(function(err) { console.error('slots fetch error:', err); setAvailableSlots([]); setLoadingSlots(false); });
+  }, [sel.date, firstServiceId, totalDuration]);
 
   const slots = () => availableSlots;
 
@@ -673,11 +733,15 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
               </div>
               <p style={{ color: '#9ca3af', fontSize: '0.7rem', marginTop: '6px' }}>{dateStr} · {sel.time} · {totalDuration} דקות</p>
             </div>
-            <div style={{ display: 'flex', gap: '10px' }}>
-              <button onClick={() => setStep(3)} style={{ flex: 1, padding: '0.875rem', borderRadius: '999px', background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.7)', color: '#A11738', fontWeight: 500, cursor: 'pointer', fontSize: '0.875rem' }}>חזרה</button>
-              <button className="lux-btn" onClick={() => (sel.name && sel.phone) && setStep(5)} disabled={!sel.name || !sel.phone}
-                style={{ flex: 2, padding: '0.875rem', borderRadius: '999px', background: (sel.name && sel.phone) ? 'linear-gradient(135deg,#A11738,#EC6A83)' : 'rgba(209,213,219,0.5)', color: (sel.name && sel.phone) ? 'white' : '#9ca3af', fontWeight: 600, border: 'none', cursor: (sel.name && sel.phone) ? 'pointer' : 'not-allowed', boxShadow: (sel.name && sel.phone) ? '0 4px 16px rgba(161,23,56,0.25)' : 'none', fontSize: '0.875rem' }}>
-                המשך לתשלום 💳
+            <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
+              <button onClick={() => setStep(3)} style={{ flexShrink: 0, padding: '0.875rem 1.1rem', borderRadius: '999px', background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.7)', color: '#A11738', fontWeight: 500, cursor: 'pointer', fontSize: '0.875rem' }}>חזרה</button>
+              <button
+                className="deposit-btn"
+                onClick={() => (sel.name && sel.phone) && setStep(5)}
+                disabled={!sel.name || !sel.phone}
+                style={{ flex: 1, padding: '1rem 1.5rem', borderRadius: '999px', color: (sel.name && sel.phone) ? 'white' : '#9ca3af', fontWeight: 700, border: 'none', cursor: (sel.name && sel.phone) ? 'pointer' : 'not-allowed', fontFamily: 'Varela Round, sans-serif', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
+                <span style={{ fontSize: '1rem', letterSpacing: '0.02em' }}>המשיכי לשריון התור 🌸</span>
+                <span style={{ fontSize: '0.72rem', fontWeight: 400, opacity: 0.88 }}>תשלום מקדמה · {Math.ceil(finalPrice / 2)}₪</span>
               </button>
             </div>
           </div>
@@ -700,11 +764,24 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                 <span style={{ color: '#9ca3af', fontSize: '0.85rem' }}>תאריך</span>
                 <span style={{ color: '#374151', fontWeight: 600, fontSize: '0.85rem' }}>{dateStr}</span>
               </div>
-              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <span style={{ color: '#9ca3af', fontSize: '0.85rem' }}>שעה</span>
                 <span style={{ color: '#374151', fontWeight: 600, fontSize: '0.85rem' }}>{sel.time}</span>
               </div>
+              <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                <span style={{ color: '#9ca3af', fontSize: '0.85rem' }}>משך הטיפול</span>
+                <span style={{ color: '#374151', fontWeight: 600, fontSize: '0.85rem' }}>{totalDuration} דקות</span>
+              </div>
             </div>
+            {/* כתובת הקליניקה */}
+            <a href="https://maps.apple.com/?address=רחוב+הרב+הרצוג+25,+גבעת+שמואל" target="_blank" rel="noreferrer"
+              style={{ display: 'flex', alignItems: 'center', gap: '12px', width: '100%', maxWidth: 340, background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.85)', borderRadius: '18px', padding: '1rem 1.25rem', marginBottom: '1.25rem', textDecoration: 'none', boxShadow: '0 4px 16px rgba(161,23,56,0.06)' }}>
+              <span style={{ fontSize: '1.5rem' }}>📍</span>
+              <div style={{ textAlign: 'right' }}>
+                <p style={{ margin: 0, fontWeight: 700, color: '#A11738', fontSize: '0.875rem' }}>רחוב הרב הרצוג 25, גבעת שמואל</p>
+                <p style={{ margin: '2px 0 0', color: '#9ca3af', fontSize: '0.75rem' }}>לחצי לניווט במפות</p>
+              </div>
+            </a>
             {/* כפתורי הוסף ליומן */}
             {(() => {
               const getCalDates = () => {
@@ -770,7 +847,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                 <span style={{ fontWeight: 700, color: '#A11738', fontSize: '0.85rem' }}>סה"כ</span>
                 <span style={{ fontFamily: "'Varela Round', sans-serif", fontWeight: 300, fontSize: '1.5rem', color: '#EC6A83' }}>{fmtPrice(totalPrice)}</span>
               </div>
-              <p style={{ color: '#9ca3af', fontSize: '0.7rem', marginTop: '6px' }}>{dateStr} · {sel.time}</p>
+              <p style={{ color: '#9ca3af', fontSize: '0.7rem', marginTop: '6px' }}>{dateStr} · {sel.time}–{addMins(sel.time, totalDuration)} · {fmtDuration(totalDuration)}</p>
             </div>
 
             {/* כרטיס מקדמה */}
@@ -778,6 +855,10 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
               <p style={{ fontWeight: 600, fontSize: '0.78rem', color: '#9ca3af', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.75rem' }}>תשלום מקדמה</p>
               <p style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '3rem', fontWeight: 700, color: '#A11738', margin: '0 0 0.4rem', lineHeight: 1 }}>₪{deposit}</p>
               <p style={{ color: '#b0b8c4', fontSize: '0.75rem' }}>50% ממחיר הטיפול</p>
+              <div style={{ marginTop: '1rem', padding: '0.6rem 1rem', background: 'rgba(161,23,56,0.06)', borderRadius: '12px' }}>
+                <p style={{ color: '#9ca3af', fontSize: '0.72rem', marginBottom: '2px' }}>להעברה ידנית — מספר הנייד של ליאור</p>
+                <p style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '1.3rem', fontWeight: 700, color: '#A11738', letterSpacing: '0.05em', direction: 'ltr' }}>053-524-9688</p>
+              </div>
             </div>
 
             {/* כפתורי תשלום */}
@@ -805,8 +886,8 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                       customer_phone: sel.phone,
                       appointment_time: startUTC.toISOString(),
                       end_time: endUTC.toISOString(),
-                      service_names: selectedServices.map(function(s) { return s.name; }).join(', '),
-                      total_price: totalPrice,
+                      service_names: selectedServices.map(function(s) { return s.name; }).join(', ') + (externalNail && hasGel ? ' + הסרת לק מסלון אחר (+10₪)' : ''),
+                      total_price: finalPrice,
                       total_duration: totalDuration,
                     })
                   });
@@ -879,6 +960,113 @@ const ServiceModal = ({ service, onSave, onClose }) => {
           <button onClick={onClose} style={{ flex: 1, padding: '0.875rem', borderRadius: '999px', background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1.5px solid rgba(247,193,195,0.5)', color: '#A11738', fontWeight: 700, cursor: 'pointer' }}>ביטול</button>
           <button onClick={() => form.name && onSave(form)} style={{ flex: 1, padding: '0.875rem', borderRadius: '999px', background: form.name ? 'linear-gradient(135deg,#A11738,#EC6A83)' : '#d1d5db', color: 'white', fontWeight: 700, border: 'none', cursor: form.name ? 'pointer' : 'not-allowed', boxShadow: form.name ? '0 8px 24px rgba(161,23,56,0.32)' : 'none' }}>
             {service ? 'שמירה' : 'הוספה'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ── EDIT APPOINTMENT MODAL ────────────────────────────────────
+const EditAppointmentModal = ({ appt, services, onSave, onClose }) => {
+  const apptDate = new Date(appt.appointment_time);
+
+  // Try to match service_names_text back to service IDs
+  const initServiceIds = () => {
+    const activeServices = services.filter(s => s.is_active);
+    if (appt.service_names_text) {
+      const names = appt.service_names_text.split(/\s*[,+]\s*/);
+      const matched = [];
+      for (const name of names) {
+        const found = activeServices.find(s => name.trim() === s.name || name.trim().startsWith(s.name));
+        if (found && !matched.includes(String(found.id))) matched.push(String(found.id));
+      }
+      if (matched.length > 0) return matched;
+    }
+    return appt.service_id ? [String(appt.service_id)] : [];
+  };
+
+  const [form, setForm] = useState({
+    date: apptDate.toLocaleDateString('en-CA', { timeZone: 'Asia/Jerusalem' }),
+    time: apptDate.toLocaleTimeString('en-GB', { timeZone: 'Asia/Jerusalem', hour: '2-digit', minute: '2-digit' }),
+    service_ids: initServiceIds(),
+    customer_name: appt.customer_name,
+    customer_phone: appt.customer_phone,
+  });
+  const [saving, setSaving] = useState(false);
+  const inp = { width: '100%', padding: '0.75rem 1rem', borderRadius: '14px', border: '1.5px solid rgba(247,193,195,0.5)', outline: 'none', fontSize: '0.875rem', direction: 'rtl', boxSizing: 'border-box', background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(8px)', fontFamily: 'Varela Round, sans-serif' };
+  const activeServices = services.filter(s => s.is_active);
+  const selectedServices = form.service_ids.map(id => activeServices.find(s => String(s.id) === id)).filter(Boolean);
+  const unselectedServices = activeServices.filter(s => !form.service_ids.includes(String(s.id)));
+  const totalDuration = selectedServices.reduce((sum, s) => sum + (s?.duration || 0), 0);
+
+  const removeService = (id) => {
+    if (form.service_ids.length <= 1) return;
+    setForm({ ...form, service_ids: form.service_ids.filter(i => i !== id) });
+  };
+  const addService = (id) => {
+    if (!id || form.service_ids.includes(id)) return;
+    setForm({ ...form, service_ids: [...form.service_ids, id] });
+  };
+
+  return (
+    <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(161,23,56,0.2)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', fontFamily: 'Varela Round, sans-serif' }}>
+      <div dir="rtl" style={{ background: 'rgba(255,255,255,0.88)', backdropFilter: 'blur(32px)', WebkitBackdropFilter: 'blur(32px)', border: '1px solid rgba(255,255,255,0.9)', borderRadius: '28px', padding: '1.5rem', width: '100%', maxWidth: '420px', margin: '1rem', boxShadow: '0 8px 32px rgba(161,23,56,0.08), inset 0 1px 0 rgba(255,255,255,0.9)' }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
+          <h2 style={{ fontWeight: 900, color: '#A11738', fontSize: '1.25rem', margin: 0 }}>עריכת תור ✏️</h2>
+          <button onClick={onClose} style={{ padding: '6px', borderRadius: '8px', background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="x" className="w-5 h-5" /></button>
+        </div>
+        <div style={{ marginBottom: '1rem' }}>
+          <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>שם לקוחה</label>
+          <input style={inp} value={form.customer_name} onChange={e => setForm({ ...form, customer_name: e.target.value })} />
+        </div>
+        <div style={{ marginBottom: '1rem' }}>
+          <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>טלפון</label>
+          <input style={inp} value={form.customer_phone} onChange={e => setForm({ ...form, customer_phone: e.target.value })} />
+        </div>
+        <div style={{ marginBottom: '1rem' }}>
+          <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>
+            שירותים
+            {totalDuration > 0 && <span style={{ fontWeight: 400, color: '#6B7280', marginRight: '6px' }}>({totalDuration} דק׳ סה״כ)</span>}
+          </label>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '8px', marginBottom: '8px' }}>
+            {selectedServices.map(s => (
+              <div key={s.id} style={{ display: 'inline-flex', alignItems: 'center', gap: '4px', background: 'linear-gradient(135deg,rgba(161,23,56,0.1),rgba(236,106,131,0.1))', border: '1px solid rgba(161,23,56,0.2)', borderRadius: '999px', padding: '4px 10px', fontSize: '0.8rem', color: '#A11738', fontWeight: 600 }}>
+                <span>{s.name}</span>
+                <span style={{ fontSize: '0.75rem', color: '#9CA3AF' }}>({s.duration} דק׳)</span>
+                {form.service_ids.length > 1 && (
+                  <button onClick={() => removeService(String(s.id))} style={{ marginRight: '2px', background: 'none', border: 'none', cursor: 'pointer', color: '#A11738', fontSize: '0.9rem', lineHeight: 1, padding: '0 2px' }}>×</button>
+                )}
+              </div>
+            ))}
+          </div>
+          {unselectedServices.length > 0 && (
+            <select
+              style={{ ...inp, color: unselectedServices.length ? '#374151' : '#9CA3AF' }}
+              value=""
+              onChange={e => { addService(e.target.value); e.target.value = ''; }}
+            >
+              <option value="">+ הוסף שירות</option>
+              {unselectedServices.map(s => (
+                <option key={s.id} value={String(s.id)}>{s.name} ({s.duration} דק׳)</option>
+              ))}
+            </select>
+          )}
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '1.25rem' }}>
+          <div>
+            <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>תאריך</label>
+            <input type="date" style={{ ...inp, direction: 'ltr' }} value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} />
+          </div>
+          <div>
+            <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>שעה</label>
+            <input type="time" style={{ ...inp, direction: 'ltr' }} value={form.time} onChange={e => setForm({ ...form, time: e.target.value })} />
+          </div>
+        </div>
+        <div style={{ display: 'flex', gap: '12px' }}>
+          <button onClick={onClose} style={{ flex: 1, padding: '0.875rem', borderRadius: '999px', background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(8px)', border: '1.5px solid rgba(247,193,195,0.5)', color: '#A11738', fontWeight: 700, cursor: 'pointer', fontFamily: 'Varela Round, sans-serif' }}>ביטול</button>
+          <button disabled={saving} onClick={async () => { setSaving(true); await onSave(form); setSaving(false); }} style={{ flex: 1, padding: '0.875rem', borderRadius: '999px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, border: 'none', cursor: 'pointer', boxShadow: '0 8px 24px rgba(161,23,56,0.32)', fontFamily: 'Varela Round, sans-serif' }}>
+            {saving ? '...' : 'שמירה'}
           </button>
         </div>
       </div>
@@ -1140,6 +1328,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
   const [blockedSlots, setBlockedSlots] = useState([]);
   const [showBlockModal, setShowBlockModal] = useState(false);
   const [blockForm, setBlockForm] = useState({ start_time: '09:00', end_time: '10:00', reason: '' });
+  const [editAppt, setEditAppt] = useState(null);
 
   const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'https://booking-saas-production-b9fd.up.railway.app';
   const VAPID_PUBLIC = 'BJruLIZOsClN97fYdg9i5G52FyTQGEVD_5pSAW6BWQNPKO5lecZhhOn58DCnS1aEkPX1qWQIKcA9INApaRiW1X0';
@@ -1205,7 +1394,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
     const date = fmtDate(appt.appointment_time);
     const time = fmtTime(appt.appointment_time);
     const msg = type === 'confirm'
-      ? `היי ${appt.customer_name} 🌸\nהתור שלך אושר!\n📅 תאריך: ${date}\n🕐 שעה: ${time}\n💅 טיפול: ${appt.service_names_text || appt.service_name}\nנתראה! — ליאור שגב ביוטי`
+      ? `קיבלתי את העברת המקדמה שלך ❤️\nאז נפגש בעז״ה בתאריך ${date} , בשעה ${time} ברחוב הרצוג 25 גבעת שמואל 🌸\nמחכה לפגוש אותך 🫶🏼\nלכל שאלה , התייעצות וכו׳ אני פה בשבילך 💞\nנפגש 🥳💅🏽\nליאור שגב , היופי שלך !🌺\nלעמוד האינסטגרם :\nhttps://www.instagram.com/liors_beauty?igsh=ZnY3aGV2YjlsNzQ4&utm_source=qr\nלעמוד הפייסבוק :\nhttps://www.facebook.com/share/1DLKLrkWFb/?mibextid=wwXIfr`
       : `היי ${appt.customer_name}, לצערי התור שלך ל${date} בשעה ${time} בוטל. ניצור איתך קשר לקביעת תור חדש 🙏`;
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
   };
@@ -1237,6 +1426,23 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
     setAppointments(appointments.map(a => a.id === id ? { ...a, status: 'cancelled' } : a));
     showToast('התור בוטל');
     if (appt) openWhatsApp(appt, 'cancel');
+  };
+
+  const saveEditAppt = async (form) => {
+    const token = localStorage.getItem('token');
+    try {
+      const utcISO = new Date(`${form.date}T${form.time}:00`).toISOString();
+      const r = await fetch(BACKEND + `/api/appointments/${editAppt.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+        body: JSON.stringify({ appointment_time: utcISO, service_ids: form.service_ids, customer_name: form.customer_name, customer_phone: form.customer_phone }),
+      });
+      if (!r.ok) { const err = await r.json(); showToast(err.error || 'שגיאה בעדכון'); return; }
+      const data = await fetch(BACKEND + '/api/appointments', { headers: { 'Authorization': 'Bearer ' + token } }).then(r => r.json());
+      if (Array.isArray(data)) setAppointments(data);
+      setEditAppt(null);
+      showToast('התור עודכן ✅');
+    } catch { showToast('שגיאה בעדכון'); }
   };
 
   const addManualAppt = async () => {
@@ -1432,7 +1638,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                   )}
                   <div style={{ display: 'flex', gap: '10px' }}>
                     <button onClick={() => setNoteModal({ open: true, apptId: appt.id, text: appt.notes || '' })} style={{ padding: '0.625rem', borderRadius: '10px', background: appt.notes ? '#fef3c7' : '#f3f4f6', color: appt.notes ? '#92400e' : '#6b7280', fontWeight: 700, fontSize: '0.8rem', border: 'none', cursor: 'pointer' }}>📝</button>
-                    <a href={`https://wa.me/972${appt.customer_phone.replace(/-/g,'').slice(1)}?text=${encodeURIComponent(`היי ${appt.customer_name} 🌸\nהתור שלך ל${appt.service_names_text || appt.service_name} ב${fmtDate(appt.appointment_time)} בשעה ${fmtTime(appt.appointment_time)} אושר! מחכה לך 💅`)}`}
+                    <a href={`https://wa.me/972${appt.customer_phone.replace(/-/g,'').slice(1)}?text=${encodeURIComponent(`קיבלתי את העברת המקדמה שלך ❤️\nאז נפגש בעז״ה בתאריך ${fmtDate(appt.appointment_time)} , בשעה ${fmtTime(appt.appointment_time)} ברחוב הרצוג 25 גבעת שמואל 🌸\nמחכה לפגוש אותך 🫶🏼\nלכל שאלה , התייעצות וכו׳ אני פה בשבילך 💞\nנפגש 🥳💅🏽\n*ליאור שגב , היופי שלך !🌺*\nלעמוד האינסטגרם :\nhttps://www.instagram.com/liors_beauty?igsh=ZnY3aGV2YjlsNzQ4&utm_source=qr\nלעמוד הפייסבוק :\nhttps://www.facebook.com/share/1DLKLrkWFb/?mibextid=wwXIfr`)}`}
                       target="_blank" rel="noreferrer"
                       style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '6px', padding: '0.625rem', borderRadius: '10px', background: '#dcfce7', color: '#166534', fontWeight: 700, fontSize: '0.8rem', textDecoration: 'none' }}>
                       <Icon name="whatsapp" className="w-4 h-4" /> וואטסאפ
@@ -1483,6 +1689,8 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
               </div>
             </div>
           )}
+
+          {editAppt && <EditAppointmentModal appt={editAppt} services={services} onSave={saveEditAppt} onClose={() => setEditAppt(null)} />}
 
           {noteModal.open && (
             <div style={{ position: 'fixed', inset: 0, zIndex: 70, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(161,23,56,0.2)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', fontFamily: 'Varela Round, sans-serif' }}>
@@ -1624,7 +1832,9 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                         </div>
                         <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           {appt.image && <img src={appt.image} alt="ins" onClick={() => setViewImage(appt.image)} style={{ width: '32px', height: '32px', borderRadius: '8px', objectFit: 'cover', cursor: 'pointer' }} />}
+                          <button onClick={() => setEditAppt(appt)} style={{ padding: '4px 8px', borderRadius: '8px', background: '#ede9fe', color: '#6d28d9', fontWeight: 700, fontSize: '0.7rem', border: 'none', cursor: 'pointer' }}>ערוך</button>
                           <button onClick={() => setNoteModal({ open: true, apptId: appt.id, text: appt.notes || '' })} style={{ padding: '4px 8px', borderRadius: '8px', background: appt.notes ? '#fef3c7' : 'rgba(255,255,255,0.6)', color: appt.notes ? '#92400e' : '#9ca3af', fontWeight: 700, fontSize: '0.75rem', border: '1px solid rgba(247,193,195,0.4)', cursor: 'pointer' }} title="הוסף הערה">📝</button>
+                          <button onClick={() => addToCalendar(appt)} style={{ padding: '4px 8px', borderRadius: '8px', background: '#dbeafe', color: '#1d4ed8', fontWeight: 700, fontSize: '0.75rem', border: 'none', cursor: 'pointer' }} title="הוסף ליומן">📅</button>
                           <button onClick={() => cancelAppt(appt.id)} style={{ padding: '4px 8px', borderRadius: '8px', background: '#fee2e2', color: '#991b1b', fontWeight: 700, fontSize: '0.7rem', border: 'none', cursor: 'pointer' }}>ביטול</button>
                         </div>
                       </div>
