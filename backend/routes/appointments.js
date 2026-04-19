@@ -298,7 +298,7 @@ router.post('/', bookingLimiter, async (req, res) => {
     const deposit = Math.ceil(displayPrice / 2);
     const telegramMsg = `🌸 תור חדש!\n\n👤 שם: ${customer_name.trim()}\n💅 טיפול: ${displayNames}\n📅 תאריך: ${dateHeb}\n🕐 שעה: ${timeHeb}\n💰 מחיר: ${displayPrice}₪\n💳 מקדמה: ${deposit}₪`;
     await sendTelegram(telegramMsg);
-    await sendPush({ title: '🌸 תור חדש!', body: `${customer_name} | ${displayNames}\n${dateHeb} בשעה ${timeHeb}` });
+    await sendPush(businessId, { title: '🌸 תור חדש!', body: `${customer_name} | ${displayNames}\n${dateHeb} בשעה ${timeHeb}` });
     notifyBusiness(businessId);
     res.status(201).json(result.rows[0]);
   } catch (err) { console.error('Book appointment error:', err); res.status(500).json({ error: 'Server error while booking appointment' }); }
