@@ -33,6 +33,8 @@ app.use(helmet({
 // ── CORS — whitelist only known origins ───────────────────────
 const ALLOWED_ORIGINS = [
   process.env.FRONTEND_URL,
+  'https://www.lioryourbeauty.com',
+  'https://lioryourbeauty.com',
   'https://authentic-wisdom-production.up.railway.app',
   'https://www.lioryourbeauty.com',
   'https://lioryourbeauty.com',
