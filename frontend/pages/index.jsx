@@ -54,6 +54,34 @@ const TERMS_GEL = `✨ הפרטים הקטנים שעושים את כל ההבד
 מחכה כבר לפגוש אותך 🥰
 ליאור שגב, היופי שלך 🎀`;
 
+const TERMS_LASH_LIFT = `💆‍♀️ טיפולים ברגישויות 💆‍♀️
+
+טיפול הרמת ריסים לא מומלץ לנשים בהריון ונשים שמניקות ב-3 חודשי הנקה מכיוון שמבחינה הורמונלית תוער הרבה שינויים ואין אירון לכן הטיפול לא יהיה אפקטיבי וכל לתחזוק לזמן קצר מהרגיל.
+
+לקוחות שבוצעת מעבירה הורמונלית כגון-שחלות-מולטיסטיות,אנדומטריוזים בעיות הורמונלית רפואיות,בעיות במזון הזמא או לקוחות שנוטלות זרללת הורמונלית וחמקין שתוער הורמונלי זובר שתיוש לכן יש סיכוי שהטיפול לא יתמן בצורה מקסימלית
+
+חל איסור לבצע טיפול הרמת ריסים לפני הריוויח לפני שנרא שטיפול הרמת ריסים לפני שרותת ארקון רק לאחר הצי נרא שנצח מענה שמתניקה לרישל ארקון יש אפשרות לבצע טיפול.
+
+חל איסור לבצע טיפול הרמת ריסים לפני שבועות מביוק איסור הפיניק דלקות, שוורה, הרפס, מחלת-אובד אלרגיה בעיניו מעד איוזר,חריקים, וביס זלי
+
+חל איסור לבצע טיפול הרמת ריסים לללקוחות חולים זרנים, שברה, ספורית, קרהונה וכו'.
+אפקט הטיפול לא יהיה מקסימלי מכיוון שתוער חולה
+
+אין לבצע טיפול הרמת ריסים ללקוחת אשר מרכיבה עדשות - יש להמיע לטיפול ולהרכיב עדשות מתוכן הטיפול אפשר להרכיב עדשות
+
+אלרגיות ורגישויות -
+לטקט הוא רכיב שקיים בדרכים קוסמטיים - מי שברשנת לחומר חל איסור לבצע טיפול הטיפול אסור לשימוש למי שאלרגי לאמוניה!
+
+💆‍♀️ הנחיות ללקוחה לאחר הטיפול: 💆‍♀️
+
+• 24 שעות לאחר הטיפול לא לטוף את הריסים
+• 24 שעות לאחר הטיפול אין לתאפר (מסקרה/איילנר)
+• אין להשתמש על הריסים בחומרים ותכשירים המכילים שמן
+• יש למנוע מחשיפה לחום במשך 72 שעות (שיזוף,סאונה,מקלחת חמה)
+• המנעי מלישון על הבטן (על הפנים) הריסים יכולים להמחץ ולשנות צורה
+• המנעי מפעילות ספורטיבית 24 שעות לאחר טיפול
+• אין להשתמש במסיכות או חומרים אשר מכילים פילינג לבנים`;
+
 const TERMS_GENERAL = `תקנון כללי – ליאור שגב יופי
 
 1. ביטול תור יש לבצע לפחות 24 שעות מראש.
@@ -303,11 +331,23 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
     .map(s => ({ ...s, category: s.category || "לק ג'ל 💅" }));
 
   const hasGel = selectedServices.some(s => s.category && s.category.includes("לק ג'ל"));
+  const hasLashLift = selectedServices.some(s => s.name === "הרמת ריסים");
   const totalPrice = selectedServices.reduce((s, svc) => s + parseFloat(svc.price || 0), 0);
   const totalDuration = selectedServices.reduce((s, svc) => s + svc.duration, 0);
 
   // Determine which terms to show
-  const termsText = hasGel ? TERMS_GEL : TERMS_GENERAL;
+  const getTermsText = () => {
+    if (hasLashLift && hasGel) {
+      return TERMS_LASH_LIFT + '\n\n────────────────────────\n\n' + TERMS_GEL;
+    } else if (hasLashLift) {
+      return TERMS_LASH_LIFT;
+    } else if (hasGel) {
+      return TERMS_GEL;
+    } else {
+      return TERMS_GENERAL;
+    }
+  };
+  const termsText = getTermsText();
 
   const toggleService = (svc) => {
     setSelectedServices(prev =>
@@ -497,7 +537,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                   <span style={{ fontFamily: "'Varela Round', sans-serif", fontWeight: 400, fontSize: '1.3rem', color: '#EC6A83',}}>סה"כ: {fmtPrice(externalNail && hasGel ? totalPrice + 10 : totalPrice)}</span>
                 </div>
                 <div style={{ fontSize: '0.7rem', color: '#9ca3af', marginBottom: '10px' }}>{selectedServices.map(s => s.name).join(' + ')} · {totalDuration} דקות</div>
-                <button className="lux-btn" onClick={() => { const hasKishut = selectedServices.some(s => s.name === 'קישוט'); if (hasKishut) { setStep('kishut_info'); } else if (hasGel) { setStep('terms_gel'); } else { setStep(2); } }}
+                <button className="lux-btn" onClick={() => { const hasKishut = selectedServices.some(s => s.name === 'קישוט'); if (hasKishut) { setStep('kishut_info'); } else if (hasGel || hasLashLift) { setStep('terms_gel'); } else { setStep(2); } }}
                   style={{ width: '100%', padding: '0.875rem', borderRadius: '999px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 600, border: 'none', cursor: 'pointer', boxShadow: '0 4px 16px rgba(161,23,56,0.28)', letterSpacing: '0.04em', fontSize: '0.875rem' }}>
                   המשך לבחירת תאריך →
                 </button>
@@ -519,7 +559,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
               style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', padding: '0.875rem', borderRadius: '999px', background: '#25D366', color: 'white', fontWeight: 600, fontSize: '0.875rem', textDecoration: 'none', marginBottom: '12px', boxSizing: 'border-box', boxShadow: '0 4px 16px rgba(37,211,102,0.28)' }}>
               <Icon name="whatsapp" className="w-5 h-5" /> שלחי תמונה לליאור בוואטסאפ
             </a>
-            <button className="lux-btn" onClick={() => { hasGel ? setStep('terms_gel') : setStep(2); }}
+            <button className="lux-btn" onClick={() => { (hasGel || hasLashLift) ? setStep('terms_gel') : setStep(2); }}
               style={{ width: '100%', padding: '0.875rem', borderRadius: '999px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 600, border: 'none', cursor: 'pointer', marginBottom: '10px', boxShadow: '0 4px 16px rgba(161,23,56,0.28)' }}>
               המשך לקביעת תור →
             </button>
@@ -528,7 +568,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
         )}
 
         {step === 'terms_gel' && (
-          <TermsScreen termsText={TERMS_GEL} onAccept={() => setStep(2)} onBack={() => setStep(1)}
+          <TermsScreen termsText={termsText} onAccept={() => setStep(2)} onBack={() => setStep(1)}
             externalNail={externalNail} onExternalNailChange={setExternalNail} />
         )}
 
