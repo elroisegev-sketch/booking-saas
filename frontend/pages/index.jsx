@@ -1385,7 +1385,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
   };
   const todayAppts = appointments.filter(a => new Date(a.appointment_time).toDateString() === new Date().toDateString() && a.status !== 'cancelled');
   const pendingAppts = appointments.filter(a => a.status === 'pending');
-  const revenue = todayAppts.filter(a => a.status === 'confirmed' || a.status === 'completed').reduce((s, a) => s + (a.price || 0), 0);
+  const revenue = todayAppts.filter(a => a.status === 'confirmed' || a.status === 'completed').reduce((s, a) => s + (Number(a.price) || 0), 0);
   const upcoming = appointments.filter(a => new Date(a.appointment_time) > new Date() && a.status !== 'cancelled').length;
   const DAY_NAMES = ['ראשון', 'שני', 'שלישי', 'רביעי', 'חמישי', 'שישי', 'שבת'];
 
