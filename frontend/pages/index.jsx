@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
+import AccessibilityWidget from '@/components/AccessibilityWidget';
 
 const MOCK_USER = { id: '1', email: 'lior@beauty.com', business_name: 'ליאור שגב – היופי שלך', slug: 'lior-segev' };
 
@@ -2173,10 +2174,13 @@ export default function App() {
           .admin-bottom-nav button svg { width: 18px !important; height: 18px !important; }
         }
       `}</style>
-      {view === 'portfolio' && <PortfolioPage onBook={() => setView('booking')} />}
-      {view === 'booking' && <BookingPage onBack={() => setView('portfolio')} onAppointmentBooked={(appt) => { setAppointments(prev => [...prev, appt]); }} />}
-      {view === 'auth' && <AuthScreen onLogin={(u) => { setUser(u); setView('dashboard'); }} />}
-      {view === 'dashboard' && user && <Dashboard user={user} onLogout={() => { setUser(null); setView('portfolio'); }} appointments={appointments} setAppointments={setAppointments} />}
+      <AccessibilityWidget />
+      <main id="main-content">
+        {view === 'portfolio' && <PortfolioPage onBook={() => setView('booking')} />}
+        {view === 'booking' && <BookingPage onBack={() => setView('portfolio')} onAppointmentBooked={(appt) => { setAppointments(prev => [...prev, appt]); }} />}
+        {view === 'auth' && <AuthScreen onLogin={(u) => { setUser(u); setView('dashboard'); }} />}
+        {view === 'dashboard' && user && <Dashboard user={user} onLogout={() => { setUser(null); setView('portfolio'); }} appointments={appointments} setAppointments={setAppointments} />}
+      </main>
     </>
   );
 }

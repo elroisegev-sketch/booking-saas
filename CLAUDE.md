@@ -43,3 +43,6 @@ Lior handles services (gel nails, eyebrow design, lash lifting). Elroi runs the 
 - Both frontend and backend run on Railway
 - Changes pushed via Git → auto-deploy on Railway
 - No manual server management needed
+
+## נגישות
+קומפוננטת AccessibilityWidget מספקת תפריט נגישות IS 5568, הצהרת נגישות בעברית, וכלי התאמה (גודל טקסט, ניגודיות, הדגשת קישורים, גווני אפור, גופן קריא, עצירת אנימציות, סמן גדול, ריווח שורות). רכזת נגישות: ליאור דנינו.
