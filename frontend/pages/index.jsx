@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import AccessibilityWidget from '@/components/AccessibilityWidget';
+import AccessibilityWidget from '../components/AccessibilityWidget';
 
 const MOCK_USER = { id: '1', email: 'lior@beauty.com', business_name: 'ליאור שגב – היופי שלך', slug: 'lior-segev' };
 
