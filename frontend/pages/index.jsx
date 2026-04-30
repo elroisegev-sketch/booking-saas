@@ -1,5 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import AccessibilityWidget from '../components/AccessibilityWidget';
+import LegalFooter from '../components/LegalFooter';
 
 const MOCK_USER = { id: '1', email: 'lior@beauty.com', business_name: 'ליאור שגב – היופי שלך', slug: 'lior-segev' };
 
@@ -2181,6 +2182,7 @@ export default function App() {
         {view === 'auth' && <AuthScreen onLogin={(u) => { setUser(u); setView('dashboard'); }} />}
         {view === 'dashboard' && user && <Dashboard user={user} onLogout={() => { setUser(null); setView('portfolio'); }} appointments={appointments} setAppointments={setAppointments} />}
       </main>
+      {view !== 'dashboard' && <LegalFooter />}
     </>
   );
 }

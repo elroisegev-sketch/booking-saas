@@ -258,7 +258,7 @@ export default function AccessibilityWidget() {
         .a11y-fab {
           position: fixed;
           bottom: 24px;
-          left: 24px;
+          right: 24px;
           z-index: 99999;
           width: 56px;
           height: 56px;
@@ -286,7 +286,7 @@ export default function AccessibilityWidget() {
         .a11y-panel {
           position: fixed;
           bottom: 90px;
-          left: 24px;
+          right: 24px;
           z-index: 100000;
           width: 320px;
           max-height: 80vh;
@@ -616,7 +616,7 @@ export default function AccessibilityWidget() {
               בהקדם האפשרי.
             </p>
             <p>
-              <strong>רכז/ת נגישות:</strong> ליאור דנינו
+              <strong>רכז/ת נגישות:</strong> ליאור שגב
               <br />
               <strong>טלפון:</strong>{" "}
               <a href="tel:+972535249688" dir="ltr">
