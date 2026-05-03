@@ -755,8 +755,8 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
             <div style={{ width: 90, height: 90, borderRadius: '50%', background: 'linear-gradient(135deg,#22c55e,#16a34a)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem', boxShadow: '0 8px 32px rgba(34,197,94,0.35)' }}>
               <svg width="44" height="44" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </div>
-            <h2 style={{ fontFamily: "'Dancing Script', cursive", fontSize: '2rem', color: '#A11738', margin: '0 0 0.5rem' }}>התור נקבע בהצלחה! 🎉</h2>
-            <p style={{ color: '#6b7280', fontSize: '0.95rem', marginBottom: '1.75rem' }}>ליאור תיצור איתך קשר לאישור סופי</p>
+            <h2 style={{ fontFamily: "'Dancing Script', cursive", fontSize: '2rem', color: '#A11738', margin: '0 0 0.5rem' }}>הבקשה נשלחה! ✨</h2>
+            <p style={{ color: '#6b7280', fontSize: '0.95rem', marginBottom: '1.75rem' }}>ליאור תאשר את התור ותחזור אלייך בהקדם</p>
             <div style={{ background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.85)', borderRadius: '24px', padding: '1.5rem 2rem', width: '100%', maxWidth: 340, boxShadow: '0 8px 32px rgba(161,23,56,0.08)', marginBottom: '2rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <span style={{ color: '#9ca3af', fontSize: '0.85rem' }}>טיפול</span>
