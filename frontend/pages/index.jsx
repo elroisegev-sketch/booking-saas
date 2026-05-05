@@ -214,8 +214,8 @@ const AuthScreen = ({ onLogin }) => {
           </div>
           <form onSubmit={handle}>
             <div style={{ marginBottom: '1rem' }}>
-              <label style={{ display: 'block', fontSize: '0.875rem', fontWeight: 700, color: '#374151', marginBottom: '4px' }}>סיסמה</label>
-              <input type="password" style={{ width: '100%', padding: '0.875rem 1.25rem', borderRadius: '16px', border: '1.5px solid rgba(247,193,195,0.5)', outline: 'none', fontSize: '0.875rem', direction: 'ltr', boxSizing: 'border-box', background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(8px)' }}
+              <label htmlFor="auth-password" style={{ display: 'block', fontSize: '0.875rem', fontWeight: 700, color: '#374151', marginBottom: '4px' }}>סיסמה</label>
+              <input id="auth-password" type="password" style={{ width: '100%', padding: '0.875rem 1.25rem', borderRadius: '16px', border: '1.5px solid rgba(247,193,195,0.5)', outline: 'none', fontSize: '0.875rem', direction: 'ltr', boxSizing: 'border-box', background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(8px)' }}
                 placeholder="••••••••" value={password} onChange={e => setPassword(e.target.value)} autoFocus />
             </div>
             {error && <p style={{ color: '#ef4444', fontSize: '0.875rem', marginBottom: '0.5rem' }}>{error}</p>}
@@ -231,8 +231,10 @@ const AuthScreen = ({ onLogin }) => {
 // ── TERMS SCREEN ──────────────────────────────────────────────
 const TermsScreen = ({ termsText, onAccept, onBack, externalNail, onExternalNailChange }) => {
   const [showPopup, setShowPopup] = useState(false);
+  const [agreed, setAgreed] = useState(false);
 
   const handleAccept = () => {
+    if (!agreed) return;
     if (onExternalNailChange && externalNail === null) {
       setShowPopup(true);
       return;
@@ -274,9 +276,32 @@ const TermsScreen = ({ termsText, onAccept, onBack, externalNail, onExternalNail
             </div>
           )}
 
+          <div style={{ padding: '0 1.5rem 1.25rem' }}>
+            <label style={{ display: 'flex', alignItems: 'flex-start', gap: '10px', cursor: 'pointer' }}>
+              <input
+                type="checkbox"
+                id="terms-agree"
+                checked={agreed}
+                onChange={e => setAgreed(e.target.checked)}
+                aria-label="אני מסכימה לתנאי השימוש ולמדיניות הפרטיות"
+                style={{ marginTop: '3px', accentColor: '#A11738', width: '16px', height: '16px', flexShrink: 0, cursor: 'pointer' }}
+              />
+              <span style={{ fontSize: '0.8rem', color: '#374151', lineHeight: 1.5 }}>
+                קראתי ואני מסכימה ל
+                <a href="/terms" target="_blank" rel="noreferrer" style={{ color: '#A11738', fontWeight: 700, textDecoration: 'underline' }}>תנאי השימוש</a>
+                {' '}ול
+                <a href="/privacy" target="_blank" rel="noreferrer" style={{ color: '#A11738', fontWeight: 700, textDecoration: 'underline' }}>מדיניות הפרטיות</a>
+              </span>
+            </label>
+          </div>
           <div style={{ padding: '1.25rem', borderTop: '1px solid rgba(247,193,195,0.2)', display: 'flex', gap: '12px' }}>
             <button onClick={onBack} style={{ flex: 1, padding: '0.875rem', borderRadius: '999px', background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.7)', color: '#374151', fontWeight: 700, cursor: 'pointer' }}>חזרה</button>
-            <button onClick={handleAccept} style={{ flex: 2, padding: '0.875rem', borderRadius: '999px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, border: 'none', cursor: 'pointer', boxShadow: '0 8px 24px rgba(161,23,56,0.32)' }}>
+            <button
+              onClick={handleAccept}
+              disabled={!agreed}
+              aria-disabled={!agreed}
+              style={{ flex: 2, padding: '0.875rem', borderRadius: '999px', background: agreed ? 'linear-gradient(135deg,#A11738,#EC6A83)' : 'rgba(209,213,219,0.6)', color: agreed ? 'white' : '#9ca3af', fontWeight: 700, border: 'none', cursor: agreed ? 'pointer' : 'not-allowed', boxShadow: agreed ? '0 8px 24px rgba(161,23,56,0.32)' : 'none', transition: 'all 0.2s' }}
+            >
               קראתי ומאשרת ✅
             </button>
           </div>
@@ -711,13 +736,13 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
             <p style={{ color: '#9ca3af', fontSize: '0.8rem', marginBottom: '1.75rem' }}>עוד צעד קטן 🌸</p>
             <div style={{ background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.8)', borderRadius: '24px', padding: '1.5rem', marginBottom: '1.25rem', boxShadow: '0 8px 32px rgba(161,23,56,0.08), inset 0 1px 0 rgba(255,255,255,0.9)' }}>
               <div style={{ marginBottom: '1.5rem' }}>
-                <label style={{ display: 'block', fontWeight: 500, fontSize: '0.72rem', color: '#9ca3af', marginBottom: '8px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>שם מלא</label>
-                <input style={{ width: '100%', padding: '0.5rem 0', border: 'none', borderBottom: `1.5px solid ${sel.name ? '#EC6A83' : 'rgba(247,193,195,0.55)'}`, outline: 'none', fontSize: '0.95rem', direction: 'rtl', boxSizing: 'border-box', background: 'transparent', color: '#2d0a1e', transition: 'border-color 0.2s' }}
+                <label htmlFor="booking-name" style={{ display: 'block', fontWeight: 500, fontSize: '0.72rem', color: '#9ca3af', marginBottom: '8px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>שם מלא</label>
+                <input id="booking-name" autoComplete="name" style={{ width: '100%', padding: '0.5rem 0', border: 'none', borderBottom: `1.5px solid ${sel.name ? '#EC6A83' : 'rgba(247,193,195,0.55)'}`, outline: 'none', fontSize: '0.95rem', direction: 'rtl', boxSizing: 'border-box', background: 'transparent', color: '#2d0a1e', transition: 'border-color 0.2s' }}
                   placeholder="שם מלא" value={sel.name} onChange={e => setSel({ ...sel, name: e.target.value })} />
               </div>
               <div>
-                <label style={{ display: 'block', fontWeight: 500, fontSize: '0.72rem', color: '#9ca3af', marginBottom: '8px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>מספר טלפון</label>
-                <input style={{ width: '100%', padding: '0.5rem 0', border: 'none', borderBottom: `1.5px solid ${sel.phone ? '#EC6A83' : 'rgba(247,193,195,0.55)'}`, outline: 'none', fontSize: '0.95rem', direction: 'ltr', boxSizing: 'border-box', textAlign: 'right', background: 'transparent', color: '#2d0a1e', transition: 'border-color 0.2s' }}
+                <label htmlFor="booking-phone" style={{ display: 'block', fontWeight: 500, fontSize: '0.72rem', color: '#9ca3af', marginBottom: '8px', letterSpacing: '0.1em', textTransform: 'uppercase' }}>מספר טלפון</label>
+                <input id="booking-phone" type="tel" autoComplete="tel" style={{ width: '100%', padding: '0.5rem 0', border: 'none', borderBottom: `1.5px solid ${sel.phone ? '#EC6A83' : 'rgba(247,193,195,0.55)'}`, outline: 'none', fontSize: '0.95rem', direction: 'ltr', boxSizing: 'border-box', textAlign: 'right', background: 'transparent', color: '#2d0a1e', transition: 'border-color 0.2s' }}
                   placeholder="050-0000000" value={sel.phone} onChange={e => setSel({ ...sel, phone: e.target.value })} />
               </div>
             </div>
@@ -931,16 +956,16 @@ const ServiceModal = ({ service, onSave, onClose }) => {
       <div dir="rtl" style={{ background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(32px)', WebkitBackdropFilter: 'blur(32px)', border: '1px solid rgba(255,255,255,0.9)', borderRadius: '28px', padding: '1.5rem', width: '100%', maxWidth: '420px', margin: '1rem', boxShadow: '0 8px 32px rgba(161,23,56,0.08), inset 0 1px 0 rgba(255,255,255,0.9)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
           <h2 style={{ fontWeight: 900, color: '#A11738', fontSize: '1.25rem', margin: 0 }}>{service ? 'עריכת שירות' : 'שירות חדש'}</h2>
-          <button onClick={onClose} style={{ padding: '6px', borderRadius: '8px', background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="x" className="w-5 h-5" /></button>
+          <button onClick={onClose} aria-label="סגור חלון" style={{ padding: '6px', borderRadius: '8px', background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="x" className="w-5 h-5" /></button>
         </div>
         <div style={{ marginBottom: '1rem' }}>
-          <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>שם השירות</label>
-          <input style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '14px', border: '1.5px solid rgba(247,193,195,0.5)', outline: 'none', fontSize: '0.875rem', direction: 'rtl', boxSizing: 'border-box', background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(8px)' }}
+          <label htmlFor="svc-name" style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>שם השירות</label>
+          <input id="svc-name" style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '14px', border: '1.5px solid rgba(247,193,195,0.5)', outline: 'none', fontSize: '0.875rem', direction: 'rtl', boxSizing: 'border-box', background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(8px)' }}
             value={form.name} onChange={e => setForm({ ...form, name: e.target.value })} />
         </div>
         <div style={{ marginBottom: '1rem' }}>
-          <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>קטגוריה</label>
-          <select style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '14px', border: '1.5px solid rgba(247,193,195,0.5)', outline: 'none', fontSize: '0.875rem', direction: 'rtl', boxSizing: 'border-box', background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(8px)' }}
+          <label htmlFor="svc-category" style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>קטגוריה</label>
+          <select id="svc-category" style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '14px', border: '1.5px solid rgba(247,193,195,0.5)', outline: 'none', fontSize: '0.875rem', direction: 'rtl', boxSizing: 'border-box', background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(8px)' }}
             value={form.category} onChange={e => setForm({ ...form, category: e.target.value })}>
             <option>לק ג&apos;ל 💅</option>
             <option>פנים 💆</option>
@@ -948,13 +973,13 @@ const ServiceModal = ({ service, onSave, onClose }) => {
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '1.25rem' }}>
           <div>
-            <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>משך (דקות)</label>
-            <input type="number" style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '14px', border: '1.5px solid rgba(247,193,195,0.5)', outline: 'none', fontSize: '0.875rem', boxSizing: 'border-box', background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(8px)' }}
+            <label htmlFor="svc-duration" style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>משך (דקות)</label>
+            <input id="svc-duration" type="number" style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '14px', border: '1.5px solid rgba(247,193,195,0.5)', outline: 'none', fontSize: '0.875rem', boxSizing: 'border-box', background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(8px)' }}
               value={form.duration} onChange={e => setForm({ ...form, duration: parseInt(e.target.value) })} />
           </div>
           <div>
-            <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>מחיר (₪)</label>
-            <input type="number" style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '14px', border: '1.5px solid rgba(247,193,195,0.5)', outline: 'none', fontSize: '0.875rem', boxSizing: 'border-box', background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(8px)' }}
+            <label htmlFor="svc-price" style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>מחיר (₪)</label>
+            <input id="svc-price" type="number" style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '14px', border: '1.5px solid rgba(247,193,195,0.5)', outline: 'none', fontSize: '0.875rem', boxSizing: 'border-box', background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(8px)' }}
               value={form.price} onChange={e => setForm({ ...form, price: parseFloat(e.target.value) })} />
           </div>
         </div>
@@ -1016,18 +1041,18 @@ const EditAppointmentModal = ({ appt, services, onSave, onClose }) => {
       <div dir="rtl" style={{ background: 'rgba(255,255,255,0.88)', backdropFilter: 'blur(32px)', WebkitBackdropFilter: 'blur(32px)', border: '1px solid rgba(255,255,255,0.9)', borderRadius: '28px', padding: '1.5rem', width: '100%', maxWidth: '420px', margin: '1rem', boxShadow: '0 8px 32px rgba(161,23,56,0.08), inset 0 1px 0 rgba(255,255,255,0.9)' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.25rem' }}>
           <h2 style={{ fontWeight: 900, color: '#A11738', fontSize: '1.25rem', margin: 0 }}>עריכת תור ✏️</h2>
-          <button onClick={onClose} style={{ padding: '6px', borderRadius: '8px', background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="x" className="w-5 h-5" /></button>
+          <button onClick={onClose} aria-label="סגור חלון" style={{ padding: '6px', borderRadius: '8px', background: 'none', border: 'none', cursor: 'pointer' }}><Icon name="x" className="w-5 h-5" /></button>
         </div>
         <div style={{ marginBottom: '1rem' }}>
-          <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>שם לקוחה</label>
-          <input style={inp} value={form.customer_name} onChange={e => setForm({ ...form, customer_name: e.target.value })} />
+          <label htmlFor="edit-name" style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>שם לקוחה</label>
+          <input id="edit-name" style={inp} value={form.customer_name} onChange={e => setForm({ ...form, customer_name: e.target.value })} />
         </div>
         <div style={{ marginBottom: '1rem' }}>
-          <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>טלפון</label>
-          <input style={inp} value={form.customer_phone} onChange={e => setForm({ ...form, customer_phone: e.target.value })} />
+          <label htmlFor="edit-phone" style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>טלפון</label>
+          <input id="edit-phone" type="tel" style={inp} value={form.customer_phone} onChange={e => setForm({ ...form, customer_phone: e.target.value })} />
         </div>
         <div style={{ marginBottom: '1rem' }}>
-          <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>
+          <label htmlFor="edit-services" style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>
             שירותים
             {totalDuration > 0 && <span style={{ fontWeight: 400, color: '#6B7280', marginRight: '6px' }}>({totalDuration} דק׳ סה״כ)</span>}
           </label>
@@ -1057,12 +1082,12 @@ const EditAppointmentModal = ({ appt, services, onSave, onClose }) => {
         </div>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '1.25rem' }}>
           <div>
-            <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>תאריך</label>
-            <input type="date" style={{ ...inp, direction: 'ltr' }} value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} />
+            <label htmlFor="edit-date" style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>תאריך</label>
+            <input id="edit-date" type="date" style={{ ...inp, direction: 'ltr' }} value={form.date} onChange={e => setForm({ ...form, date: e.target.value })} />
           </div>
           <div>
-            <label style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>שעה</label>
-            <input type="time" style={{ ...inp, direction: 'ltr' }} value={form.time} onChange={e => setForm({ ...form, time: e.target.value })} />
+            <label htmlFor="edit-time" style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>שעה</label>
+            <input id="edit-time" type="time" style={{ ...inp, direction: 'ltr' }} value={form.time} onChange={e => setForm({ ...form, time: e.target.value })} />
           </div>
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
