@@ -348,6 +348,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   const [nailService, setNailService] = useState(null);
   const [showWaBubble, setShowWaBubble] = useState(true);
   const [bookingToast, setBookingToast] = useState(null);
+  const [paying, setPaying] = useState(false);
   const showBookingToast = (msg) => { setBookingToast(msg); setTimeout(() => setBookingToast(null), 4000); };
 
   // Restore state from sessionStorage on mount
@@ -899,6 +900,8 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
             {/* כפתורי תשלום */}
             {(() => {
               const bookAndOpenPayment = async (e, paymentUrl) => {
+                if (paying) return;
+                setPaying(true);
                 e.preventDefault();
                 const rawTime = sel.time.trim();
                 const dateStr2 = `${sel.date.getFullYear()}-${String(sel.date.getMonth()+1).padStart(2,'0')}-${String(sel.date.getDate()).padStart(2,'0')}`;
@@ -934,9 +937,10 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                     if (res.status === 429) showBookingToast('יותר מדי ניסיונות — נסי שוב בעוד שעה');
                     else if (res.status === 409) { showBookingToast('הזמן הזה כבר תפוס, בחרי שעה אחרת'); setStep(3); }
                     else showBookingToast('שגיאה ברישום התור, נסי שוב');
+                    setPaying(false);
                     return;
                   }
-                } catch(err) { console.error('booking failed', err); showBookingToast('בעיית חיבור — נסי שוב'); return; }
+                } catch(err) { console.error('booking failed', err); showBookingToast('בעיית חיבור — נסי שוב'); setPaying(false); return; }
                 try { sessionStorage.removeItem(BOOKING_KEY); } catch(e) {}
                 setConfirmed(true);
                 // פותח את אפליקציית התשלום עם אלמנט עוגן — כך deep links עובדים נכון על iOS
@@ -951,16 +955,16 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                 {/* ביט */}
                 <a href={`bit://pay?phoneNumber=0535249688&amount=${deposit}`}
                   onClick={e => bookAndOpenPayment(e, `bit://pay?phoneNumber=0535249688&amount=${deposit}`)}
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', width: '100%', padding: '1rem', borderRadius: '999px', background: 'linear-gradient(135deg, #5B3FD4, #7B5FFF)', color: 'white', fontWeight: 700, fontSize: '1rem', textDecoration: 'none', marginBottom: '10px', boxSizing: 'border-box', boxShadow: '0 6px 24px rgba(91,63,212,0.38)', cursor: 'pointer' }}>
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', width: '100%', padding: '1rem', borderRadius: '999px', background: paying ? '#a0a0b0' : 'linear-gradient(135deg, #5B3FD4, #7B5FFF)', color: 'white', fontWeight: 700, fontSize: '1rem', textDecoration: 'none', marginBottom: '10px', boxSizing: 'border-box', boxShadow: paying ? 'none' : '0 6px 24px rgba(91,63,212,0.38)', cursor: paying ? 'not-allowed' : 'pointer', opacity: paying ? 0.7 : 1, pointerEvents: paying ? 'none' : 'auto' }}>
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="rgba(255,255,255,0.25)"/><text x="12" y="16.5" textAnchor="middle" fontSize="13" fontWeight="800" fill="white" fontFamily="Arial">B</text></svg>
-                  תשלום בביט — ₪{deposit}
+                  {paying ? 'שולחת...' : `תשלום בביט — ₪${deposit}`}
                 </a>
                 {/* פייבוקס */}
                 <a href={`https://payboxapp.page.link/pay?userId=0535249688&sum=${deposit}`}
                   onClick={e => bookAndOpenPayment(e, `https://payboxapp.page.link/pay?userId=0535249688&sum=${deposit}`)}
-                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', width: '100%', padding: '1rem', borderRadius: '999px', background: 'linear-gradient(135deg, #00A86B, #00C97A)', color: 'white', fontWeight: 700, fontSize: '1rem', textDecoration: 'none', marginBottom: '10px', boxSizing: 'border-box', boxShadow: '0 6px 24px rgba(0,168,107,0.35)', cursor: 'pointer' }}>
+                  style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', width: '100%', padding: '1rem', borderRadius: '999px', background: paying ? '#a0a0b0' : 'linear-gradient(135deg, #00A86B, #00C97A)', color: 'white', fontWeight: 700, fontSize: '1rem', textDecoration: 'none', marginBottom: '10px', boxSizing: 'border-box', boxShadow: paying ? 'none' : '0 6px 24px rgba(0,168,107,0.35)', cursor: paying ? 'not-allowed' : 'pointer', opacity: paying ? 0.7 : 1, pointerEvents: paying ? 'none' : 'auto' }}>
                   <svg width="22" height="22" viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="11" fill="rgba(255,255,255,0.25)"/><text x="12" y="16.5" textAnchor="middle" fontSize="12" fontWeight="800" fill="white" fontFamily="Arial">P</text></svg>
-                  תשלום בפייבוקס — ₪{deposit}
+                  {paying ? 'שולחת...' : `תשלום בפייבוקס — ₪${deposit}`}
                 </a>
               </>);
             })()}
