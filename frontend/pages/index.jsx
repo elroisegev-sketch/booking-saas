@@ -347,6 +347,8 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   const [nailCountModal, setNailCountModal] = useState(false);
   const [nailService, setNailService] = useState(null);
   const [showWaBubble, setShowWaBubble] = useState(true);
+  const [bookingToast, setBookingToast] = useState(null);
+  const showBookingToast = (msg) => { setBookingToast(msg); setTimeout(() => setBookingToast(null), 4000); };
 
   // Restore state from sessionStorage on mount
   useEffect(() => {
@@ -497,6 +499,12 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
 
   return (
     <div dir="rtl" style={{ minHeight: '100vh', background: 'linear-gradient(135deg, #fff5f7 0%, #fce8f3 40%, #f3eeff 80%, #fff5f7 100%)', fontFamily: "'Varela Round', sans-serif" }}>
+
+      {bookingToast && (
+        <div style={{ position: 'fixed', top: '1.25rem', left: '50%', transform: 'translateX(-50%)', zIndex: 9999, background: 'rgba(161,23,56,0.92)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', color: 'white', padding: '0.75rem 1.5rem', borderRadius: '999px', fontWeight: 700, fontSize: '0.875rem', fontFamily: 'Varela Round, sans-serif', boxShadow: '0 8px 24px rgba(161,23,56,0.35)', whiteSpace: 'nowrap' }}>
+          {bookingToast}
+        </div>
+      )}
 
       {/* Header */}
       <div style={{ background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', borderBottom: '1px solid rgba(255,255,255,0.7)', padding: '0.875rem 1.25rem', display: 'flex', alignItems: 'center', gap: '0.75rem', position: 'sticky', top: 0, zIndex: 10 }}>
@@ -923,12 +931,12 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                   if (!res.ok) {
                     const errData = await res.json().catch(() => ({}));
                     console.error('booking error', res.status, errData);
-                    if (res.status === 429) alert('יותר מדי ניסיונות — נסי שוב בעוד שעה');
-                    else if (res.status === 409) alert('הזמן הזה כבר תפוס, בחרי שעה אחרת');
-                    else alert('שגיאה ברישום התור, נסי שוב');
+                    if (res.status === 429) showBookingToast('יותר מדי ניסיונות — נסי שוב בעוד שעה');
+                    else if (res.status === 409) { showBookingToast('הזמן הזה כבר תפוס, בחרי שעה אחרת'); setStep(3); }
+                    else showBookingToast('שגיאה ברישום התור, נסי שוב');
                     return;
                   }
-                } catch(err) { console.error('booking failed', err); alert('בעיית חיבור — נסי שוב'); return; }
+                } catch(err) { console.error('booking failed', err); showBookingToast('בעיית חיבור — נסי שוב'); return; }
                 try { sessionStorage.removeItem(BOOKING_KEY); } catch(e) {}
                 setConfirmed(true);
                 // פותח את אפליקציית התשלום עם אלמנט עוגן — כך deep links עובדים נכון על iOS
