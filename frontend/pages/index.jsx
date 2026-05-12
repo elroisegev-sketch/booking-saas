@@ -383,6 +383,8 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
     onBack();
   };
 
+  useEffect(() => { window.scrollTo({ top: 0, behavior: 'instant' }); }, [step]);
+
   useEffect(() => {
     const BACKEND = 'https://booking-saas-production-b9fd.up.railway.app';
     const fetchWithRetry = (url, onSuccess, retries) => {
