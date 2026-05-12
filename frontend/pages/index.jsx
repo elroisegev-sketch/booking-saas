@@ -904,9 +904,10 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                 const startUTC = new Date(`${dateStr2}T${startH}:${startM}:00Z`);
                 const endUTC = new Date(startUTC.getTime() + totalDuration * 60000);
                 try {
-                  await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://booking-saas-production-b9fd.up.railway.app/api'}/appointments`, {
+                  const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'https://booking-saas-production-b9fd.up.railway.app/api'}/appointments`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
+                    keepalive: true,
                     body: JSON.stringify({
                       business_slug: 'lior-segev',
                       service_id: selectedServices[0] ? selectedServices[0].id : null,
@@ -919,11 +920,24 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                       total_duration: totalDuration,
                     })
                   });
-                } catch(e) { console.error('booking failed', e); }
+                  if (!res.ok) {
+                    const errData = await res.json().catch(() => ({}));
+                    console.error('booking error', res.status, errData);
+                    if (res.status === 429) alert('יותר מדי ניסיונות — נסי שוב בעוד שעה');
+                    else if (res.status === 409) alert('הזמן הזה כבר תפוס, בחרי שעה אחרת');
+                    else alert('שגיאה ברישום התור, נסי שוב');
+                    return;
+                  }
+                } catch(err) { console.error('booking failed', err); alert('בעיית חיבור — נסי שוב'); return; }
                 try { sessionStorage.removeItem(BOOKING_KEY); } catch(e) {}
                 setConfirmed(true);
-                // פותחים את אפליקציית התשלום רק אחרי שהתור נרשם בשרת
-                window.location.href = paymentUrl;
+                // פותח את אפליקציית התשלום עם אלמנט עוגן — כך deep links עובדים נכון על iOS
+                const a = document.createElement('a');
+                a.href = paymentUrl;
+                a.rel = 'noreferrer';
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
               };
               return (<>
                 {/* ביט */}
