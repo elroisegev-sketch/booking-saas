@@ -128,4 +128,18 @@ if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
 }
 
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`🗓  BookSlot API running on http://localhost:${PORT}`));
+app.listen(PORT, async () => {
+  console.log(`🗓  BookSlot API running on http://localhost:${PORT}`);
+  // Validate DB schema on startup – catches SQL column-name bugs before they hit users
+  try {
+    await require('./db').query(`
+      SELECT a.id, a.total_price, a.service_names_text,
+             COALESCE(s.name, a.service_names_text, 'test') AS service_name,
+             COALESCE(a.total_price, s.price, 0) AS price
+      FROM appointments a LEFT JOIN services s ON a.service_id = s.id LIMIT 1
+    `);
+    console.log('✅ DB schema validation passed');
+  } catch (err) {
+    console.error('🚨 DB SCHEMA VALIDATION FAILED:', err.message);
+  }
+});

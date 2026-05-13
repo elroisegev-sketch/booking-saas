@@ -24,10 +24,48 @@ Lior handles services (gel nails, eyebrow design, lash lifting). Elroi runs the 
 4. **Timezone:** UTC+2 (Israel). Always display times in UTC+2, never UTC.
 5. **Mobile-first** – Lior's clients book from mobile. Desktop is secondary.
 
+## Database Schema – EXACT Column Names (Railway PostgreSQL)
+
+### appointments
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid | PK |
+| business_id | uuid | FK → users.id |
+| service_id | uuid | nullable (manual bookings) |
+| customer_name | varchar | |
+| customer_phone | varchar | |
+| customer_email | varchar | nullable |
+| appointment_time | timestamptz | |
+| end_time | timestamptz | |
+| status | varchar | pending/confirmed/cancelled/completed |
+| notes | text | nullable |
+| service_names_text | text | nullable – display name for multi-service |
+| total_price | numeric | nullable – use COALESCE(a.total_price, s.price, 0) |
+| created_at | timestamptz | |
+
+### services
+| Column | Type | Notes |
+|---|---|---|
+| id | uuid | PK |
+| business_id | uuid | FK → users.id |
+| name | varchar | |
+| duration | integer | minutes |
+| price | numeric(10,2) | |
+| is_active | boolean | |
+| category | varchar | |
+
+> **CRITICAL – SQL pitfall that broke production (May 2026):**
+> - `a.price` does NOT exist → use `a.total_price`
+> - `a.service_name` does NOT exist → use `a.service_names_text`
+> - Always use `LEFT JOIN services` (not INNER JOIN) so manual appointments without service_id are included
+> - Correct price expression: `COALESCE(a.total_price, s.price, 0) AS price`
+> - Correct service name expression: `COALESCE(s.name, a.service_names_text, 'טיפול') AS service_name`
+
 ## Known Pitfalls
 - Hebrew strings in Python scripts can strip quotes – avoid Python file-editing scripts for Hebrew content
 - `index.jsx` has many versions across sessions – always confirm which version is active before editing
 - Slot generation is dynamic based on service duration – don't hardcode time slots
+- **Any SQL touching `appointments` table** – verify column names against schema above before writing queries
 
 ## Business Logic
 - Services: gel nails, eyebrow design, lash lifting (each has its own duration + price)
