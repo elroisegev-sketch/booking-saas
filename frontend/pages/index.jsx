@@ -546,20 +546,32 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
             backdropFilter: 'blur(12px)',
             WebkitBackdropFilter: 'blur(12px)',
             border: '1.5px solid rgba(37,211,102,0.25)',
-            borderRadius: '14px',
-            padding: '0.45rem 0.75rem 0.45rem 1.8rem',
-            boxShadow: '0 4px 16px rgba(0,0,0,0.1)',
-            whiteSpace: 'nowrap',
+            borderRadius: '16px',
+            padding: '0.75rem 0.9rem 0.75rem 1.8rem',
+            boxShadow: '0 4px 20px rgba(0,0,0,0.12)',
             animation: 'fadeUp 0.35s cubic-bezier(0.22,1,0.36,1) both',
+            minWidth: '190px',
           }}>
             <button onClick={() => setShowWaBubble(false)} style={{
-              position: 'absolute', top: '50%', left: '6px', transform: 'translateY(-50%)',
+              position: 'absolute', top: '8px', left: '6px',
               background: 'none', border: 'none', cursor: 'pointer',
               color: '#9ca3af', fontSize: '0.65rem', lineHeight: 1, padding: '2px',
             }}>✕</button>
-            <p style={{ margin: 0, fontSize: '0.78rem', fontWeight: 700, color: '#111827', fontFamily: 'Varela Round, sans-serif', direction: 'rtl' }}>
-              שאלה? דברי עם ליאור 💬
+            <p style={{ margin: '0 0 0.5rem', fontSize: '0.72rem', fontWeight: 700, color: '#9ca3af', fontFamily: 'Varela Round, sans-serif', direction: 'rtl', letterSpacing: '0.03em' }}>
+              דברי עם ליאור ישירות
             </p>
+            <a href={`https://wa.me/972${LIOR_PHONE.slice(1)}?text=${encodeURIComponent('היי ליאור 🌸 אני צריכה עזרה עם קביעת התור')}`}
+              target="_blank" rel="noreferrer"
+              onClick={() => setShowWaBubble(false)}
+              style={{ display: 'block', padding: '0.45rem 0.7rem', borderRadius: '10px', background: 'rgba(37,211,102,0.08)', color: '#128c5e', fontWeight: 700, fontSize: '0.8rem', textDecoration: 'none', marginBottom: '6px', fontFamily: 'Varela Round, sans-serif', direction: 'rtl' }}>
+              💬 שאלה כללית
+            </a>
+            <a href={`https://wa.me/972${LIOR_PHONE.slice(1)}?text=${encodeURIComponent('היי ליאור 🔥\nאני צריכה תור דחוף ב-24 השעות הקרובות!\nאפשר? 🙏')}`}
+              target="_blank" rel="noreferrer"
+              onClick={() => setShowWaBubble(false)}
+              style={{ display: 'block', padding: '0.45rem 0.7rem', borderRadius: '10px', background: 'rgba(239,68,68,0.08)', color: '#dc2626', fontWeight: 700, fontSize: '0.8rem', textDecoration: 'none', fontFamily: 'Varela Round, sans-serif', direction: 'rtl' }}>
+              🔥 תור דחוף — 24 שעות
+            </a>
             {/* זנב */}
             <div style={{
               position: 'absolute', bottom: '-7px', left: '20px',
@@ -571,12 +583,11 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
           </div>
         )}
         {/* כפתור עיגול */}
-        <a href={`https://wa.me/972${LIOR_PHONE.slice(1)}?text=${encodeURIComponent('היי ליאור 🌸 אני צריכה עזרה עם קביעת התור')}`}
-          target="_blank" rel="noreferrer"
-          onClick={() => setShowWaBubble(false)}
-          style={{ width: '58px', height: '58px', borderRadius: '50%', background: '#25D366', boxShadow: '0 4px 20px rgba(37,211,102,0.5)', textDecoration: 'none', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <button
+          onClick={() => setShowWaBubble(v => !v)}
+          style={{ width: '58px', height: '58px', borderRadius: '50%', background: '#25D366', boxShadow: '0 4px 20px rgba(37,211,102,0.5)', border: 'none', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           <span style={{ color: 'white', display: 'flex' }}><Icon name="whatsapp" className="w-8 h-8" /></span>
-        </a>
+        </button>
       </div>
 
       <div style={{ maxWidth: '520px', margin: '0 auto', padding: '2rem 1.5rem' }}>
@@ -920,6 +931,12 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                 </div>
                 <p style={{ color: '#EC6A83', fontSize: '0.72rem', marginTop: '6px', fontWeight: 600 }}>העתיקי את המספר לביט/פייבוקס לתשלום</p>
               </div>
+            </div>
+
+            {/* אזהרת מקדמה */}
+            <div style={{ background: 'rgba(161,23,56,0.07)', border: '1.5px solid rgba(161,23,56,0.2)', borderRadius: '14px', padding: '0.85rem 1.1rem', marginBottom: '1rem', textAlign: 'center' }}>
+              <p style={{ margin: 0, fontWeight: 700, fontSize: '0.88rem', color: '#A11738' }}>⚠️ התור לא נקבע עד להעברת המקדמה</p>
+              <p style={{ margin: '4px 0 0', fontSize: '0.78rem', color: '#6b7280' }}>לחצי על אחד הכפתורים כדי לשריין את הזמן שלך</p>
             </div>
 
             {/* כפתורי תשלום */}
