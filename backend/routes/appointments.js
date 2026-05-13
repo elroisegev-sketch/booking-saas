@@ -206,19 +206,32 @@ router.get('/crm', auth, async (req, res) => {
   if (!month || !/^\d{4}-\d{2}$/.test(month))
     return res.status(400).json({ error: 'month param required (YYYY-MM)' });
   try {
-    const result = await db.query(
-      `SELECT id, customer_name, customer_phone, service_names_text,
-              appointment_time, COALESCE(total_price, 0) AS total_price
-       FROM appointments
-       WHERE business_id = $1
-         AND status != 'cancelled'
-         AND TO_CHAR(appointment_time AT TIME ZONE 'Asia/Jerusalem', 'YYYY-MM') = $2
-       ORDER BY appointment_time ASC`,
-      [req.user.id, month]
-    );
-    const rows = result.rows;
+    const [apptResult, expResult] = await Promise.all([
+      db.query(
+        `SELECT a.id, a.customer_name, a.customer_phone, a.service_names_text,
+                a.appointment_time,
+                COALESCE(NULLIF(a.total_price,0), NULLIF(a.price,0), s.price, 0) AS total_price,
+                (SELECT COUNT(*) FROM appointments a2
+                 WHERE a2.business_id = a.business_id
+                   AND a2.customer_phone = a.customer_phone
+                   AND a2.status != 'cancelled') AS visit_count
+         FROM appointments a
+         LEFT JOIN services s ON a.service_id = s.id
+         WHERE a.business_id = $1
+           AND a.status != 'cancelled'
+           AND TO_CHAR(a.appointment_time AT TIME ZONE 'Asia/Jerusalem', 'YYYY-MM') = $2
+         ORDER BY a.appointment_time ASC`,
+        [req.user.id, month]
+      ),
+      db.query(
+        `SELECT COALESCE(SUM(amount),0) AS total FROM expenses WHERE business_id=$1 AND month=$2`,
+        [req.user.id, month]
+      ),
+    ]);
+    const rows = apptResult.rows;
     const totalRevenue = rows.reduce((s, r) => s + parseFloat(r.total_price || 0), 0);
-    res.json({ appointments: rows, totalRevenue, count: rows.length });
+    const totalExpenses = parseFloat(expResult.rows[0].total || 0);
+    res.json({ appointments: rows, totalRevenue, totalExpenses, count: rows.length });
   } catch (err) { console.error(err); res.status(500).json({ error: 'Server error' }); }
 });
 

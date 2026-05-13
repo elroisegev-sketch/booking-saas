@@ -1431,6 +1431,9 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
   const [crmMonth, setCrmMonth] = useState(() => { const n = new Date(); return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}`; });
   const [crmData, setCrmData] = useState(null);
   const [crmLoading, setCrmLoading] = useState(false);
+  const [crmExpenses, setCrmExpenses] = useState([]);
+  const [expForm, setExpForm] = useState({ description: '', amount: '' });
+  const [expSaving, setExpSaving] = useState(false);
 
   const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'https://booking-saas-production-b9fd.up.railway.app';
   const VAPID_PUBLIC = 'BJruLIZOsClN97fYdg9i5G52FyTQGEVD_5pSAW6BWQNPKO5lecZhhOn58DCnS1aEkPX1qWQIKcA9INApaRiW1X0';
@@ -1477,10 +1480,14 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
     if (!token) return;
     setCrmLoading(true);
-    fetch(`${BACKEND}/api/appointments/crm?month=${crmMonth}`, { headers: { 'Authorization': 'Bearer ' + token } })
-      .then(r => r.json())
-      .then(data => { setCrmData(data); setCrmLoading(false); })
-      .catch(() => setCrmLoading(false));
+    Promise.all([
+      fetch(`${BACKEND}/api/appointments/crm?month=${crmMonth}`, { headers: { 'Authorization': 'Bearer ' + token } }).then(r => r.json()),
+      fetch(`${BACKEND}/api/expenses?month=${crmMonth}`, { headers: { 'Authorization': 'Bearer ' + token } }).then(r => r.json()),
+    ]).then(([appts, exps]) => {
+      setCrmData(appts);
+      setCrmExpenses(Array.isArray(exps) ? exps : []);
+      setCrmLoading(false);
+    }).catch(() => setCrmLoading(false));
   }, [tab, crmMonth]);
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
@@ -2087,14 +2094,17 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
             const prevMonth = () => { const d = new Date(y, m-2, 1); setCrmMonth(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`); };
             const nextMonth = () => { const d = new Date(y, m, 1); setCrmMonth(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`); };
             const isCurrentMonth = crmMonth === (() => { const n = new Date(); return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}`; })();
+            const totalExpenses = crmExpenses.reduce((s, e) => s + parseFloat(e.amount || 0), 0);
+            const profit = (crmData ? parseFloat(crmData.totalRevenue || 0) : 0) - totalExpenses;
             const exportCSV = () => {
               if (!crmData?.appointments?.length) return;
               const bom = '﻿';
-              const headers = ['שם לקוחה','טלפון','שירות','תאריך ושעה','מחיר (₪)'];
+              const headers = ['שם לקוחה','טלפון','שירות','תאריך ושעה','מחיר (₪)','ביקורים סה״כ'];
               const rows = crmData.appointments.map(a => [
                 a.customer_name, a.customer_phone, a.service_names_text || '',
                 fmtDate(a.appointment_time) + ' ' + fmtTime(a.appointment_time),
                 parseFloat(a.total_price || 0).toFixed(2),
+                a.visit_count || 1,
               ]);
               const csv = [headers, ...rows].map(r => r.map(c => `"${String(c||'').replace(/"/g,'""')}"`).join(',')).join('\n');
               const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
@@ -2102,8 +2112,31 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
               const a = document.createElement('a'); a.href = url; a.download = `CRM-${crmMonth}.csv`; a.click();
               URL.revokeObjectURL(url);
             };
+            const addExpense = async () => {
+              if (!expForm.description.trim() || !expForm.amount) return;
+              const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+              setExpSaving(true);
+              try {
+                const res = await fetch(`${BACKEND}/api/expenses`, {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+                  body: JSON.stringify({ description: expForm.description, amount: parseFloat(expForm.amount), month: crmMonth }),
+                });
+                if (res.ok) {
+                  const newExp = await res.json();
+                  setCrmExpenses(prev => [...prev, newExp]);
+                  setExpForm({ description: '', amount: '' });
+                }
+              } finally { setExpSaving(false); }
+            };
+            const deleteExpense = async (id) => {
+              const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+              const res = await fetch(`${BACKEND}/api/expenses/${id}`, { method: 'DELETE', headers: { 'Authorization': 'Bearer ' + token } });
+              if (res.ok) setCrmExpenses(prev => prev.filter(e => e.id !== id));
+            };
             return (
               <div>
+                {/* כותרת + ניווט חודשים */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
                   <h1 style={{ fontSize: '1.5rem', fontWeight: 900, color: '#A11738', margin: 0 }}>CRM 📊</h1>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -2116,42 +2149,81 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                 {crmLoading && <div style={{ textAlign: 'center', padding: '3rem', color: '#A11738', fontWeight: 700 }}>טוען...</div>}
 
                 {!crmLoading && crmData && (<>
-                  {/* כרטיס סיכום */}
-                  <div style={{ ...card, padding: '1.25rem 1.5rem', marginBottom: '1rem', display: 'flex', gap: '1rem' }}>
-                    <div style={{ flex: 1, textAlign: 'center', borderLeft: '1px solid rgba(247,193,195,0.4)', paddingLeft: '1rem' }}>
-                      <p style={{ margin: 0, color: '#9ca3af', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.05em' }}>סה״כ הכנסות</p>
-                      <p style={{ margin: '4px 0 0', fontSize: '1.75rem', fontWeight: 900, color: '#A11738', fontFamily: 'Varela Round, sans-serif' }}>₪{parseFloat(crmData.totalRevenue||0).toLocaleString('he-IL')}</p>
-                    </div>
-                    <div style={{ flex: 1, textAlign: 'center' }}>
-                      <p style={{ margin: 0, color: '#9ca3af', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.05em' }}>מספר טיפולים</p>
-                      <p style={{ margin: '4px 0 0', fontSize: '1.75rem', fontWeight: 900, color: '#EC6A83', fontFamily: 'Varela Round, sans-serif' }}>{crmData.count}</p>
-                    </div>
+                  {/* כרטיס סיכום 3 עמודות */}
+                  <div style={{ ...card, padding: '1rem 0.75rem', marginBottom: '1rem', display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '0' }}>
+                    {[
+                      { label: 'הכנסות', value: `₪${parseFloat(crmData.totalRevenue||0).toLocaleString('he-IL')}`, color: '#A11738' },
+                      { label: 'הוצאות', value: `₪${totalExpenses.toLocaleString('he-IL')}`, color: '#f59e0b' },
+                      { label: 'רווח נקי', value: `₪${profit.toLocaleString('he-IL')}`, color: profit >= 0 ? '#16a34a' : '#dc2626' },
+                    ].map((item, i) => (
+                      <div key={i} style={{ textAlign: 'center', padding: '0.25rem 0.5rem', borderLeft: i < 2 ? '1px solid rgba(247,193,195,0.35)' : 'none' }}>
+                        <p style={{ margin: 0, color: '#9ca3af', fontSize: '0.65rem', fontWeight: 600, letterSpacing: '0.04em' }}>{item.label}</p>
+                        <p style={{ margin: '3px 0 0', fontSize: '1.1rem', fontWeight: 900, color: item.color, fontFamily: 'Varela Round, sans-serif', lineHeight: 1.2 }}>{item.value}</p>
+                      </div>
+                    ))}
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
+                    <span style={{ fontSize: '0.78rem', color: '#9ca3af' }}>{crmData.count} טיפולים החודש</span>
+                    <button onClick={exportCSV} disabled={!crmData.appointments?.length} style={{ padding: '0.45rem 1rem', borderRadius: '999px', background: crmData.appointments?.length ? 'linear-gradient(135deg,#A11738,#EC6A83)' : 'rgba(209,213,219,0.5)', color: crmData.appointments?.length ? 'white' : '#9ca3af', fontWeight: 700, fontSize: '0.78rem', border: 'none', cursor: crmData.appointments?.length ? 'pointer' : 'not-allowed', boxShadow: crmData.appointments?.length ? '0 4px 12px rgba(161,23,56,0.2)' : 'none', fontFamily: 'Varela Round, sans-serif' }}>
+                      ייצוא CSV ⬇️
+                    </button>
                   </div>
 
-                  {/* כפתור ייצוא */}
-                  <button onClick={exportCSV} disabled={!crmData.appointments?.length} style={{ width: '100%', padding: '0.75rem', borderRadius: '14px', background: crmData.appointments?.length ? 'linear-gradient(135deg,#A11738,#EC6A83)' : 'rgba(209,213,219,0.5)', color: crmData.appointments?.length ? 'white' : '#9ca3af', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: crmData.appointments?.length ? 'pointer' : 'not-allowed', marginBottom: '1rem', boxShadow: crmData.appointments?.length ? '0 4px 16px rgba(161,23,56,0.25)' : 'none', fontFamily: 'Varela Round, sans-serif' }}>
-                    ייצוא לאקסל (CSV) ⬇️
-                  </button>
-
-                  {/* טבלת לקוחות */}
+                  {/* לקוחות */}
                   {crmData.appointments?.length === 0 && (
-                    <div style={{ ...card, padding: '2rem', textAlign: 'center' }}>
+                    <div style={{ ...card, padding: '2rem', textAlign: 'center', marginBottom: '1rem' }}>
                       <p style={{ color: '#9ca3af', margin: 0 }}>אין תורים לחודש זה</p>
                     </div>
                   )}
                   {crmData.appointments?.map((a, i) => (
-                    <div key={a.id || i} style={{ ...card, padding: '1rem 1.25rem', marginBottom: '10px' }}>
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
-                        <span style={{ fontWeight: 700, fontSize: '0.95rem', color: '#1f2937' }}>{a.customer_name}</span>
-                        <span style={{ fontWeight: 900, fontSize: '0.95rem', color: '#A11738' }}>₪{parseFloat(a.total_price||0).toLocaleString('he-IL')}</span>
+                    <div key={a.id || i} style={{ ...card, padding: '0.9rem 1.1rem', marginBottom: '8px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '4px' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                          <span style={{ fontWeight: 700, fontSize: '0.92rem', color: '#1f2937' }}>{a.customer_name}</span>
+                          {a.visit_count > 1 && <span style={{ fontSize: '0.65rem', fontWeight: 700, background: 'rgba(161,23,56,0.1)', color: '#A11738', borderRadius: '999px', padding: '2px 7px' }}>ביקור #{a.visit_count}</span>}
+                          {a.visit_count == 1 && <span style={{ fontSize: '0.65rem', fontWeight: 700, background: 'rgba(34,197,94,0.12)', color: '#16a34a', borderRadius: '999px', padding: '2px 7px' }}>חדשה ✨</span>}
+                        </div>
+                        <span style={{ fontWeight: 900, fontSize: '0.92rem', color: '#A11738' }}>₪{parseFloat(a.total_price||0).toLocaleString('he-IL')}</span>
                       </div>
-                      <p style={{ margin: '0 0 4px', fontSize: '0.8rem', color: '#6b7280' }}>{a.service_names_text}</p>
+                      <p style={{ margin: '0 0 4px', fontSize: '0.78rem', color: '#6b7280' }}>{a.service_names_text}</p>
                       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                        <a href={`tel:${a.customer_phone}`} style={{ fontSize: '0.78rem', color: '#A11738', textDecoration: 'none', direction: 'ltr' }}>{a.customer_phone}</a>
-                        <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>{fmtDate(a.appointment_time)} · {fmtTime(a.appointment_time)}</span>
+                        <a href={`tel:${a.customer_phone}`} style={{ fontSize: '0.75rem', color: '#A11738', textDecoration: 'none', direction: 'ltr' }}>{a.customer_phone}</a>
+                        <span style={{ fontSize: '0.72rem', color: '#9ca3af' }}>{fmtDate(a.appointment_time)} · {fmtTime(a.appointment_time)}</span>
                       </div>
                     </div>
                   ))}
+
+                  {/* הוצאות */}
+                  <div style={{ marginTop: '1.5rem' }}>
+                    <h2 style={{ fontSize: '1rem', fontWeight: 900, color: '#A11738', marginBottom: '0.75rem' }}>הוצאות החודש 💸</h2>
+                    <div style={{ ...card, padding: '1rem', marginBottom: '0.75rem' }}>
+                      <div style={{ display: 'flex', gap: '8px', marginBottom: crmExpenses.length ? '0.75rem' : 0 }}>
+                        <input
+                          value={expForm.description} onChange={e => setExpForm(f => ({ ...f, description: e.target.value }))}
+                          placeholder="תיאור (שכירות, חומרים...)"
+                          style={{ flex: 2, padding: '0.5rem 0.75rem', borderRadius: '10px', border: '1.5px solid rgba(247,193,195,0.55)', fontSize: '0.82rem', fontFamily: 'Varela Round, sans-serif', outline: 'none', background: 'rgba(255,255,255,0.8)', direction: 'rtl' }}
+                        />
+                        <input
+                          type="number" min="0" value={expForm.amount} onChange={e => setExpForm(f => ({ ...f, amount: e.target.value }))}
+                          placeholder="₪"
+                          style={{ flex: 1, padding: '0.5rem 0.5rem', borderRadius: '10px', border: '1.5px solid rgba(247,193,195,0.55)', fontSize: '0.82rem', fontFamily: 'Varela Round, sans-serif', outline: 'none', background: 'rgba(255,255,255,0.8)', textAlign: 'center' }}
+                        />
+                        <button onClick={addExpense} disabled={expSaving || !expForm.description.trim() || !expForm.amount} style={{ padding: '0.5rem 0.85rem', borderRadius: '10px', background: expForm.description.trim() && expForm.amount ? 'linear-gradient(135deg,#A11738,#EC6A83)' : 'rgba(209,213,219,0.5)', color: expForm.description.trim() && expForm.amount ? 'white' : '#9ca3af', fontWeight: 700, fontSize: '0.82rem', border: 'none', cursor: expForm.description.trim() && expForm.amount ? 'pointer' : 'not-allowed', whiteSpace: 'nowrap', fontFamily: 'Varela Round, sans-serif' }}>
+                          {expSaving ? '...' : '+ הוסף'}
+                        </button>
+                      </div>
+                      {crmExpenses.map(e => (
+                        <div key={e.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '0.45rem 0', borderTop: '1px solid rgba(247,193,195,0.25)' }}>
+                          <span style={{ fontSize: '0.82rem', color: '#374151' }}>{e.description}</span>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#f59e0b' }}>₪{parseFloat(e.amount).toLocaleString('he-IL')}</span>
+                            <button onClick={() => deleteExpense(e.id)} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', fontSize: '0.75rem', padding: '2px 4px' }}>✕</button>
+                          </div>
+                        </div>
+                      ))}
+                      {crmExpenses.length === 0 && <p style={{ margin: 0, color: '#d1d5db', fontSize: '0.78rem', textAlign: 'center' }}>אין הוצאות רשומות</p>}
+                    </div>
+                  </div>
                 </>)}
               </div>
             );

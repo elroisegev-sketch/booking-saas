@@ -83,6 +83,7 @@ app.use('/api/appointments', require('./routes/appointments'));
 app.use('/api/availability', require('./routes/availability'));
 app.use('/api/blocked-slots', require('./routes/blocked_slots'));
 app.use('/api/push', require('./routes/push').router);
+app.use('/api/expenses', require('./routes/expenses'));
 
 app.get('/health', (_, res) => res.json({ status: 'ok', service: 'BookSlot API' }));
 
@@ -92,6 +93,18 @@ require('./db').query(`ALTER TABLE appointments ADD COLUMN IF NOT EXISTS notes T
 // Multi-service names text column
 require('./db').query(`ALTER TABLE appointments ADD COLUMN IF NOT EXISTS service_names_text TEXT`).catch(() => {});
 require('./db').query(`ALTER TABLE appointments ADD COLUMN IF NOT EXISTS total_price NUMERIC`).catch(() => {});
+
+// Expenses table migration
+require('./db').query(`
+  CREATE TABLE IF NOT EXISTS expenses (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    business_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    month VARCHAR(7) NOT NULL,
+    description TEXT NOT NULL,
+    amount NUMERIC NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+  )
+`).catch(err => console.error('expenses migration error:', err));
 
 // Allow manual appointments without service_id (make it nullable)
 require('./db').query(`ALTER TABLE appointments ALTER COLUMN service_id DROP NOT NULL`).catch(() => {});
