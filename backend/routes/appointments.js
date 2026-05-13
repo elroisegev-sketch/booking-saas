@@ -180,7 +180,7 @@ router.get('/', auth, async (req, res) => {
   if (from && !isValidISODate(from)) return res.status(400).json({ error: 'Invalid from date' });
   if (to && !isValidISODate(to)) return res.status(400).json({ error: 'Invalid to date' });
   try {
-    let query = `SELECT a.*, s.name AS service_name, s.duration, COALESCE(a.total_price, a.price, s.price, 0) AS price FROM appointments a LEFT JOIN services s ON a.service_id = s.id WHERE a.business_id = $1`;
+    let query = `SELECT a.*, s.name AS service_name, s.duration, COALESCE(a.total_price, a.price, s.price, 0) AS price FROM appointments a JOIN services s ON a.service_id = s.id WHERE a.business_id = $1`;
     const params = [req.user.id];
     if (status) { params.push(status); query += ` AND a.status = $${params.length}`; }
     else { query += ` AND a.status != 'cancelled'`; }
