@@ -172,6 +172,7 @@ const Icon = ({ name, className = 'w-5 h-5' }) => {
     image: <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>,
     whatsapp: <svg className={className} fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>,
     portfolio: <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>,
+    crm: <svg className={className} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg>,
   };
   return icons[name] || null;
 };
@@ -1427,6 +1428,9 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
   const [showBlockModal, setShowBlockModal] = useState(false);
   const [blockForm, setBlockForm] = useState({ start_time: '09:00', end_time: '10:00', reason: '' });
   const [editAppt, setEditAppt] = useState(null);
+  const [crmMonth, setCrmMonth] = useState(() => { const n = new Date(); return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}`; });
+  const [crmData, setCrmData] = useState(null);
+  const [crmLoading, setCrmLoading] = useState(false);
 
   const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'https://booking-saas-production-b9fd.up.railway.app';
   const VAPID_PUBLIC = 'BJruLIZOsClN97fYdg9i5G52FyTQGEVD_5pSAW6BWQNPKO5lecZhhOn58DCnS1aEkPX1qWQIKcA9INApaRiW1X0';
@@ -1467,6 +1471,17 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
     };
     registerPush();
   }, []);
+
+  useEffect(() => {
+    if (tab !== 'crm') return;
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (!token) return;
+    setCrmLoading(true);
+    fetch(`${BACKEND}/api/appointments/crm?month=${crmMonth}`, { headers: { 'Authorization': 'Bearer ' + token } })
+      .then(r => r.json())
+      .then(data => { setCrmData(data); setCrmLoading(false); })
+      .catch(() => setCrmLoading(false));
+  }, [tab, crmMonth]);
 
   const showToast = (msg) => { setToast(msg); setTimeout(() => setToast(null), 3000); };
 
@@ -1609,7 +1624,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
     { id: 'services', label: 'שירותים', icon: 'sparkles' },
     { id: 'customers', label: 'לקוחות', icon: 'users' },
     { id: 'availability', label: 'שעות', icon: 'clock' },
-    { id: 'portfolio', label: 'תיק עבודות', icon: 'portfolio' },
+    { id: 'crm', label: 'CRM', icon: 'crm' },
   ];
 
   const mainStyle = { flex: 1, overflowY: 'auto', fontFamily: 'Varela Round, sans-serif', background: 'linear-gradient(135deg, #fff5f7 0%, #fce8f3 40%, #f3eeff 80%, #fff5f7 100%)', paddingBottom: '80px' };
@@ -2064,23 +2079,83 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
             </div>
           )}
 
-          {/* PORTFOLIO */}
-          {tab === 'portfolio' && (
-            <div>
-              <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#A11738', marginBottom: '0.5rem' }}>תיק עבודות 🖼</h1>
-              <p style={{ color: '#9ca3af', fontSize: '0.875rem', marginBottom: '1.5rem' }}>תמונות שמוצגות ללקוחות</p>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '1rem' }}>
-                {PORTFOLIO.map(item => (
-                  <div key={item.id} style={{ ...card, padding: '1.5rem', textAlign: 'center' }}>
-                    <div style={{ fontSize: '3rem', marginBottom: '0.75rem' }}>{item.emoji}</div>
-                    <p style={{ fontWeight: 900, color: '#A11738', margin: '0 0 4px' }}>{item.title}</p>
-                    <p style={{ color: '#9ca3af', fontSize: '0.75rem', margin: 0 }}>{item.desc}</p>
+          {/* CRM */}
+          {tab === 'crm' && (() => {
+            const monthNames = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+            const [y, m] = crmMonth.split('-').map(Number);
+            const monthLabel = `${monthNames[m-1]} ${y}`;
+            const prevMonth = () => { const d = new Date(y, m-2, 1); setCrmMonth(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`); };
+            const nextMonth = () => { const d = new Date(y, m, 1); setCrmMonth(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`); };
+            const isCurrentMonth = crmMonth === (() => { const n = new Date(); return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}`; })();
+            const exportCSV = () => {
+              if (!crmData?.appointments?.length) return;
+              const bom = '﻿';
+              const headers = ['שם לקוחה','טלפון','שירות','תאריך ושעה','מחיר (₪)'];
+              const rows = crmData.appointments.map(a => [
+                a.customer_name, a.customer_phone, a.service_names_text || '',
+                fmtDate(a.appointment_time) + ' ' + fmtTime(a.appointment_time),
+                parseFloat(a.total_price || 0).toFixed(2),
+              ]);
+              const csv = [headers, ...rows].map(r => r.map(c => `"${String(c||'').replace(/"/g,'""')}"`).join(',')).join('\n');
+              const blob = new Blob([bom + csv], { type: 'text/csv;charset=utf-8;' });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement('a'); a.href = url; a.download = `CRM-${crmMonth}.csv`; a.click();
+              URL.revokeObjectURL(url);
+            };
+            return (
+              <div>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
+                  <h1 style={{ fontSize: '1.5rem', fontWeight: 900, color: '#A11738', margin: 0 }}>CRM 📊</h1>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    <button onClick={prevMonth} style={{ padding: '6px 10px', borderRadius: '10px', border: '1px solid rgba(247,193,195,0.6)', background: 'rgba(255,255,255,0.7)', cursor: 'pointer', fontWeight: 700, color: '#A11738', fontSize: '1rem' }}>›</button>
+                    <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#374151', minWidth: '90px', textAlign: 'center' }}>{monthLabel}</span>
+                    <button onClick={nextMonth} disabled={isCurrentMonth} style={{ padding: '6px 10px', borderRadius: '10px', border: '1px solid rgba(247,193,195,0.6)', background: isCurrentMonth ? 'rgba(240,240,240,0.5)' : 'rgba(255,255,255,0.7)', cursor: isCurrentMonth ? 'not-allowed' : 'pointer', fontWeight: 700, color: isCurrentMonth ? '#d1d5db' : '#A11738', fontSize: '1rem' }}>‹</button>
                   </div>
-                ))}
+                </div>
+
+                {crmLoading && <div style={{ textAlign: 'center', padding: '3rem', color: '#A11738', fontWeight: 700 }}>טוען...</div>}
+
+                {!crmLoading && crmData && (<>
+                  {/* כרטיס סיכום */}
+                  <div style={{ ...card, padding: '1.25rem 1.5rem', marginBottom: '1rem', display: 'flex', gap: '1rem' }}>
+                    <div style={{ flex: 1, textAlign: 'center', borderLeft: '1px solid rgba(247,193,195,0.4)', paddingLeft: '1rem' }}>
+                      <p style={{ margin: 0, color: '#9ca3af', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.05em' }}>סה״כ הכנסות</p>
+                      <p style={{ margin: '4px 0 0', fontSize: '1.75rem', fontWeight: 900, color: '#A11738', fontFamily: 'Varela Round, sans-serif' }}>₪{parseFloat(crmData.totalRevenue||0).toLocaleString('he-IL')}</p>
+                    </div>
+                    <div style={{ flex: 1, textAlign: 'center' }}>
+                      <p style={{ margin: 0, color: '#9ca3af', fontSize: '0.72rem', fontWeight: 600, letterSpacing: '0.05em' }}>מספר טיפולים</p>
+                      <p style={{ margin: '4px 0 0', fontSize: '1.75rem', fontWeight: 900, color: '#EC6A83', fontFamily: 'Varela Round, sans-serif' }}>{crmData.count}</p>
+                    </div>
+                  </div>
+
+                  {/* כפתור ייצוא */}
+                  <button onClick={exportCSV} disabled={!crmData.appointments?.length} style={{ width: '100%', padding: '0.75rem', borderRadius: '14px', background: crmData.appointments?.length ? 'linear-gradient(135deg,#A11738,#EC6A83)' : 'rgba(209,213,219,0.5)', color: crmData.appointments?.length ? 'white' : '#9ca3af', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: crmData.appointments?.length ? 'pointer' : 'not-allowed', marginBottom: '1rem', boxShadow: crmData.appointments?.length ? '0 4px 16px rgba(161,23,56,0.25)' : 'none', fontFamily: 'Varela Round, sans-serif' }}>
+                    ייצוא לאקסל (CSV) ⬇️
+                  </button>
+
+                  {/* טבלת לקוחות */}
+                  {crmData.appointments?.length === 0 && (
+                    <div style={{ ...card, padding: '2rem', textAlign: 'center' }}>
+                      <p style={{ color: '#9ca3af', margin: 0 }}>אין תורים לחודש זה</p>
+                    </div>
+                  )}
+                  {crmData.appointments?.map((a, i) => (
+                    <div key={a.id || i} style={{ ...card, padding: '1rem 1.25rem', marginBottom: '10px' }}>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '6px' }}>
+                        <span style={{ fontWeight: 700, fontSize: '0.95rem', color: '#1f2937' }}>{a.customer_name}</span>
+                        <span style={{ fontWeight: 900, fontSize: '0.95rem', color: '#A11738' }}>₪{parseFloat(a.total_price||0).toLocaleString('he-IL')}</span>
+                      </div>
+                      <p style={{ margin: '0 0 4px', fontSize: '0.8rem', color: '#6b7280' }}>{a.service_names_text}</p>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <a href={`tel:${a.customer_phone}`} style={{ fontSize: '0.78rem', color: '#A11738', textDecoration: 'none', direction: 'ltr' }}>{a.customer_phone}</a>
+                        <span style={{ fontSize: '0.75rem', color: '#9ca3af' }}>{fmtDate(a.appointment_time)} · {fmtTime(a.appointment_time)}</span>
+                      </div>
+                    </div>
+                  ))}
+                </>)}
               </div>
-              <p style={{ color: '#9ca3af', fontSize: '0.8rem', marginTop: '1rem', textAlign: 'center' }}>בקרוב: אפשרות להעלות תמונות אמיתיות 📸</p>
-            </div>
-          )}
+            );
+          })()}
 
           {/* BOOKING PREVIEW */}
           {tab === 'booking' && (

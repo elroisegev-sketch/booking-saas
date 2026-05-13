@@ -200,6 +200,28 @@ router.get('/customers', auth, async (req, res) => {
   } catch (err) { res.status(500).json({ error: 'Server error' }); }
 });
 
+// GET /api/appointments/crm?month=YYYY-MM
+router.get('/crm', auth, async (req, res) => {
+  const { month } = req.query;
+  if (!month || !/^\d{4}-\d{2}$/.test(month))
+    return res.status(400).json({ error: 'month param required (YYYY-MM)' });
+  try {
+    const result = await db.query(
+      `SELECT id, customer_name, customer_phone, service_names_text,
+              appointment_time, COALESCE(total_price, 0) AS total_price
+       FROM appointments
+       WHERE business_id = $1
+         AND status != 'cancelled'
+         AND TO_CHAR(appointment_time AT TIME ZONE 'Asia/Jerusalem', 'YYYY-MM') = $2
+       ORDER BY appointment_time ASC`,
+      [req.user.id, month]
+    );
+    const rows = result.rows;
+    const totalRevenue = rows.reduce((s, r) => s + parseFloat(r.total_price || 0), 0);
+    res.json({ appointments: rows, totalRevenue, count: rows.length });
+  } catch (err) { console.error(err); res.status(500).json({ error: 'Server error' }); }
+});
+
 // GET /api/appointments/slots/:slug/:serviceId/:date
 router.get('/slots/:slug/:serviceId/:date', async (req, res) => {
   const { slug, serviceId, date } = req.params;
