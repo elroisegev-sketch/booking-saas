@@ -451,8 +451,9 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   const getFD = (y, m) => new Date(y, m, 1).getDay();
 
   const isAvail = (date) => {
-    const today = new Date(); today.setHours(0, 0, 0, 0);
-    if (date < today) return false;
+    const min24 = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    const endOfDay = new Date(date.getFullYear(), date.getMonth(), date.getDate(), 23, 59, 59, 999);
+    if (endOfDay < min24) return false;
     const dow = date.getDay();
     // public endpoint מחזיר רק ימים פעילים — אם קיים, הוא פעיל
     // אם הנתונים טרם נטענו (null) — fallback למוק. אם נטענו ריק — לא עובדת אף יום
@@ -483,7 +484,15 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
       .catch(function(err) { console.error('slots fetch error:', err); setAvailableSlots([]); setLoadingSlots(false); });
   }, [sel.date, firstServiceId, totalDuration]);
 
-  const slots = () => availableSlots;
+  const slots = () => {
+    const min24 = new Date(Date.now() + 24 * 60 * 60 * 1000);
+    return availableSlots.filter(s => {
+      if (!sel.date) return true;
+      const [th, tm] = s.split(':').map(Number);
+      const slotDT = new Date(sel.date.getFullYear(), sel.date.getMonth(), sel.date.getDate(), th, tm, 0, 0);
+      return slotDT >= min24;
+    });
+  };
 
   const CAT_ORDER = ["לק ג'ל 💅", 'פנים 💆'];
   const allCats = [...new Set(displayServices.map(s => s.category))];
