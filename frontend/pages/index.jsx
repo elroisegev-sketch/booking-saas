@@ -349,6 +349,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   const [showWaBubble, setShowWaBubble] = useState(true);
   const [bookingToast, setBookingToast] = useState(null);
   const [paying, setPaying] = useState(false);
+  const [copiedPhone, setCopiedPhone] = useState(false);
   const showBookingToast = (msg) => { setBookingToast(msg); setTimeout(() => setBookingToast(null), 4000); };
 
   // Restore state from sessionStorage on mount
@@ -792,7 +793,11 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
               <svg width="44" height="44" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </div>
             <h2 style={{ fontFamily: "'Dancing Script', cursive", fontSize: '2rem', color: '#A11738', margin: '0 0 0.5rem' }}>הבקשה נשלחה! ✨</h2>
-            <p style={{ color: '#6b7280', fontSize: '0.95rem', marginBottom: '1.75rem' }}>ליאור תאשר את התור ותחזור אלייך בהקדם</p>
+            <p style={{ color: '#6b7280', fontSize: '0.9rem', marginBottom: '0.75rem' }}>ליאור תחזור אלייך בהקדם לאישור</p>
+            <div style={{ background: 'rgba(161,23,56,0.07)', border: '1.5px solid rgba(161,23,56,0.2)', borderRadius: '14px', padding: '0.85rem 1.1rem', marginBottom: '1.5rem', width: '100%', maxWidth: 340 }}>
+              <p style={{ margin: 0, fontWeight: 700, fontSize: '0.88rem', color: '#A11738' }}>⚠️ התור לא נקבע עד להעברת המקדמה</p>
+              <p style={{ margin: '4px 0 0', fontSize: '0.8rem', color: '#6b7280' }}>יש להעביר את המקדמה דרך ביט/פייבוקס כדי לשריין את הזמן שלך</p>
+            </div>
             <div style={{ background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.85)', borderRadius: '24px', padding: '1.5rem 2rem', width: '100%', maxWidth: 340, boxShadow: '0 8px 32px rgba(161,23,56,0.08)', marginBottom: '2rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
                 <span style={{ color: '#9ca3af', fontSize: '0.85rem' }}>טיפול</span>
@@ -893,9 +898,18 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
               <p style={{ fontWeight: 600, fontSize: '0.78rem', color: '#9ca3af', letterSpacing: '0.1em', textTransform: 'uppercase', marginBottom: '0.75rem' }}>תשלום מקדמה</p>
               <p style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '3rem', fontWeight: 700, color: '#A11738', margin: '0 0 0.4rem', lineHeight: 1 }}>₪{deposit}</p>
               <p style={{ color: '#b0b8c4', fontSize: '0.75rem' }}>50% ממחיר הטיפול</p>
-              <div style={{ marginTop: '1rem', padding: '0.6rem 1rem', background: 'rgba(161,23,56,0.06)', borderRadius: '12px' }}>
-                <p style={{ color: '#9ca3af', fontSize: '0.72rem', marginBottom: '2px' }}>להעברה ידנית — מספר הנייד של ליאור</p>
-                <p style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '1.3rem', fontWeight: 700, color: '#A11738', letterSpacing: '0.05em', direction: 'ltr' }}>053-524-9688</p>
+              <div style={{ marginTop: '1rem', padding: '0.75rem 1rem', background: 'rgba(161,23,56,0.06)', borderRadius: '12px' }}>
+                <p style={{ color: '#9ca3af', fontSize: '0.72rem', marginBottom: '6px' }}>להעברה ידנית — מספר הנייד של ליאור</p>
+                <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px' }}>
+                  <p style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '1.3rem', fontWeight: 700, color: '#A11738', letterSpacing: '0.05em', direction: 'ltr', margin: 0 }}>053-524-9688</p>
+                  <button
+                    onClick={() => { navigator.clipboard.writeText('0535249688'); setCopiedPhone(true); setTimeout(() => setCopiedPhone(false), 2000); }}
+                    style={{ padding: '0.35rem 0.85rem', borderRadius: '999px', background: copiedPhone ? 'linear-gradient(135deg,#22c55e,#16a34a)' : 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, fontSize: '0.75rem', border: 'none', cursor: 'pointer', whiteSpace: 'nowrap', transition: 'background 0.2s', fontFamily: 'inherit' }}
+                  >
+                    {copiedPhone ? '✓ הועתק' : 'העתק'}
+                  </button>
+                </div>
+                <p style={{ color: '#EC6A83', fontSize: '0.72rem', marginTop: '6px', fontWeight: 600 }}>העתיקי את המספר לביט/פייבוקס לתשלום</p>
               </div>
             </div>
 
