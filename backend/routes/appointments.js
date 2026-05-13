@@ -180,7 +180,7 @@ router.get('/', auth, async (req, res) => {
   if (from && !isValidISODate(from)) return res.status(400).json({ error: 'Invalid from date' });
   if (to && !isValidISODate(to)) return res.status(400).json({ error: 'Invalid to date' });
   try {
-    let query = `SELECT a.*, s.name AS service_name, s.duration, COALESCE(a.total_price, a.price, s.price, 0) AS price FROM appointments a JOIN services s ON a.service_id = s.id WHERE a.business_id = $1`;
+    let query = `SELECT a.*, COALESCE(s.name, a.service_name, 'טיפול') AS service_name, COALESCE(s.duration, 60) AS duration, COALESCE(a.total_price, a.price, s.price, 0) AS price FROM appointments a LEFT JOIN services s ON a.service_id = s.id WHERE a.business_id = $1`;
     const params = [req.user.id];
     if (status) { params.push(status); query += ` AND a.status = $${params.length}`; }
     else { query += ` AND a.status != 'cancelled'`; }
@@ -345,7 +345,7 @@ router.patch('/:id', auth, async (req, res) => {
   const ids = service_ids?.length ? service_ids : (service_id ? [service_id] : null);
   try {
     const curr = await db.query(
-      `SELECT a.*, s.duration FROM appointments a JOIN services s ON a.service_id = s.id WHERE a.id=$1 AND a.business_id=$2`,
+      `SELECT a.*, COALESCE(s.duration, 60) AS duration FROM appointments a LEFT JOIN services s ON a.service_id = s.id WHERE a.id=$1 AND a.business_id=$2`,
       [req.params.id, req.user.id]
     );
     if (!curr.rows.length) return res.status(404).json({ error: 'Appointment not found' });
