@@ -299,7 +299,7 @@ router.post('/', bookingLimiter, async (req, res) => {
     return res.status(400).json({ error: 'Missing required fields' });
   if (typeof customer_name !== 'string' || customer_name.trim().length < 2 || customer_name.trim().length > 100)
     return res.status(400).json({ error: 'שם לא תקין (2-100 תווים)' });
-  const cleanPhone = customer_phone.replace(/[-\s]/g, '');
+  const cleanPhone = customer_phone.replace(/\D/g, '').replace(/^972/, '0');
   if (!PHONE_RE.test(cleanPhone))
     return res.status(400).json({ error: 'מספר טלפון לא תקין' });
   if (customer_email && !EMAIL_RE.test(customer_email))
@@ -336,7 +336,7 @@ router.post('/', bookingLimiter, async (req, res) => {
     await sendPush(businessId, { title: '🌸 תור חדש!', body: `${customer_name} | ${displayNames}\n${dateHeb} בשעה ${timeHeb}` });
     notifyBusiness(businessId);
     res.status(201).json(result.rows[0]);
-  } catch (err) { console.error('Book appointment error:', err); res.status(500).json({ error: 'Server error while booking appointment' }); }
+  } catch (err) { console.error('Book appointment error:', err); res.status(500).json({ error: 'שגיאה בשרת, נסי שוב בעוד רגע' }); }
 });
 
 // PATCH /api/appointments/:id  (edit full appointment, auth required)

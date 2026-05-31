@@ -966,7 +966,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                       business_slug: 'lior-segev',
                       service_id: selectedServices[0] ? selectedServices[0].id : null,
                       customer_name: sel.name,
-                      customer_phone: sel.phone,
+                      customer_phone: sel.phone.replace(/\D/g, '').replace(/^972/, '0'),
                       appointment_time: startUTC.toISOString(),
                       end_time: endUTC.toISOString(),
                       service_names: selectedServices.map(function(s) { return s.name; }).join(', ') + (externalNail && hasGel ? ' + הסרת לק מסלון אחר (+10₪)' : ''),
@@ -979,6 +979,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                     console.error('booking error', res.status, errData);
                     if (res.status === 429) showBookingToast('יותר מדי ניסיונות — נסי שוב בעוד שעה');
                     else if (res.status === 409) { showBookingToast('הזמן הזה כבר תפוס, בחרי שעה אחרת'); setStep(3); }
+                    else if (res.status === 400 && errData.error) showBookingToast(errData.error);
                     else showBookingToast('שגיאה ברישום התור, נסי שוב');
                     setPaying(false);
                     return;
