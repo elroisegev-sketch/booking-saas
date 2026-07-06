@@ -353,6 +353,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   const [paying, setPaying] = useState(false);
   const [copiedPhone, setCopiedPhone] = useState(false);
   const [hadSavedDetails, setHadSavedDetails] = useState(false);
+  const [savedBooking, setSavedBooking] = useState(null);
   const [nearestDate, setNearestDate] = useState(null);
   const showBookingToast = (msg) => { setBookingToast(msg); setTimeout(() => setBookingToast(null), 4000); };
 
@@ -379,6 +380,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
           if (d && (d.name || d.phone)) {
             setSel(prev => (prev.name ? prev : { ...prev, name: d.name || prev.name, phone: d.phone || prev.phone }));
             setHadSavedDetails(true);
+            setSavedBooking(d);
           }
         }
       } catch(e) {}
@@ -443,6 +445,31 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   const hasLashLift = selectedServices.some(s => s.name === "הרמת ריסים");
   const totalPrice = selectedServices.reduce((s, svc) => s + parseFloat(svc.price || 0), 0);
   const totalDuration = selectedServices.reduce((s, svc) => s + svc.duration, 0);
+
+  // Returning customer (#6): resolve last-booked services against the current list.
+  // Refresh price/duration from the live service when it still exists and wasn't customized
+  // (e.g. "השלמת ציפורן (2)"); keep the saved copy for customized ones; drop removed ones.
+  const resolveSaved = (savedSvcs) => {
+    if (!Array.isArray(savedSvcs)) return [];
+    return savedSvcs.map(ss => {
+      const cur = displayServices.find(c => String(c.id) === String(ss.id));
+      if (!cur) return null;
+      return ss.name !== cur.name ? ss : cur;
+    }).filter(Boolean);
+  };
+  const savedResolved = savedBooking ? resolveSaved(savedBooking.services) : [];
+  const savedTotal = savedResolved.reduce((s, svc) => s + parseFloat(svc.price || 0), 0);
+
+  // Select a set of services and advance to the right next step (mirrors the sticky-bar logic).
+  const proceedWith = (svcs) => {
+    setSelectedServices(svcs);
+    const gel = svcs.some(s => s.category && s.category.includes("לק ג'ל"));
+    const lash = svcs.some(s => s.name === "הרמת ריסים");
+    const kishut = svcs.some(s => s.name === "קישוט");
+    if (kishut) setStep('kishut_info');
+    else if (gel || lash) setStep('terms_gel');
+    else setStep(2);
+  };
 
   // Determine which terms to show
   const getTermsText = () => {
@@ -648,6 +675,26 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
           <div>
             <h2 style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '2rem', fontWeight: 300, color: '#3d0c16', marginBottom: '0.2rem' }}>בחרי שירותים</h2>
             <p style={{ color: '#9ca3af', fontSize: '0.8rem', marginBottom: '1.75rem' }}>ניתן לבחור מספר שירותים</p>
+
+            {/* Returning customer (#6) — "your usual" one-tap rebook */}
+            {savedResolved.length > 0 && selectedServices.length === 0 && savedBooking && savedBooking.name && (
+              <div style={{ background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1.5px solid rgba(236,106,131,0.4)', borderRadius: '24px', padding: '1.25rem 1.25rem 1.1rem', marginBottom: '1.75rem', boxShadow: '0 8px 32px rgba(161,23,56,0.1), inset 0 1px 0 rgba(255,255,255,0.9)' }}>
+                <p style={{ fontWeight: 700, color: '#A11738', fontSize: '1rem', margin: '0 0 2px' }}>שלום שוב, {savedBooking.name} 🌸</p>
+                {savedBooking.visits > 1 && (
+                  <p style={{ color: '#9ca3af', fontSize: '0.72rem', margin: '0 0 0.75rem' }}>כבר {savedBooking.visits} ביקורים אצל ליאור</p>
+                )}
+                <p style={{ color: '#6b7280', fontSize: '0.72rem', margin: savedBooking.visits > 1 ? '0 0 4px' : '0.5rem 0 4px', letterSpacing: '0.02em' }}>התור הרגיל שלך</p>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.9rem' }}>
+                  <span style={{ color: '#2d0a1e', fontSize: '0.85rem', fontWeight: 600 }}>{savedResolved.map(s => s.name).join(' + ')}</span>
+                  <span style={{ color: '#EC6A83', fontWeight: 700, fontSize: '0.95rem', flexShrink: 0, marginRight: '8px' }}>{fmtPrice(savedTotal)}</span>
+                </div>
+                <button className="lux-btn" onClick={() => proceedWith(savedResolved)}
+                  style={{ width: '100%', padding: '0.8rem', borderRadius: '999px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, border: 'none', cursor: 'pointer', fontSize: '0.875rem', boxShadow: '0 4px 16px rgba(161,23,56,0.28)' }}>
+                  לחזור על זה →
+                </button>
+              </div>
+            )}
+
             {cats.map(cat => (
               <div key={cat} style={{ marginBottom: '1.5rem' }}>
                 <p style={{ display: 'inline-flex', fontWeight: 500, color: '#A11738', fontSize: '0.78rem', letterSpacing: '0.08em', marginBottom: '0.75rem', background: 'rgba(247,193,195,0.3)', backdropFilter: 'blur(8px)', padding: '3px 12px', borderRadius: '999px', border: '1px solid rgba(247,193,195,0.3)' }}>{cat}</p>
@@ -1060,7 +1107,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                 } catch(err) { console.error('booking failed', err); showBookingToast('בעיית חיבור — נסי שוב'); setPaying(false); return; }
                 try { sessionStorage.removeItem(BOOKING_KEY); } catch(e) {}
                 // Remember details for next time (returning-customer pre-fill). Silent if unavailable.
-                try { localStorage.setItem(CUSTOMER_KEY, JSON.stringify({ name: sel.name, phone: sel.phone })); } catch(e) {}
+                try { localStorage.setItem(CUSTOMER_KEY, JSON.stringify({ name: sel.name, phone: sel.phone, services: selectedServices, visits: ((savedBooking && savedBooking.visits) || 0) + 1, lastDate: startUTC.toISOString() })); } catch(e) {}
                 setConfirmed(true);
                 // פותח את אפליקציית התשלום עם אלמנט עוגן — כך deep links עובדים נכון על iOS
                 const a = document.createElement('a');
