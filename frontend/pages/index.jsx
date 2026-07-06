@@ -331,6 +331,7 @@ const TermsScreen = ({ termsText, onAccept, onBack, externalNail, onExternalNail
 
 // ── BOOKING PAGE ──────────────────────────────────────────────
 const BOOKING_KEY = 'lior_booking_state';
+const CUSTOMER_KEY = 'lior_customer_details';
 
 const BookingPage = ({ onBack, onAppointmentBooked }) => {
   // steps: 0=terms, 1=services, 2=date, 3=time, 4=details, 5=payment
@@ -351,20 +352,37 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   const [bookingToast, setBookingToast] = useState(null);
   const [paying, setPaying] = useState(false);
   const [copiedPhone, setCopiedPhone] = useState(false);
+  const [hadSavedDetails, setHadSavedDetails] = useState(false);
+  const [nearestDate, setNearestDate] = useState(null);
   const showBookingToast = (msg) => { setBookingToast(msg); setTimeout(() => setBookingToast(null), 4000); };
 
   // Restore state from sessionStorage on mount
   useEffect(() => {
+    let restoredName = false;
     try {
       const saved = sessionStorage.getItem(BOOKING_KEY);
       if (saved) {
         const s = JSON.parse(saved);
         if (s.step) setStep(s.step);
         if (s.selectedServices) setSelectedServices(s.selectedServices);
-        if (s.sel) setSel({ ...s.sel, date: s.sel.date ? new Date(s.sel.date) : null });
+        if (s.sel) { setSel({ ...s.sel, date: s.sel.date ? new Date(s.sel.date) : null }); if (s.sel.name) restoredName = true; }
         if (s.calMonth) setCalMonth(new Date(s.calMonth));
       }
     } catch(e) {}
+    // Pre-fill returning-customer details — only if not already restored mid-booking.
+    // Falls back silently if localStorage is unavailable (e.g. Safari private mode).
+    if (!restoredName) {
+      try {
+        const savedDetails = localStorage.getItem(CUSTOMER_KEY);
+        if (savedDetails) {
+          const d = JSON.parse(savedDetails);
+          if (d && (d.name || d.phone)) {
+            setSel(prev => (prev.name ? prev : { ...prev, name: d.name || prev.name, phone: d.phone || prev.phone }));
+            setHadSavedDetails(true);
+          }
+        }
+      } catch(e) {}
+    }
   }, []);
 
   // Save state to sessionStorage on every change (skip first run — restore hasn't applied yet)
@@ -465,6 +483,22 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
     return !!(a && a.is_active);
   };
 
+  // Smart default: once availability is loaded, pick the nearest open day (unless one is already chosen/restored).
+  useEffect(() => {
+    if (dataLoading) return;
+    const today = new Date();
+    for (let i = 0; i <= 60; i++) {
+      const d = new Date(today.getFullYear(), today.getMonth(), today.getDate() + i);
+      if (isAvail(d)) {
+        setNearestDate(d);
+        setSel(prev => (prev.date ? prev : { ...prev, date: d }));
+        setCalMonth(prevMonth => (sel.date ? prevMonth : new Date(d.getFullYear(), d.getMonth(), 1)));
+        break;
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataLoading, realAvailability]);
+
   const [availableSlots, setAvailableSlots] = useState([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
 
@@ -493,6 +527,16 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
       const slotDT = new Date(sel.date.getFullYear(), sel.date.getMonth(), sel.date.getDate(), th, tm, 0, 0);
       return slotDT >= min24;
     });
+  };
+
+  // Next open day after the currently-selected date (day-of-week active). Used when a day has no free slots.
+  const nextOpenDay = () => {
+    if (!sel.date) return null;
+    for (let i = 1; i <= 60; i++) {
+      const d = new Date(sel.date.getFullYear(), sel.date.getMonth(), sel.date.getDate() + i);
+      if (isAvail(d)) return d;
+    }
+    return null;
   };
 
   const CAT_ORDER = ["לק ג'ל 💅", 'פנים 💆'];
@@ -702,7 +746,10 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
         {step === 2 && !dataLoading && (
           <div>
             <h2 style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '2rem', fontWeight: 300, color: '#3d0c16', marginBottom: '0.2rem' }}>בחרי תאריך</h2>
-            <p style={{ color: '#9ca3af', fontSize: '0.8rem', marginBottom: '1.75rem' }}>{selectedServices.map(s => s.name).join(' + ')}</p>
+            <p style={{ color: '#9ca3af', fontSize: '0.8rem', marginBottom: nearestDate && sel.date && sel.date.toDateString() === nearestDate.toDateString() ? '0.5rem' : '1.75rem' }}>{selectedServices.map(s => s.name).join(' + ')}</p>
+            {nearestDate && sel.date && sel.date.toDateString() === nearestDate.toDateString() && (
+              <p style={{ color: '#A11738', fontSize: '0.75rem', fontWeight: 600, marginBottom: '1.5rem' }}>📍 בחרנו לך את היום הקרוב שפנוי — אפשר לשנות</p>
+            )}
             <div style={{ background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.8)', borderRadius: '24px', overflow: 'hidden', marginBottom: '1.25rem', boxShadow: '0 8px 32px rgba(161,23,56,0.08), inset 0 1px 0 rgba(255,255,255,0.9)' }}>
               <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '1rem 1.5rem', borderBottom: '1px solid rgba(247,193,195,0.18)' }}>
                 <button onClick={() => setCalMonth(new Date(calMonth.getFullYear(), calMonth.getMonth() - 1))} style={{ padding: '0.4rem', background: 'none', border: 'none', cursor: 'pointer', color: '#A11738' }}><Icon name="chevronR" className="w-4 h-4" /></button>
@@ -748,11 +795,34 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
               </div>
             ) : (
               <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: '10px', marginBottom: '1.5rem' }}>
-                {slots().map(s => (
-                  <button key={s} className="slot-btn" onClick={() => setSel({ ...sel, time: s })}
-                    style={{ padding: '0.875rem 0.5rem', borderRadius: '999px', fontWeight: 600, fontSize: '0.875rem', border: `1.5px solid ${sel.time === s ? 'transparent' : 'rgba(247,193,195,0.38)'}`, background: sel.time === s ? 'linear-gradient(135deg,#A11738,#EC6A83)' : 'white', color: sel.time === s ? 'white' : '#A11738', cursor: 'pointer', boxShadow: sel.time === s ? '0 4px 16px rgba(161,23,56,0.25)' : '0 1px 4px rgba(0,0,0,0.04)' }}>{s}</button>
+                {slots().map((s, i) => (
+                  <div key={s} style={{ position: 'relative' }}>
+                    {i === 0 && (
+                      <span style={{ position: 'absolute', top: '-8px', left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontSize: '0.55rem', fontWeight: 700, padding: '2px 8px', borderRadius: '999px', whiteSpace: 'nowrap', zIndex: 1, boxShadow: '0 2px 8px rgba(161,23,56,0.3)', pointerEvents: 'none' }}>הכי קרוב</span>
+                    )}
+                    <button className="slot-btn" onClick={() => setSel({ ...sel, time: s })}
+                      style={{ width: '100%', padding: '0.875rem 0.5rem', borderRadius: '999px', fontWeight: 600, fontSize: '0.875rem', border: `1.5px solid ${sel.time === s ? 'transparent' : 'rgba(247,193,195,0.38)'}`, background: sel.time === s ? 'linear-gradient(135deg,#A11738,#EC6A83)' : 'white', color: sel.time === s ? 'white' : '#A11738', cursor: 'pointer', boxShadow: sel.time === s ? '0 4px 16px rgba(161,23,56,0.25)' : '0 1px 4px rgba(0,0,0,0.04)' }}>{s}</button>
+                  </div>
                 ))}
-                {slots().length === 0 && <p style={{ gridColumn: '1/-1', textAlign: 'center', color: '#9ca3af', padding: '2rem', fontSize: '0.875rem' }}>אין שעות פנויות ביום זה</p>}
+                {slots().length === 0 && (() => {
+                  const nod = nextOpenDay();
+                  return (
+                    <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '1.5rem 0.5rem' }}>
+                      <p style={{ color: '#9ca3af', fontSize: '0.9rem', marginBottom: '1.25rem' }}>היום הזה מלא</p>
+                      {nod && (
+                        <button onClick={() => { setSel({ ...sel, date: nod, time: null }); setCalMonth(new Date(nod.getFullYear(), nod.getMonth(), 1)); }}
+                          style={{ width: '100%', padding: '0.875rem', borderRadius: '999px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: 'pointer', marginBottom: '10px', boxShadow: '0 4px 16px rgba(161,23,56,0.25)' }}>
+                          לבדוק יום אחר: {nod.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' })} →
+                        </button>
+                      )}
+                      <a href={`https://wa.me/972${LIOR_PHONE.slice(1)}?text=${encodeURIComponent(`היי ליאור 🌸\nהיום ${dateStr} מלא — אשמח להיכנס לרשימת המתנה ל${serviceNames}`)}`}
+                        target="_blank" rel="noreferrer"
+                        style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', width: '100%', padding: '0.875rem', borderRadius: '999px', background: '#25D366', color: 'white', fontWeight: 700, fontSize: '0.875rem', textDecoration: 'none', boxSizing: 'border-box', boxShadow: '0 4px 16px rgba(37,211,102,0.28)' }}>
+                        <Icon name="whatsapp" className="w-5 h-5" /> עדכני אותי כשמתפנה
+                      </a>
+                    </div>
+                  );
+                })()}
               </div>
             )}
             <div style={{ display: 'flex', gap: '10px' }}>
@@ -778,6 +848,9 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                 <input id="booking-phone" type="tel" autoComplete="tel" style={{ width: '100%', padding: '0.5rem 0', border: 'none', borderBottom: `1.5px solid ${sel.phone ? '#EC6A83' : 'rgba(247,193,195,0.55)'}`, outline: 'none', fontSize: '0.95rem', direction: 'ltr', boxSizing: 'border-box', textAlign: 'right', background: 'transparent', color: '#2d0a1e', transition: 'border-color 0.2s' }}
                   placeholder="050-0000000" value={sel.phone} onChange={e => setSel({ ...sel, phone: e.target.value })} />
               </div>
+              {hadSavedDetails && (
+                <p style={{ margin: '1rem 0 0', fontSize: '0.72rem', color: '#9ca3af', textAlign: 'center' }}>שמרנו מהפעם הקודמת — עדכני אם השתנה</p>
+              )}
             </div>
             <div style={{ background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.8)', borderRadius: '24px', padding: '1.25rem', marginBottom: '1.25rem', boxShadow: '0 8px 32px rgba(161,23,56,0.08), inset 0 1px 0 rgba(255,255,255,0.9)' }}>
               <p style={{ fontFamily: "'Varela Round', sans-serif", fontWeight: 400, color: '#A11738', fontSize: '1rem', marginBottom: '0.875rem' }}>סיכום הזמנה</p>
@@ -800,8 +873,8 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                 onClick={() => (sel.name && sel.phone) && setStep(5)}
                 disabled={!sel.name || !sel.phone}
                 style={{ flex: 1, padding: '1rem 1.5rem', borderRadius: '999px', color: (sel.name && sel.phone) ? 'white' : '#9ca3af', fontWeight: 700, border: 'none', cursor: (sel.name && sel.phone) ? 'pointer' : 'not-allowed', fontFamily: 'Varela Round, sans-serif', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '2px' }}>
-                <span style={{ fontSize: '1rem', letterSpacing: '0.02em' }}>המשיכי לשריון התור 🌸</span>
-                <span style={{ fontSize: '0.72rem', fontWeight: 400, opacity: 0.88 }}>תשלום מקדמה · {Math.ceil(finalPrice / 2)}₪</span>
+                <span style={{ fontSize: '1rem', letterSpacing: '0.02em' }}>{sel.date && sel.time ? `לשריון: ${sel.date.toLocaleDateString('he-IL', { weekday: 'long' })} ${sel.time}` : 'המשיכי לשריון התור 🌸'}</span>
+                <span style={{ fontSize: '0.72rem', fontWeight: 400, opacity: 0.88 }}>מקדמה · ₪{Math.ceil(finalPrice / 2)}</span>
               </button>
             </div>
           </div>
@@ -813,7 +886,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
             <div style={{ width: 90, height: 90, borderRadius: '50%', background: 'linear-gradient(135deg,#22c55e,#16a34a)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem', boxShadow: '0 8px 32px rgba(34,197,94,0.35)' }}>
               <svg width="44" height="44" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
             </div>
-            <h2 style={{ fontFamily: "'Dancing Script', cursive", fontSize: '2rem', color: '#A11738', margin: '0 0 0.5rem' }}>הבקשה נשלחה! ✨</h2>
+            <h2 style={{ fontFamily: "'Dancing Script', cursive", fontSize: '2rem', color: '#A11738', margin: '0 0 0.5rem' }}>הבקשה נשלחה ✨</h2>
             <p style={{ color: '#6b7280', fontSize: '0.9rem', marginBottom: '0.75rem' }}>ליאור תחזור אלייך בהקדם לאישור</p>
             <div style={{ background: 'rgba(161,23,56,0.07)', border: '1.5px solid rgba(161,23,56,0.2)', borderRadius: '14px', padding: '0.85rem 1.1rem', marginBottom: '1.5rem', width: '100%', maxWidth: 340 }}>
               <p style={{ margin: 0, fontWeight: 700, fontSize: '0.88rem', color: '#A11738' }}>⚠️ התור לא נקבע עד להעברת המקדמה</p>
@@ -986,6 +1059,8 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                   }
                 } catch(err) { console.error('booking failed', err); showBookingToast('בעיית חיבור — נסי שוב'); setPaying(false); return; }
                 try { sessionStorage.removeItem(BOOKING_KEY); } catch(e) {}
+                // Remember details for next time (returning-customer pre-fill). Silent if unavailable.
+                try { localStorage.setItem(CUSTOMER_KEY, JSON.stringify({ name: sel.name, phone: sel.phone })); } catch(e) {}
                 setConfirmed(true);
                 // פותח את אפליקציית התשלום עם אלמנט עוגן — כך deep links עובדים נכון על iOS
                 const a = document.createElement('a');
