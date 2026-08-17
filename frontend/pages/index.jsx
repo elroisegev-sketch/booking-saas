@@ -2403,23 +2403,43 @@ export default function App({ initialView = 'portfolio' }) {
   const [appointments, setAppointments] = useState([]);
 
   useEffect(() => {
-    try {
-      const onAdmin = initialView === 'auth' || window.location.pathname.startsWith('/admin');
-      if (onAdmin) {
-        const token = localStorage.getItem('token');
-        const rawUser = localStorage.getItem('user');
-        if (token && rawUser) {
-          try {
-            setUser(JSON.parse(rawUser));
-            setView('dashboard');
-            return;
-          } catch (e) {}
+    let cancelled = false;
+    const run = async () => {
+      try {
+        const onAdmin = initialView === 'auth' || window.location.pathname.startsWith('/admin');
+        if (!onAdmin) {
+          if (sessionStorage.getItem(BOOKING_KEY)) setView('booking');
+          return;
         }
-        setView('auth');
-        return;
+        const token = localStorage.getItem('token');
+        if (!token) {
+          if (!cancelled) setView('auth');
+          return;
+        }
+        const res = await fetch('https://booking-saas-production-b9fd.up.railway.app/api/me', {
+          headers: { Authorization: 'Bearer ' + token },
+        });
+        if (!res.ok) {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          if (!cancelled) {
+            setUser(null);
+            setView('auth');
+          }
+          return;
+        }
+        const me = await res.json();
+        if (!cancelled) {
+          localStorage.setItem('user', JSON.stringify(me));
+          setUser(me);
+          setView('dashboard');
+        }
+      } catch (e) {
+        if (!cancelled) setView('auth');
       }
-      if (sessionStorage.getItem(BOOKING_KEY)) setView('booking');
-    } catch (e) {}
+    };
+    run();
+    return () => { cancelled = true; };
   }, [initialView]);
 
   useEffect(() => {
@@ -2577,7 +2597,13 @@ export default function App({ initialView = 'portfolio' }) {
         {view === 'portfolio' && <PortfolioPage onBook={() => setView('booking')} />}
         {view === 'booking' && <BookingPage onBack={() => setView('portfolio')} onAppointmentBooked={(appt) => { setAppointments(prev => [...prev, appt]); }} />}
         {view === 'auth' && <AuthScreen onLogin={(u) => { setUser(u); setView('dashboard'); }} />}
-        {view === 'dashboard' && user && <Dashboard user={user} onLogout={() => { setUser(null); setView('portfolio'); }} appointments={appointments} setAppointments={setAppointments} />}
+        {view === 'dashboard' && user && <Dashboard user={user} onLogout={() => {
+          localStorage.removeItem('token');
+          localStorage.removeItem('user');
+          setUser(null);
+          setAppointments([]);
+          setView(typeof window !== 'undefined' && window.location.pathname.startsWith('/admin') ? 'auth' : 'portfolio');
+        }} appointments={appointments} setAppointments={setAppointments} />}
       </main>
       {view !== 'dashboard' && <LegalFooter />}
     </>
