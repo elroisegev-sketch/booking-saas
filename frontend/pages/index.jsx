@@ -1405,6 +1405,61 @@ const FanGallery = () => {
   );
 };
 
+const GOOGLE_REVIEW_URL = site.social.googleMaps;
+
+const GOOGLE_REVIEWS = [
+  { name: 'שירה כהן', when: 'לפני 3 חודשים', service: "לק ג'ל", text: 'ממש ממש ממליצה על ליאור. קודם כל את נכנסת וישר מרגישה בנח. ליאור פשוט חמודה ברמות, מלא סבלנות וחיוך, פשוט נותנת לך להרגיש בנח. עבודה מדהימה — עשיתי אצלה לק ג׳ל ונשאר לי יציב וחזק, עבודה נקייה ויפה. לא תתחרטו ולא ממומן.' },
+  { name: 'hagit danino', when: 'לפני 4 חודשים', service: 'ציפורניים וגבות', text: 'מקצועית מאוד, אסתטית, יצירתית. עושה אצלה גם ציפורניים וגם גבות. מאוד מרוצה מהתוצאות.' },
+  { name: 'Halel Danino', when: 'לפני 4 חודשים', service: 'מניקור', text: 'הייתי אצל הרבה מניקוריסטיות. כשהגעתי אליה הפכתי ללקוחה קבועה כבר קרוב לשנתיים. מאוד מקצועית, חד משמעית שווה את הכסף.' },
+  { name: 'נחמי פרידמן', when: 'לפני 3 חודשים', service: 'מניקור', text: 'ליאור המהממת! תמיד בחיוך, בנחת ובסבלנות. מקצוענית ודייקנית והעבודות שלה מושלמות ממש.' },
+  { name: 'יעלה נדם', when: 'לפני 4 חודשים', service: 'עיצוב גבות, הרמת ריסים', text: 'הקוסמטיקאית הכי מקצועית וחמה שאני מכירה. מדהימה ומוכשרת.' },
+  { name: 'תאיר נתן', when: 'לפני 4 חודשים', service: 'הרמת ריסים, מניקור', text: 'מקצועית ברמות. עבודה מהממת ויסודית.' },
+  { name: 'Gabriella Green', when: 'לפני 3 חודשים', service: '', text: 'נעימה, אסתטית ותוצאות מהממות.' },
+];
+
+const StarRow = () => (
+  <span style={{ color: '#C4A35A', letterSpacing: '2px', fontSize: '0.95rem' }} aria-label="5 כוכבים">★★★★★</span>
+);
+
+const ReviewsCarousel = () => {
+  const [i, setI] = useState(0);
+  const review = GOOGLE_REVIEWS[i];
+  const go = (dir) => setI((n) => (n + dir + GOOGLE_REVIEWS.length) % GOOGLE_REVIEWS.length);
+
+  return (
+    <div>
+      <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
+        <p style={{ fontSize: '2.4rem', fontWeight: 800, color: '#A11738', margin: 0, lineHeight: 1 }}>{site.ratingValue}</p>
+        <StarRow />
+        <p style={{ color: '#A11738', opacity: 0.65, fontSize: '0.8rem', margin: '0.35rem 0 0' }}>{site.reviewCount} ביקורות בגוגל</p>
+      </div>
+
+      <div style={{ position: 'relative', background: 'rgba(255,255,255,0.72)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.9)', borderRadius: '28px', padding: '1.5rem 1.35rem 1.35rem', boxShadow: '0 10px 36px rgba(161,23,56,0.1), inset 0 1px 0 rgba(255,255,255,1)', minHeight: '220px' }}>
+        <p style={{ fontWeight: 800, color: '#A11738', margin: 0, fontSize: '1.05rem' }}>{review.name}</p>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '4px 0 10px' }}>
+          <StarRow />
+          <span style={{ color: '#9ca3af', fontSize: '0.72rem' }}>{review.when}</span>
+        </div>
+        <p style={{ color: '#3d0c16', fontSize: '0.92rem', lineHeight: 1.7, margin: 0 }}>{review.text}</p>
+        {review.service ? <p style={{ color: '#EC6A83', fontSize: '0.75rem', fontWeight: 700, margin: '12px 0 0' }}>{review.service}</p> : null}
+
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.15rem' }}>
+          <button type="button" onClick={() => go(-1)} aria-label="ביקורת קודמת" style={{ width: 36, height: 36, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.85)', background: 'rgba(255,255,255,0.75)', color: '#A11738', fontSize: '1.25rem', cursor: 'pointer' }}>‹</button>
+          <p style={{ margin: 0, color: 'rgba(161,23,56,0.4)', fontSize: '0.7rem', letterSpacing: '0.12em' }}>{i + 1} / {GOOGLE_REVIEWS.length}</p>
+          <button type="button" onClick={() => go(1)} aria-label="ביקורת הבאה" style={{ width: 36, height: 36, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.85)', background: 'rgba(255,255,255,0.75)', color: '#A11738', fontSize: '1.25rem', cursor: 'pointer' }}>›</button>
+        </div>
+      </div>
+
+      <a href={GOOGLE_REVIEW_URL} target="_blank" rel="noreferrer" className="lux-btn" style={{
+        display: 'flex', alignItems: 'center', justifyContent: 'center',
+        width: '100%', marginTop: '1rem', height: 52, textDecoration: 'none',
+      }}>
+        השאירי ביקורת בגוגל ★
+      </a>
+    </div>
+  );
+};
+
 // ── PORTFOLIO PAGE ────────────────────────────────────────────
 const PortfolioPage = ({ onBook }) => {
   useEffect(() => {
@@ -1486,6 +1541,13 @@ const PortfolioPage = ({ onBook }) => {
             תיק עבודות
           </h2>
           <FanGallery />
+        </div>
+
+        <div className="reveal-sec" style={{ marginBottom: '2.5rem' }}>
+          <h2 style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '1.9rem', fontWeight: 300, color: '#3d0c16', textAlign: 'center', marginBottom: '1.25rem' }}>
+            מה הלקוחות כותבות
+          </h2>
+          <ReviewsCarousel />
         </div>
 
         {/* Social card */}
@@ -1646,6 +1708,8 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
     const time = fmtTime(appt.appointment_time);
     const msg = type === 'confirm'
       ? `קיבלתי את העברת המקדמה שלך ❤️\nאז נפגש בעז״ה בתאריך ${date} , בשעה ${time} ברחוב הרצוג 25 גבעת שמואל 🌸\nמחכה לפגוש אותך 🫶🏼\nלכל שאלה , התייעצות וכו׳ אני פה בשבילך 💞\nנפגש 🥳💅🏽\nליאור שגב , היופי שלך !🌺\nלעמוד האינסטגרם :\nhttps://www.instagram.com/liors_beauty?igsh=ZnY3aGV2YjlsNzQ4&utm_source=qr\nלעמוד הפייסבוק :\nhttps://www.facebook.com/share/1DLKLrkWFb/?mibextid=wwXIfr`
+      : type === 'review'
+      ? `היי ${appt.customer_name} 🌸\nשמחתי לראות אותך היום!\nאם נהנית, ביקורת קצרה בגוגל עוזרת לי המון:\n${GOOGLE_REVIEW_URL}\n\nליאור שגב, היופי שלך 🌺`
       : `היי ${appt.customer_name}, לצערי התור שלך ל${date} בשעה ${time} בוטל. ניצור איתך קשר לקביעת תור חדש 🙏`;
     window.open(`https://wa.me/${phone}?text=${encodeURIComponent(msg)}`, '_blank');
   };
@@ -2086,6 +2150,9 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                           <button onClick={() => setEditAppt(appt)} style={{ padding: '4px 8px', borderRadius: '8px', background: '#ede9fe', color: '#6d28d9', fontWeight: 700, fontSize: '0.7rem', border: 'none', cursor: 'pointer' }}>ערוך</button>
                           <button onClick={() => setNoteModal({ open: true, apptId: appt.id, text: appt.notes || '' })} style={{ padding: '4px 8px', borderRadius: '8px', background: appt.notes ? '#fef3c7' : 'rgba(255,255,255,0.6)', color: appt.notes ? '#92400e' : '#9ca3af', fontWeight: 700, fontSize: '0.75rem', border: '1px solid rgba(247,193,195,0.4)', cursor: 'pointer' }} title="הוסף הערה">📝</button>
                           <button onClick={() => addToCalendar(appt)} style={{ padding: '4px 8px', borderRadius: '8px', background: '#dbeafe', color: '#1d4ed8', fontWeight: 700, fontSize: '0.75rem', border: 'none', cursor: 'pointer' }} title="הוסף ליומן">📅</button>
+                          {(appt.status === 'confirmed' || appt.status === 'completed') && (
+                            <button onClick={() => openWhatsApp(appt, 'review')} style={{ padding: '4px 8px', borderRadius: '8px', background: '#fef3c7', color: '#92400e', fontWeight: 700, fontSize: '0.7rem', border: 'none', cursor: 'pointer' }} title="בקשת ביקורת בגוגל">⭐ ביקורת</button>
+                          )}
                           <button onClick={() => cancelAppt(appt.id)} style={{ padding: '4px 8px', borderRadius: '8px', background: '#fee2e2', color: '#991b1b', fontWeight: 700, fontSize: '0.7rem', border: 'none', cursor: 'pointer' }}>ביטול</button>
                         </div>
                       </div>

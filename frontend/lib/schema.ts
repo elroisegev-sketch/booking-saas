@@ -43,7 +43,14 @@ export function localBusinessSchema() {
       opens: h.open,
       closes: h.close,
     })),
-    sameAs: [site.social.instagram, site.social.facebook],
+    sameAs: [site.social.instagram, site.social.facebook, site.social.googleMaps],
+    aggregateRating: {
+      "@type": "AggregateRating",
+      ratingValue: site.ratingValue,
+      reviewCount: String(site.reviewCount),
+      bestRating: "5",
+      worstRating: "1",
+    },
   };
 }
 

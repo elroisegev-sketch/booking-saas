@@ -36,7 +36,12 @@ export const site = {
   social: {
     instagram: "https://instagram.com/liors_beauty",
     facebook: "https://www.facebook.com/share/1DLKLrkWFb/",
+    googleMaps:
+      "https://www.google.com/maps/search/?api=1&query=" +
+      encodeURIComponent("ליאור שגב היופי שלך גבעת שמואל"),
   },
+  reviewCount: 7,
+  ratingValue: "5.0",
 } as const;
 
 // בונה קישור וואטסאפ עם הודעה מוכנה מראש
