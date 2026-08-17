@@ -2397,20 +2397,30 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
 };
 
 // ── ROOT ──────────────────────────────────────────────────────
-export default function App() {
+export default function App({ initialView = 'portfolio' }) {
   const [user, setUser] = useState(null);
-  const [view, setView] = useState('portfolio');
+  const [view, setView] = useState(initialView);
   const [appointments, setAppointments] = useState([]);
 
   useEffect(() => {
     try {
-      if (window.location.pathname === '/admin') {
-        setView(localStorage.getItem('token') ? 'dashboard' : 'auth');
+      const onAdmin = initialView === 'auth' || window.location.pathname.startsWith('/admin');
+      if (onAdmin) {
+        const token = localStorage.getItem('token');
+        const rawUser = localStorage.getItem('user');
+        if (token && rawUser) {
+          try {
+            setUser(JSON.parse(rawUser));
+            setView('dashboard');
+            return;
+          } catch (e) {}
+        }
+        setView('auth');
         return;
       }
       if (sessionStorage.getItem(BOOKING_KEY)) setView('booking');
     } catch (e) {}
-  }, []);
+  }, [initialView]);
 
   useEffect(() => {
     const token = localStorage.getItem('token');

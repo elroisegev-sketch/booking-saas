@@ -1,1 +1,5 @@
-export { default } from './index';
+import HomeApp from './index';
+
+export default function AdminPage() {
+  return <HomeApp initialView="auth" />;
+}
