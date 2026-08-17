@@ -1423,8 +1423,9 @@ const StarRow = () => (
 
 const ReviewsCarousel = () => {
   const [i, setI] = useState(0);
-  const review = GOOGLE_REVIEWS[i];
-  const go = (dir) => setI((n) => (n + dir + GOOGLE_REVIEWS.length) % GOOGLE_REVIEWS.length);
+  const startX = useRef(null);
+  const n = GOOGLE_REVIEWS.length;
+  const go = (dir) => setI((cur) => (cur + dir + n) % n);
 
   return (
     <div>
@@ -1434,20 +1435,58 @@ const ReviewsCarousel = () => {
         <p style={{ color: '#A11738', opacity: 0.65, fontSize: '0.8rem', margin: '0.35rem 0 0' }}>{site.reviewCount} ביקורות בגוגל</p>
       </div>
 
-      <div style={{ position: 'relative', background: 'rgba(255,255,255,0.72)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.9)', borderRadius: '28px', padding: '1.5rem 1.35rem 1.35rem', boxShadow: '0 10px 36px rgba(161,23,56,0.1), inset 0 1px 0 rgba(255,255,255,1)', minHeight: '220px' }}>
-        <p style={{ fontWeight: 800, color: '#A11738', margin: 0, fontSize: '1.05rem' }}>{review.name}</p>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '4px 0 10px' }}>
-          <StarRow />
-          <span style={{ color: '#9ca3af', fontSize: '0.72rem' }}>{review.when}</span>
+      <div
+        dir="ltr"
+        onTouchStart={(e) => { startX.current = e.changedTouches[0].clientX; }}
+        onTouchEnd={(e) => {
+          if (startX.current == null) return;
+          const dx = e.changedTouches[0].clientX - startX.current;
+          if (dx > 45) go(-1);
+          if (dx < -45) go(1);
+          startX.current = null;
+        }}
+        style={{
+          position: 'relative',
+          overflow: 'hidden',
+          background: 'rgba(255,255,255,0.72)',
+          backdropFilter: 'blur(20px)',
+          WebkitBackdropFilter: 'blur(20px)',
+          border: '1px solid rgba(255,255,255,0.9)',
+          borderRadius: '28px',
+          boxShadow: '0 10px 36px rgba(161,23,56,0.1), inset 0 1px 0 rgba(255,255,255,1)',
+        }}
+      >
+        <div
+          style={{
+            display: 'flex',
+            width: `${n * 100}%`,
+            transform: `translate3d(-${(i * 100) / n}%, 0, 0)`,
+            transition: 'transform 0.55s cubic-bezier(0.22, 1, 0.36, 1)',
+            willChange: 'transform',
+          }}
+        >
+          {GOOGLE_REVIEWS.map((review) => (
+            <div
+              key={review.name}
+              dir="rtl"
+              style={{ width: `${100 / n}%`, flexShrink: 0, padding: '1.5rem 1.35rem 1.15rem', boxSizing: 'border-box' }}
+            >
+              <p style={{ fontWeight: 800, color: '#A11738', margin: 0, fontSize: '1.05rem' }}>{review.name}</p>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '8px', margin: '4px 0 10px' }}>
+                <StarRow />
+                <span style={{ color: '#9ca3af', fontSize: '0.72rem' }}>{review.when}</span>
+              </div>
+              <p style={{ color: '#3d0c16', fontSize: '0.92rem', lineHeight: 1.7, margin: 0 }}>{review.text}</p>
+              {review.service ? <p style={{ color: '#EC6A83', fontSize: '0.75rem', fontWeight: 700, margin: '12px 0 0' }}>{review.service}</p> : null}
+            </div>
+          ))}
         </div>
-        <p style={{ color: '#3d0c16', fontSize: '0.92rem', lineHeight: 1.7, margin: 0 }}>{review.text}</p>
-        {review.service ? <p style={{ color: '#EC6A83', fontSize: '0.75rem', fontWeight: 700, margin: '12px 0 0' }}>{review.service}</p> : null}
+      </div>
 
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '1.15rem' }}>
-          <button type="button" onClick={() => go(-1)} aria-label="ביקורת קודמת" style={{ width: 36, height: 36, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.85)', background: 'rgba(255,255,255,0.75)', color: '#A11738', fontSize: '1.25rem', cursor: 'pointer' }}>‹</button>
-          <p style={{ margin: 0, color: 'rgba(161,23,56,0.4)', fontSize: '0.7rem', letterSpacing: '0.12em' }}>{i + 1} / {GOOGLE_REVIEWS.length}</p>
-          <button type="button" onClick={() => go(1)} aria-label="ביקורת הבאה" style={{ width: 36, height: 36, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.85)', background: 'rgba(255,255,255,0.75)', color: '#A11738', fontSize: '1.25rem', cursor: 'pointer' }}>›</button>
-        </div>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '0.9rem', padding: '0 4px' }}>
+        <button type="button" onClick={() => go(-1)} aria-label="ביקורת קודמת" style={{ width: 40, height: 40, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.85)', background: 'rgba(255,255,255,0.75)', color: '#A11738', fontSize: '1.3rem', cursor: 'pointer' }}>‹</button>
+        <p style={{ margin: 0, color: 'rgba(161,23,56,0.4)', fontSize: '0.7rem', letterSpacing: '0.12em' }}>{i + 1} / {n}</p>
+        <button type="button" onClick={() => go(1)} aria-label="ביקורת הבאה" style={{ width: 40, height: 40, borderRadius: '50%', border: '1px solid rgba(255,255,255,0.85)', background: 'rgba(255,255,255,0.75)', color: '#A11738', fontSize: '1.3rem', cursor: 'pointer' }}>›</button>
       </div>
 
       <a href={GOOGLE_REVIEW_URL} target="_blank" rel="noreferrer" className="lux-btn" style={{
