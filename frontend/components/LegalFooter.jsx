@@ -35,6 +35,7 @@ export default function LegalFooter() {
           <h3 style={colTitle}>ליאור ביוטי</h3>
           <p style={{ fontSize: '14px', lineHeight: 1.7 }}>
             ליאור שגב<br />
+            הרב הרצוג 25<br />
             גבעת שמואל<br />
             <a href="tel:+972535249688" style={linkStyle} dir="ltr">053-524-9688</a><br />
             <a href="mailto:liordanino58@gmail.com" style={linkStyle}>liordanino58@gmail.com</a>
@@ -57,6 +58,7 @@ export default function LegalFooter() {
         <div>
           <h3 style={colTitle}>מידע חוקי</h3>
           <nav>
+            <FooterLink href="/blog">מדריכים</FooterLink>
             <FooterLink href="/terms">תקנון ותנאי שימוש</FooterLink>
             <FooterLink href="/privacy">מדיניות פרטיות</FooterLink>
             <FooterLink href="/accessibility">הצהרת נגישות</FooterLink>

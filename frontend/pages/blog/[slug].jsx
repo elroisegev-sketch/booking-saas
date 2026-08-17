@@ -96,8 +96,8 @@ export default function BlogPost({ slug, frontmatter, html }) {
           {frontmatter.faq && frontmatter.faq.length > 0 && <Faq items={frontmatter.faq} />}
 
           <Reveal className="blog-card cta-card" style={{ marginTop: "3rem" }}>
-            <h2>מוכנה לפנק את הידיים?</h2>
-            <p>כתבי לי הודעה קצרה בוואטסאפ ונמצא יחד תור שמתאים לך.</p>
+            <h2>{frontmatter.ctaTitle || "מוכנה לקבוע תור?"}</h2>
+            <p>{frontmatter.ctaText || "כתבי לי הודעה קצרה בוואטסאפ ונמצא יחד תור שמתאים לך."}</p>
             <WhatsappButton
               block
               message={`היי ליאור, קראתי את "${frontmatter.title}" ואשמח לקבוע תור`}

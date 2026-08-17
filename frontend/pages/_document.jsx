@@ -13,9 +13,8 @@ export default function Document() {
           href="https://fonts.googleapis.com/css2?family=Varela+Round&display=swap"
           rel="stylesheet"
         />
-        <meta name="description" content="ליאור שגב – היופי שלך | קביעת תורים" />
-        {/* Structured Data — LocalBusiness (NailSalon). מוזרק ב-_document כי עמוד
-            הבית מרונדר בצד הלקוח בלבד, וכאן הסכמה נראית לסורקים בצד השרת. */}
+        {/* Structured Data — LocalBusiness (NailSalon). מוזרק ב-_document כדי
+            שהסכמה תישאר ב-HTML גם אם עמוד הבית מרונדר בצד הלקוח. */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessSchema()) }}

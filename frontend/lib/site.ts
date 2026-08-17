@@ -4,11 +4,11 @@
 export const site = {
   name: "ליאור שגב | ציפורניים",
   legalName: "ליאור שגב – היופי שלך",
-  domain: "lioryourbeauty.com",
-  url: "https://lioryourbeauty.com",
+  domain: "www.lioryourbeauty.com",
+  url: "https://www.lioryourbeauty.com",
   locale: "he-IL",
   description:
-    "מכון הציפורניים של ליאור שגב בגבעת שמואל. לק ג'ל, מניקור ובנייה בג'ל בעבודת יד מדויקת. לקביעת תור בוואטסאפ.",
+    "מכון הציפורניים של ליאור שגב בגבעת שמואל. לק ג'ל, מניקור, מבנה אנטומי ועיצוב גבות. לקביעת תור באתר או בוואטסאפ.",
   // מספר וואטסאפ בפורמט בינלאומי (972) + מספר מקומי לתצוגה
   whatsapp: "972535249688",
   phoneDisplay: "053-524-9688",
@@ -24,10 +24,13 @@ export const site = {
     lat: 32.075379,
     lng: 34.845833,
   },
-  // שעות פעילות אמיתיות (מתוך זמינות התורים באתר)
+  // שעות שמופיעות לקהל (NAP). הזמינות ביומן התורים יכולה להיות מדויקת יותר ליום.
   hours: [
-    { days: ["Sunday"], open: "10:00", close: "17:00" },
-    { days: ["Monday", "Tuesday", "Wednesday", "Thursday"], open: "09:00", close: "18:00" },
+    {
+      days: ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday"],
+      open: "10:00",
+      close: "18:00",
+    },
   ],
   priceRange: "₪₪",
   social: {

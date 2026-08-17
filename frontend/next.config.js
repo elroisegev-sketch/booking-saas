@@ -1,5 +1,21 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  async redirects() {
+    return [
+      {
+        source: '/',
+        has: [{ type: 'host', value: 'lioryourbeauty.com' }],
+        destination: 'https://www.lioryourbeauty.com/',
+        permanent: true,
+      },
+      {
+        source: '/:path*',
+        has: [{ type: 'host', value: 'lioryourbeauty.com' }],
+        destination: 'https://www.lioryourbeauty.com/:path*',
+        permanent: true,
+      },
+    ];
+  },
   async headers() {
     return [
       {

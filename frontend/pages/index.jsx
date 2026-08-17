@@ -1,6 +1,8 @@
 import { useState, useRef, useEffect } from 'react';
+import Head from 'next/head';
 import AccessibilityWidget from '../components/AccessibilityWidget';
 import LegalFooter from '../components/LegalFooter';
+import { site } from '../lib/site';
 
 const MOCK_USER = { id: '1', email: 'lior@beauty.com', business_name: 'ליאור שגב – היופי שלך', slug: 'lior-segev' };
 
@@ -1439,14 +1441,17 @@ const PortfolioPage = ({ onBook }) => {
       <div style={{ paddingTop: '80px', paddingBottom: '3rem', textAlign: 'center', padding: '80px 1.75rem 3rem', animation: 'fadeUp 0.9s 0.1s cubic-bezier(0.22,1,0.36,1) both' }}>
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
           <div style={{ width: '150px', height: '150px', borderRadius: '50%', overflow: 'hidden', border: '4px solid rgba(161,23,56,0.25)', boxShadow: '0 12px 40px rgba(161,23,56,0.22)' }}>
-            <img src="/lior-profile.png" alt="ליאור שגב" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%' }} />
+            <img src="/lior-profile.png" alt="ליאור שגב, מעצבת ציפורניים בגבעת שמואל" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%' }} />
           </div>
         </div>
         <h1 style={{ fontFamily: "'Varela Round', sans-serif", fontSize: 'clamp(2.8rem, 11vw, 5rem)', fontWeight: 700, color: '#A11738', lineHeight: 1.1, marginBottom: '0.5rem', letterSpacing: '0.01em', animation: 'breathe 4s ease-in-out infinite', display: 'inline-block' }}>
           היופי שלך
         </h1>
-        <p style={{ color: '#A11738', fontSize: '0.72rem', letterSpacing: '0.3em', textTransform: 'uppercase', opacity: 0.7, marginBottom: '2.5rem' }}>
+        <p style={{ color: '#A11738', fontSize: '0.72rem', letterSpacing: '0.3em', textTransform: 'uppercase', opacity: 0.7, marginBottom: '0.75rem' }}>
           Lior Segev Beauty
+        </p>
+        <p style={{ color: '#A11738', fontSize: '0.95rem', opacity: 0.85, marginBottom: '2.25rem', lineHeight: 1.6 }}>
+          לק ג'ל, מניקור ועיצוב גבות בגבעת שמואל
         </p>
         <button className="lux-btn" onClick={onBook} style={{
           width: '100%', maxWidth: '360px', height: '64px',
@@ -1460,6 +1465,9 @@ const PortfolioPage = ({ onBook }) => {
         }}>
           <span>💅</span> קביעת תור
         </button>
+        <a href="/blog" style={{ display: 'inline-block', marginTop: '1.1rem', color: '#A11738', fontSize: '0.88rem', fontWeight: 600, textDecoration: 'none', opacity: 0.85 }}>
+          מדריכים על לק ג'ל, מבנה אנטומי וגבות ←
+        </a>
       </div>
 
       {/* ── CONTENT ── */}
@@ -2391,14 +2399,18 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
 // ── ROOT ──────────────────────────────────────────────────────
 export default function App() {
   const [user, setUser] = useState(null);
-  const [view, setView] = useState(() => {
-    try {
-      if (typeof window !== 'undefined' && sessionStorage.getItem(BOOKING_KEY)) return 'booking';
-      if (typeof window !== 'undefined' && window.location.pathname === '/admin') return 'auth';
-    } catch(e) {}
-    return 'portfolio';
-  });
+  const [view, setView] = useState('portfolio');
   const [appointments, setAppointments] = useState([]);
+
+  useEffect(() => {
+    try {
+      if (window.location.pathname === '/admin') {
+        setView(localStorage.getItem('token') ? 'dashboard' : 'auth');
+        return;
+      }
+      if (sessionStorage.getItem(BOOKING_KEY)) setView('booking');
+    } catch (e) {}
+  }, []);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
@@ -2408,9 +2420,18 @@ export default function App() {
     }).then(r => r.json()).then(data => { if (Array.isArray(data)) setAppointments(data); });
   }, [view]);
 
-  if (typeof window === 'undefined') return null;
   return (
     <>
+      <Head>
+        <title>לק ג'ל ומניקור בגבעת שמואל | ליאור שגב</title>
+        <meta name="description" content={site.description} />
+        <link rel="canonical" href={`${site.url}/`} />
+        <link rel="alternate" hrefLang="he-IL" href={`${site.url}/`} />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="לק ג'ל ומניקור בגבעת שמואל | ליאור שגב" />
+        <meta property="og:description" content={site.description} />
+        <meta property="og:url" content={`${site.url}/`} />
+      </Head>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Varela+Round&family=Dancing+Script:wght@700&display=swap');
         * { box-sizing: border-box; margin: 0; padding: 0; }

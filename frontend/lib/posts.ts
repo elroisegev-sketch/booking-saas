@@ -27,6 +27,8 @@ export type PostFrontmatter = {
   coverAlt?: string;
   faq?: FaqItem[];
   prices?: PriceItem[];
+  ctaTitle?: string;
+  ctaText?: string;
 };
 
 export type Post = {
