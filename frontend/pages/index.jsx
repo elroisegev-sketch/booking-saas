@@ -1396,6 +1396,7 @@ const FanGallery = () => {
       )}
 
       <div className="fan-gallery-wrap" style={{ position: 'relative', height: '285px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.25rem' }}>
+        <div className="fan-gallery-stage">
         {images.map((src, idx) => {
           const offset = getOffset(idx);
           if (Math.abs(offset) > 3) return null;
@@ -1403,7 +1404,7 @@ const FanGallery = () => {
           const isCenter = offset === 0;
           const isVisible = Math.abs(offset) <= 2;
           return (
-            <div key={idx}
+            <div key={idx} className="fan-gallery-card"
               onClick={() => { if (isCenter) setLightbox(idx); else if (isVisible) setCenter(idx); }}
               style={{
                 position: 'absolute',
@@ -1430,10 +1431,10 @@ const FanGallery = () => {
           );
         })}
 
-        <button onClick={() => setCenter(c => (c + 1) % totalImages)}
-          style={{ position: 'absolute', right: '0', top: '50%', transform: 'translateY(-50%)', zIndex: 20, background: 'rgba(255,255,255,0.72)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.85)', borderRadius: '50%', width: '36px', height: '36px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#A11738', fontSize: '1.4rem', boxShadow: '0 4px 14px rgba(161,23,56,0.15)' }}>‹</button>
-        <button onClick={() => setCenter(c => (c - 1 + totalImages) % totalImages)}
-          style={{ position: 'absolute', left: '0', top: '50%', transform: 'translateY(-50%)', zIndex: 20, background: 'rgba(255,255,255,0.72)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.85)', borderRadius: '50%', width: '36px', height: '36px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#A11738', fontSize: '1.4rem', boxShadow: '0 4px 14px rgba(161,23,56,0.15)' }}>›</button>
+        </div>
+
+        <button className="fan-gallery-nav fan-gallery-nav-prev" onClick={() => setCenter(c => (c + 1) % totalImages)}>‹</button>
+        <button className="fan-gallery-nav fan-gallery-nav-next" onClick={() => setCenter(c => (c - 1 + totalImages) % totalImages)}>›</button>
       </div>
 
       <p style={{ textAlign: 'center', color: 'rgba(161,23,56,0.38)', fontSize: '0.67rem', letterSpacing: '0.18em', marginBottom: '0.25rem' }}>{center + 1} / {totalImages}</p>
@@ -1565,10 +1566,10 @@ const PortfolioPage = ({ onBook }) => {
   }, []);
 
   return (
-    <div dir="rtl" style={{ minHeight: '100vh', fontFamily: "'Varela Round', sans-serif", background: 'linear-gradient(160deg, #FDECE5 0%, #F7C1C3 50%, #EC6A83 100%)', overflowX: 'hidden' }}>
+    <div className="portfolio-page" dir="rtl" style={{ minHeight: '100vh', fontFamily: "'Varela Round', sans-serif", background: 'linear-gradient(160deg, #FDECE5 0%, #F7C1C3 50%, #EC6A83 100%)', overflowX: 'hidden' }}>
 
       {/* ── HERO ── */}
-      <div style={{ paddingTop: '80px', paddingBottom: '3rem', textAlign: 'center', padding: '80px 1.75rem 3rem', animation: 'fadeUp 0.9s 0.1s cubic-bezier(0.22,1,0.36,1) both' }}>
+      <div className="portfolio-hero" style={{ paddingTop: '80px', paddingBottom: '3rem', textAlign: 'center', padding: '80px 1.75rem 3rem', animation: 'fadeUp 0.9s 0.1s cubic-bezier(0.22,1,0.36,1) both' }}>
         <div style={{ display: 'flex', justifyContent: 'center', marginBottom: '1.5rem' }}>
           <div style={{ width: '150px', height: '150px', borderRadius: '50%', overflow: 'hidden', border: '4px solid rgba(161,23,56,0.25)', boxShadow: '0 12px 40px rgba(161,23,56,0.22)' }}>
             <img src="/lior-profile.png" alt="ליאור שגב, מעצבת ציפורניים בגבעת שמואל" style={{ width: '100%', height: '100%', objectFit: 'cover', objectPosition: 'center 20%' }} />
@@ -1611,15 +1612,15 @@ const PortfolioPage = ({ onBook }) => {
         </div>
 
         {/* Gallery */}
-        <div className="reveal-sec" style={{ marginBottom: '2.5rem' }}>
+        <div className="reveal-sec portfolio-gallery-section" style={{ marginBottom: '2.5rem' }}>
           <h2 style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '1.9rem', fontWeight: 300, color: '#3d0c16', textAlign: 'center', marginBottom: '1.75rem' }}>
             תיק עבודות
           </h2>
           <FanGallery />
         </div>
 
-        <div className="portfolio-bottom-grid">
-        <div className="reveal-sec" style={{ marginBottom: '2.5rem' }}>
+        <div className="portfolio-bottom-stack">
+        <div className="reveal-sec portfolio-reviews-section" style={{ marginBottom: '2.5rem' }}>
           <h2 style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '1.9rem', fontWeight: 300, color: '#3d0c16', textAlign: 'center', marginBottom: '1.25rem' }}>
             מה הלקוחות כותבות
           </h2>
@@ -1627,7 +1628,7 @@ const PortfolioPage = ({ onBook }) => {
         </div>
 
         {/* Social card */}
-        <div className="reveal-sec social-card-breathe" style={{ position: 'relative', background: 'linear-gradient(135deg, rgba(255,245,247,0.9), rgba(252,231,243,0.85), rgba(243,238,255,0.9))', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.9)', borderRadius: '32px', padding: '2.5rem 2rem', textAlign: 'center', boxShadow: '0 12px 48px rgba(161,23,56,0.1), inset 0 1px 0 rgba(255,255,255,1)', marginBottom: '1.75rem', overflow: 'hidden' }}>
+        <div className="reveal-sec social-card-breathe portfolio-social-card" style={{ position: 'relative', background: 'linear-gradient(135deg, rgba(255,245,247,0.9), rgba(252,231,243,0.85), rgba(243,238,255,0.9))', backdropFilter: 'blur(24px)', WebkitBackdropFilter: 'blur(24px)', border: '1px solid rgba(255,255,255,0.9)', borderRadius: '32px', padding: '2.5rem 2rem', textAlign: 'center', boxShadow: '0 12px 48px rgba(161,23,56,0.1), inset 0 1px 0 rgba(255,255,255,1)', marginBottom: '1.75rem', overflow: 'hidden' }}>
 
           {/* Sparkles */}
           <span className="sparkle sp1" style={{ position: 'absolute', top: '14%', right: '12%', fontSize: '1rem', opacity: 0.7 }}>✦</span>
@@ -2779,17 +2780,87 @@ export default function App({ initialView = 'portfolio' }) {
         }
         .admin-sidebar-nav { display: none; }
 
+        .fan-gallery-nav {
+          position: absolute;
+          top: 50%;
+          transform: translateY(-50%);
+          z-index: 20;
+          background: rgba(255,255,255,0.72);
+          backdrop-filter: blur(8px);
+          -webkit-backdrop-filter: blur(8px);
+          border: 1px solid rgba(255,255,255,0.85);
+          border-radius: 50%;
+          width: 36px;
+          height: 36px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #A11738;
+          font-size: 1.4rem;
+          box-shadow: 0 4px 14px rgba(161,23,56,0.15);
+        }
+        .fan-gallery-nav-prev { right: 0; }
+        .fan-gallery-nav-next { left: 0; }
+        .fan-gallery-stage { position: relative; width: 100%; height: 100%; }
+
         @media (min-width: 768px) {
-          .portfolio-content { max-width: 720px !important; padding-left: 2rem !important; padding-right: 2rem !important; }
           .booking-shell { max-width: 680px !important; padding-left: 2rem !important; padding-right: 2rem !important; }
           .booking-services-grid { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px !important; }
-          .portfolio-bottom-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 1.5rem; align-items: start; }
-          .portfolio-bottom-grid > .reveal-sec { margin-bottom: 0 !important; }
+
+          .portfolio-content { max-width: 720px !important; padding-left: 2rem !important; padding-right: 2rem !important; }
+          .portfolio-hero { padding-left: 2rem !important; padding-right: 2rem !important; }
           .fan-gallery-wrap { height: 340px !important; }
         }
 
         @media (min-width: 1024px) {
-          .portfolio-content { max-width: 980px !important; }
+          .portfolio-page { overflow-x: clip; }
+          .portfolio-hero { max-width: 900px; margin: 0 auto; }
+          .portfolio-content { max-width: 900px !important; padding-left: 2.5rem !important; padding-right: 2.5rem !important; }
+          .portfolio-gallery-section { margin-bottom: 3rem !important; }
+          .fan-gallery-wrap {
+            height: 430px !important;
+            max-width: 820px;
+            margin-left: auto !important;
+            margin-right: auto !important;
+          }
+          .fan-gallery-stage {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            transform: scale(1.55);
+            transform-origin: center center;
+          }
+          .fan-gallery-card {
+            width: 158px !important;
+            height: 210px !important;
+          }
+          .fan-gallery-nav {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 20;
+            background: rgba(255,255,255,0.82);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255,255,255,0.85);
+            border-radius: 50%;
+            width: 44px;
+            height: 44px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #A11738;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 14px rgba(161,23,56,0.15);
+          }
+          .fan-gallery-nav-prev { right: 0; }
+          .fan-gallery-nav-next { left: 0; }
+          .portfolio-reviews-section { max-width: 680px; margin-left: auto !important; margin-right: auto !important; }
+          .portfolio-social-card { max-width: 400px !important; margin-left: auto !important; margin-right: auto !important; }
+          .portfolio-bottom-stack { display: flex; flex-direction: column; align-items: center; gap: 0; }
+
           .booking-shell { max-width: 820px !important; }
           .fan-gallery-wrap { height: 380px !important; }
 
@@ -2943,7 +3014,12 @@ export default function App({ initialView = 'portfolio' }) {
         }
 
         @media (min-width: 1280px) {
-          .portfolio-content { max-width: 1100px !important; }
+          .portfolio-content { max-width: 1040px !important; }
+          .portfolio-hero { max-width: 1040px; }
+          .fan-gallery-wrap { max-width: 920px; height: 460px !important; }
+          .fan-gallery-stage { transform: scale(1.7); }
+          .portfolio-reviews-section { max-width: 760px; }
+          .booking-shell { max-width: 820px !important; }
           .admin-inner { padding: 1.75rem 2.5rem !important; }
           .admin-gallery-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important; }
           .gallery-thumb img { height: 220px; }
