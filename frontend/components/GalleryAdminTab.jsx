@@ -195,10 +195,28 @@ export default function GalleryAdminTab({ showToast }) {
 
                 <div className="gallery-item-actions">
                   <div className="gallery-order-btns">
-                    <button type="button" disabled={idx === 0} onClick={() => move(idx, -1)} title="הזזי למעלה">↑</button>
-                    <button type="button" disabled={idx === items.length - 1} onClick={() => move(idx, 1)} title="הזזי למטה">↓</button>
+                    <button
+                      type="button"
+                      className="gallery-order-btn"
+                      disabled={idx === 0}
+                      onClick={() => move(idx, -1)}
+                      aria-label={`הזזי תמונה ${idx + 1} קדימה בגלריה`}
+                    >
+                      <span className="gallery-order-icon" aria-hidden="true">▲</span>
+                      <span className="gallery-order-label">קודם</span>
+                    </button>
+                    <button
+                      type="button"
+                      className="gallery-order-btn"
+                      disabled={idx === items.length - 1}
+                      onClick={() => move(idx, 1)}
+                      aria-label={`הזזי תמונה ${idx + 1} אחורה בגלריה`}
+                    >
+                      <span className="gallery-order-icon" aria-hidden="true">▼</span>
+                      <span className="gallery-order-label">הבא</span>
+                    </button>
                   </div>
-                  <button type="button" className="gallery-delete-btn" onClick={() => remove(item.id)}>מחק</button>
+                  <button type="button" className="gallery-delete-btn" onClick={() => remove(item.id)} aria-label={`מחקי תמונה ${idx + 1}`}>מחק</button>
                 </div>
               </div>
             ))}

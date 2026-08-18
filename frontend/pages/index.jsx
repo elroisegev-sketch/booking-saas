@@ -1924,7 +1924,6 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
     { id: 'crm', label: 'CRM', icon: 'crm' },
   ];
 
-  const mainStyle = { flex: 1, overflowY: 'auto', fontFamily: 'Varela Round, sans-serif', background: 'linear-gradient(135deg, #fff5f7 0%, #fce8f3 40%, #f3eeff 80%, #fff5f7 100%)', paddingBottom: '80px' };
   const card = { background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.8)', borderRadius: '24px', boxShadow: '0 8px 32px rgba(161,23,56,0.07), inset 0 1px 0 rgba(255,255,255,0.9)' };
 
   const renderNavButton = (item, layout) => (
@@ -1971,7 +1970,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
       </aside>
 
       {/* Main */}
-      <div className="admin-main" style={mainStyle}>
+      <div className="admin-main">
         <div className="admin-inner" style={{ maxWidth: '900px', margin: '0 auto', padding: '1rem' }}>
 
           {/* OVERVIEW */}
@@ -2795,6 +2794,69 @@ export default function App({ initialView = 'portfolio' }) {
           border-radius: 999px;
         }
         .admin-sidebar-nav { display: none; }
+        .admin-body {
+          flex: 1;
+          min-height: 0;
+          display: flex;
+          flex-direction: row;
+          overflow: hidden;
+        }
+        .admin-main {
+          flex: 1;
+          min-width: 0;
+          min-height: 0;
+          overflow-y: auto;
+          -webkit-overflow-scrolling: touch;
+          overscroll-behavior: contain;
+          padding-bottom: 80px;
+          font-family: 'Varela Round', sans-serif;
+          background: linear-gradient(135deg, #fff5f7 0%, #fce8f3 40%, #f3eeff 80%, #fff5f7 100%);
+        }
+        .gallery-item-actions {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          flex-shrink: 0;
+        }
+        .gallery-order-btns { display: flex; gap: 8px; width: 100%; }
+        .gallery-order-btn {
+          flex: 1;
+          min-height: 48px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 2px;
+          padding: 8px 10px;
+          border-radius: 14px;
+          border: 2px solid rgba(247,193,195,0.85);
+          background: #fff;
+          color: #A11738;
+          font-weight: 800;
+          font-size: 0.8rem;
+          cursor: pointer;
+          font-family: 'Varela Round', sans-serif;
+          touch-action: manipulation;
+          -webkit-tap-highlight-color: transparent;
+        }
+        .gallery-order-icon { font-size: 1.35rem; line-height: 1; font-weight: 900; }
+        .gallery-order-label { font-size: 0.72rem; font-weight: 800; }
+        .gallery-order-btn:not(:disabled):active { background: #F7C1C3; }
+        .gallery-order-btn:disabled { opacity: 0.35; cursor: not-allowed; }
+        .gallery-delete-btn {
+          min-height: 44px;
+          padding: 10px 14px;
+          border-radius: 12px;
+          border: none;
+          background: #fee2e2;
+          color: #991b1b;
+          font-weight: 800;
+          font-size: 0.85rem;
+          cursor: pointer;
+          font-family: 'Varela Round', sans-serif;
+          touch-action: manipulation;
+          width: 100%;
+        }
 
         .fan-gallery-wrap {
           display: grid;
@@ -2856,7 +2918,7 @@ export default function App({ initialView = 'portfolio' }) {
 
           .booking-shell { max-width: 820px !important; }
 
-          .admin-body { display: flex; flex: 1; min-height: 0; overflow: hidden; }
+          .admin-main { padding-bottom: 1.5rem !important; }
           .admin-overview-actions { flex-direction: row !important; }
           .admin-sidebar-nav {
             display: flex;
@@ -2871,7 +2933,6 @@ export default function App({ initialView = 'portfolio' }) {
             border-left: 1px solid rgba(255,255,255,0.75);
             overflow-y: auto;
           }
-          .admin-main { padding-bottom: 1.5rem !important; flex: 1; min-width: 0; }
           .admin-inner { max-width: none !important; padding: 1.5rem 2rem !important; }
           .admin-bottom-nav { display: none !important; }
           .admin-top-header { padding: 1rem 2rem !important; }
@@ -2975,34 +3036,13 @@ export default function App({ initialView = 'portfolio' }) {
           }
           .gallery-item-info { display: none; }
           .gallery-item-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            gap: 8px;
+            flex-direction: row;
+            align-items: stretch;
             margin-top: 10px;
             width: 100%;
           }
-          .gallery-order-btns { display: flex; gap: 6px; }
-          .gallery-order-btns button {
-            padding: 6px 12px;
-            border-radius: 10px;
-            border: none;
-            background: #F7C1C3;
-            color: #A11738;
-            font-weight: 700;
-            cursor: pointer;
-          }
-          .gallery-order-btns button:disabled { opacity: 0.35; cursor: not-allowed; }
-          .gallery-delete-btn {
-            padding: 6px 12px;
-            border-radius: 10px;
-            border: none;
-            background: #fee2e2;
-            color: #991b1b;
-            font-weight: 700;
-            font-size: 0.8rem;
-            cursor: pointer;
-          }
+          .gallery-order-btns { flex: 1; }
+          .gallery-delete-btn { width: auto; min-width: 72px; flex-shrink: 0; }
         }
 
         @media (min-width: 1280px) {
@@ -3032,6 +3072,7 @@ export default function App({ initialView = 'portfolio' }) {
           }
           .admin-gallery-item {
             flex-direction: row !important;
+            flex-wrap: wrap !important;
             align-items: center !important;
             gap: 12px;
             padding: 12px !important;
@@ -3055,10 +3096,13 @@ export default function App({ initialView = 'portfolio' }) {
             cursor: pointer;
           }
           .gallery-item-actions {
-            flex-direction: column;
-            margin-top: 0;
-            width: auto;
+            flex-direction: row;
+            flex-basis: 100%;
+            margin-top: 4px;
+            width: 100%;
           }
+          .gallery-order-btns { flex: 1; }
+          .gallery-delete-btn { width: auto; min-width: 72px; flex-shrink: 0; }
           .admin-gallery-count { display: none; }
         }
 
