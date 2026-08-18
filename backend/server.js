@@ -55,6 +55,8 @@ app.use(cors({
 }));
 
 // ── Body size limit (prevent oversized JSON DoS) ──────────────
+const galleryRouter = require('./routes/gallery');
+app.use('/api/gallery', express.json({ limit: '3mb' }), galleryRouter);
 app.use(express.json({ limit: '50kb' }));
 
 // ── Global rate limit — 100 req / 15 min per IP ───────────────
@@ -84,6 +86,19 @@ app.use('/api/availability', require('./routes/availability'));
 app.use('/api/blocked-slots', require('./routes/blocked_slots'));
 app.use('/api/push', require('./routes/push').router);
 app.use('/api/expenses', require('./routes/expenses'));
+
+// Gallery table + seed flag on users
+require('./db').query(`
+  CREATE TABLE IF NOT EXISTS gallery_images (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    business_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    mime VARCHAR(50) NOT NULL DEFAULT 'image/jpeg',
+    data BYTEA NOT NULL,
+    created_at TIMESTAMPTZ DEFAULT NOW()
+  )
+`).catch(err => console.error('gallery_images migration error:', err));
+require('./db').query(`CREATE INDEX IF NOT EXISTS idx_gallery_business ON gallery_images(business_id, sort_order)`).catch(() => {});
 
 app.get('/health', (_, res) => res.json({ status: 'ok', service: 'BookSlot API' }));
 

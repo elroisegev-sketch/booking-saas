@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from 'react';
 import Head from 'next/head';
 import AccessibilityWidget from '../components/AccessibilityWidget';
 import LegalFooter from '../components/LegalFooter';
+import GalleryAdminTab from '../components/GalleryAdminTab';
 import { site } from '../lib/site';
 
 const MOCK_USER = { id: '1', email: 'lior@beauty.com', business_name: 'ליאור שגב – היופי שלך', slug: 'lior-segev' };
@@ -334,6 +335,22 @@ const TermsScreen = ({ termsText, onAccept, onBack, externalNail, onExternalNail
 // ── BOOKING PAGE ──────────────────────────────────────────────
 const BOOKING_KEY = 'lior_booking_state';
 const CUSTOMER_KEY = 'lior_customer_details';
+const MILITARY_POPUP_KEY = 'lior_military_popup_seen';
+
+const MilitaryDiscountPopup = ({ onClose }) => (
+  <div style={{ position: 'fixed', inset: 0, zIndex: 120, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(161,23,56,0.22)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', padding: '1rem' }}>
+    <div dir="rtl" style={{ background: 'linear-gradient(135deg, rgba(255,245,247,0.98), rgba(252,231,243,0.95))', border: '1px solid rgba(255,255,255,0.95)', borderRadius: '28px', padding: '1.75rem 1.5rem', width: '100%', maxWidth: '360px', boxShadow: '0 16px 48px rgba(161,23,56,0.18)', animation: 'scaleIn 0.35s cubic-bezier(0.22,1,0.36,1)', textAlign: 'center' }}>
+      <span style={{ fontSize: '2rem', display: 'block', marginBottom: '0.75rem' }} aria-hidden="true">💗</span>
+      <h2 style={{ fontFamily: "'Varela Round', sans-serif", fontWeight: 700, color: '#A11738', fontSize: '1.35rem', margin: '0 0 0.75rem' }}>הטבה לחיילות ונשות מילואים</h2>
+      <p style={{ color: '#3d0c16', fontSize: '0.92rem', lineHeight: 1.75, margin: '0 0 1.25rem' }}>
+        תודה ענקית לנשות מילואים, לחיילות ולבנות שירות לאומי. מגיעה לכן הנחה אצלי — רק ספרי לי כשאת קובעת תור.
+      </p>
+      <button type="button" className="lux-btn" onClick={onClose} style={{ width: '100%', padding: '0.875rem', borderRadius: '999px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, border: 'none', cursor: 'pointer' }}>
+        הבנתי, תודה 💗
+      </button>
+    </div>
+  </div>
+);
 
 const BookingPage = ({ onBack, onAppointmentBooked }) => {
   // steps: 0=terms, 1=services, 2=date, 3=time, 4=details, 5=payment
@@ -357,7 +374,16 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   const [hadSavedDetails, setHadSavedDetails] = useState(false);
   const [savedBooking, setSavedBooking] = useState(null);
   const [nearestDate, setNearestDate] = useState(null);
+  const [showMilitaryPopup, setShowMilitaryPopup] = useState(false);
   const showBookingToast = (msg) => { setBookingToast(msg); setTimeout(() => setBookingToast(null), 4000); };
+
+  const maybeShowMilitaryPopup = () => {
+    try {
+      if (sessionStorage.getItem(MILITARY_POPUP_KEY)) return;
+      sessionStorage.setItem(MILITARY_POPUP_KEY, '1');
+    } catch (e) {}
+    setShowMilitaryPopup(true);
+  };
 
   // Restore state from sessionStorage on mount
   useEffect(() => {
@@ -488,11 +514,13 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
   const termsText = getTermsText();
 
   const toggleService = (svc) => {
-    setSelectedServices(prev =>
-      prev.find(s => s.id === svc.id)
-        ? prev.filter(s => s.id !== svc.id)
-        : [...prev, svc]
-    );
+    setSelectedServices(prev => {
+      const isRemoving = prev.find(s => s.id === svc.id);
+      if (isRemoving) return prev.filter(s => s.id !== svc.id);
+      const next = [...prev, svc];
+      if (next.length === 1) maybeShowMilitaryPopup();
+      return next;
+    });
   };
 
   const getDIM = (y, m) => new Date(y, m + 1, 0).getDate();
@@ -730,7 +758,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                   <p style={{ color: '#9ca3af', fontSize: '0.78rem', marginBottom: '1.25rem' }}>כל השלמה = ₪10</p>
                   <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2,1fr)', gap: '10px', marginBottom: '1rem' }}>
                     {[1,2,3,4].map(n => (
-                      <button key={n} className="lux-btn" onClick={() => { const updated = { ...nailService, name: `השלמת ציפורן (${n})`, price: n * 10, duration: n * 15 }; setSelectedServices(prev => [...prev.filter(s => !s.name.startsWith('השלמת ציפורן')), updated]); setNailCountModal(false); }}
+                      <button key={n} className="lux-btn" onClick={() => { const updated = { ...nailService, name: `השלמת ציפורן (${n})`, price: n * 10, duration: n * 15 }; setSelectedServices(prev => { const next = [...prev.filter(s => !s.name.startsWith('השלמת ציפורן')), updated]; if (next.length === 1) maybeShowMilitaryPopup(); return next; }); setNailCountModal(false); }}
                         style={{ padding: '0.875rem', borderRadius: '16px', background: 'rgba(253,236,229,0.7)', backdropFilter: 'blur(8px)', border: '1px solid rgba(247,193,195,0.5)', fontWeight: 700, color: '#A11738', fontSize: '0.9rem', cursor: 'pointer' }}>
                         {n === 1 ? 'ציפורן אחת' : `${n} ציפורניים`}<br/>
                         <span style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '1rem', color: '#EC6A83',}}>₪{n * 10}</span>
@@ -742,6 +770,8 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
                 </div>
               </div>
             )}
+
+            {showMilitaryPopup && <MilitaryDiscountPopup onClose={() => setShowMilitaryPopup(false)} />}
 
             {selectedServices.length > 0 && (
               <div style={{ position: 'sticky', bottom: '1rem', background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1.5px solid rgba(255,255,255,0.8)', borderRadius: '24px', padding: '1rem 1.25rem', marginTop: '1rem', boxShadow: '0 8px 32px rgba(161,23,56,0.14), inset 0 1px 0 rgba(255,255,255,0.9)' }}>
@@ -1299,7 +1329,9 @@ const EditAppointmentModal = ({ appt, services, onSave, onClose }) => {
 };
 
 // ── FAN GALLERY ───────────────────────────────────────────────
-const GALLERY_IMAGES = [
+const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://booking-saas-production-b9fd.up.railway.app';
+
+const FALLBACK_GALLERY_IMAGES = [
   ...Array.from({ length: 21 }, (_, i) => `/gallery/1 - ${i + 1}.jpeg`),
   '/gallery/26C7B032-40D9-43E1-9BCF-8DBB8B14284E.JPG',
   '/gallery/7F27DFF2-0FDA-4E72-93BE-D0A6093C84F1.JPG',
@@ -1326,7 +1358,6 @@ const GALLERY_IMAGES = [
   '/gallery/IMG_9674.JPG',
   '/gallery/לק פיגוז -1 .png',
 ];
-const TOTAL_IMAGES = GALLERY_IMAGES.length;
 
 const FAN_CONFIG = {
   '-2': { x: -105, rotate: -26, scale: 0.70, z: 1, opacity: 0.52 },
@@ -1337,13 +1368,30 @@ const FAN_CONFIG = {
 };
 
 const FanGallery = () => {
+  const [galleryUrls, setGalleryUrls] = useState(null);
   const [center, setCenter] = useState(0);
   const [lightbox, setLightbox] = useState(null);
 
+  useEffect(() => {
+    fetch(`${API_URL}/api/gallery/public/lior-segev`)
+      .then((r) => r.json())
+      .then((data) => {
+        if (Array.isArray(data) && data.length) setGalleryUrls(data.map((x) => x.url));
+      })
+      .catch(() => {});
+  }, []);
+
+  const images = galleryUrls && galleryUrls.length ? galleryUrls : FALLBACK_GALLERY_IMAGES;
+  const totalImages = images.length;
+
+  useEffect(() => {
+    setCenter((c) => (totalImages ? Math.min(c, totalImages - 1) : 0));
+  }, [totalImages]);
+
   const getOffset = (idx) => {
     let o = idx - center;
-    if (o > TOTAL_IMAGES / 2) o -= TOTAL_IMAGES;
-    if (o < -TOTAL_IMAGES / 2) o += TOTAL_IMAGES;
+    if (o > totalImages / 2) o -= totalImages;
+    if (o < -totalImages / 2) o += totalImages;
     return o;
   };
 
@@ -1354,13 +1402,13 @@ const FanGallery = () => {
     <>
       {lightbox !== null && (
         <div onClick={() => setLightbox(null)} style={{ position: 'fixed', inset: 0, zIndex: 200, background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'zoom-out' }}>
-          <img src={GALLERY_IMAGES[lightbox]} alt="" style={{ maxWidth: '92vw', maxHeight: '88vh', borderRadius: '20px', boxShadow: '0 32px 80px rgba(0,0,0,0.6)', animation: 'scaleIn 0.35s cubic-bezier(0.22,1,0.36,1)' }} />
+          <img src={images[lightbox]} alt="" style={{ maxWidth: '92vw', maxHeight: '88vh', borderRadius: '20px', boxShadow: '0 32px 80px rgba(0,0,0,0.6)', animation: 'scaleIn 0.35s cubic-bezier(0.22,1,0.36,1)' }} />
           <button onClick={() => setLightbox(null)} style={{ position: 'absolute', top: '1.5rem', left: '1.5rem', background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: '50%', width: '40px', height: '40px', color: 'white', fontSize: '1.2rem', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>✕</button>
         </div>
       )}
 
       <div style={{ position: 'relative', height: '285px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.25rem' }}>
-        {GALLERY_IMAGES.map((src, idx) => {
+        {images.map((src, idx) => {
           const offset = getOffset(idx);
           if (Math.abs(offset) > 3) return null;
           const cfg = getCfg(offset);
@@ -1394,13 +1442,13 @@ const FanGallery = () => {
           );
         })}
 
-        <button onClick={() => setCenter(c => (c + 1) % TOTAL_IMAGES)}
+        <button onClick={() => setCenter(c => (c + 1) % totalImages)}
           style={{ position: 'absolute', right: '0', top: '50%', transform: 'translateY(-50%)', zIndex: 20, background: 'rgba(255,255,255,0.72)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.85)', borderRadius: '50%', width: '36px', height: '36px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#A11738', fontSize: '1.4rem', boxShadow: '0 4px 14px rgba(161,23,56,0.15)' }}>‹</button>
-        <button onClick={() => setCenter(c => (c - 1 + TOTAL_IMAGES) % TOTAL_IMAGES)}
+        <button onClick={() => setCenter(c => (c - 1 + totalImages) % totalImages)}
           style={{ position: 'absolute', left: '0', top: '50%', transform: 'translateY(-50%)', zIndex: 20, background: 'rgba(255,255,255,0.72)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1px solid rgba(255,255,255,0.85)', borderRadius: '50%', width: '36px', height: '36px', cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#A11738', fontSize: '1.4rem', boxShadow: '0 4px 14px rgba(161,23,56,0.15)' }}>›</button>
       </div>
 
-      <p style={{ textAlign: 'center', color: 'rgba(161,23,56,0.38)', fontSize: '0.67rem', letterSpacing: '0.18em', marginBottom: '0.25rem' }}>{center + 1} / {TOTAL_IMAGES}</p>
+      <p style={{ textAlign: 'center', color: 'rgba(161,23,56,0.38)', fontSize: '0.67rem', letterSpacing: '0.18em', marginBottom: '0.25rem' }}>{center + 1} / {totalImages}</p>
     </>
   );
 };
@@ -1863,6 +1911,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
     { id: 'pending', label: `ממתינים${pendingAppts.length > 0 ? ` (${pendingAppts.length})` : ''}`, icon: 'clock' },
     { id: 'calendar', label: 'יומן', icon: 'calendar' },
     { id: 'services', label: 'שירותים', icon: 'sparkles' },
+    { id: 'gallery', label: 'גלריה', icon: 'image' },
     { id: 'customers', label: 'לקוחות', icon: 'users' },
     { id: 'availability', label: 'שעות', icon: 'clock' },
     { id: 'crm', label: 'CRM', icon: 'crm' },
@@ -1906,9 +1955,14 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                   <button onClick={enablePush} style={{ marginTop: "8px", fontSize: "0.75rem", padding: "4px 12px", borderRadius: "8px", background: "#F7C1C3", color: "#A11738", border: "none", cursor: "pointer", fontWeight: 700 }}>🔔 הפעל התראות</button>
                   <p style={{ color: '#9ca3af', fontSize: '0.875rem', marginTop: '4px' }}>הנה מה שקורה היום</p>
                 </div>
-                <button onClick={() => setTab('booking')} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0.625rem 1rem', borderRadius: '12px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: '#F7C1C3', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: 'pointer', fontFamily: 'Varela Round, sans-serif' }}>
-                  <Icon name="link" className="w-4 h-4" /> דף הזמנות
-                </button>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flexShrink: 0 }}>
+                  <button onClick={() => setTab('booking')} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0.625rem 1rem', borderRadius: '12px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: '#F7C1C3', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: 'pointer', fontFamily: 'Varela Round, sans-serif' }}>
+                    <Icon name="link" className="w-4 h-4" /> דף הזמנות
+                  </button>
+                  <button onClick={() => setTab('gallery')} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0.625rem 1rem', borderRadius: '12px', background: 'rgba(255,255,255,0.55)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', border: '1px solid rgba(255,255,255,0.65)', color: '#A11738', fontWeight: 700, fontSize: '0.875rem', cursor: 'pointer', fontFamily: 'Varela Round, sans-serif' }}>
+                    <Icon name="image" className="w-4 h-4" /> גלריה
+                  </button>
+                </div>
               </div>
 
               {pendingAppts.length > 0 && (
@@ -2465,6 +2519,9 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
               </div>
             );
           })()}
+
+          {/* GALLERY */}
+          {tab === 'gallery' && <GalleryAdminTab showToast={showToast} />}
 
           {/* BOOKING PREVIEW */}
           {tab === 'booking' && (
