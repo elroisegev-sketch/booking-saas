@@ -1343,6 +1343,7 @@ const FanGallery = () => {
   const [images, setImages] = useState(null);
   const [center, setCenter] = useState(0);
   const [lightbox, setLightbox] = useState(null);
+  const [fanScale, setFanScale] = useState(1);
 
   useEffect(() => {
     fetch(`${API_URL}/api/gallery/public/lior-segev`)
@@ -1354,7 +1355,16 @@ const FanGallery = () => {
       .catch(() => setImages([]));
   }, []);
 
+  useEffect(() => {
+    const update = () => setFanScale(window.innerWidth >= 1024 ? 1.45 : window.innerWidth >= 768 ? 1.15 : 1);
+    update();
+    window.addEventListener('resize', update);
+    return () => window.removeEventListener('resize', update);
+  }, []);
+
   const totalImages = images ? images.length : 0;
+  const cardW = Math.round(158 * fanScale);
+  const cardH = Math.round(210 * fanScale);
 
   useEffect(() => {
     setCenter((c) => (totalImages ? Math.min(c, totalImages - 1) : 0));
@@ -1395,23 +1405,30 @@ const FanGallery = () => {
         </div>
       )}
 
-      <div className="fan-gallery-wrap" style={{ position: 'relative', height: '285px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.25rem' }}>
-        <div className="fan-gallery-stage">
-        {images.map((src, idx) => {
+      <div className="fan-gallery-wrap">
+        <button type="button" className="fan-gallery-nav fan-gallery-nav-prev" aria-label="תמונה קודמת" onClick={() => setCenter(c => (c + 1) % totalImages)}>‹</button>
+
+        <div className="fan-gallery-viewport" style={{ height: Math.round(285 * fanScale) }}>
+          <div className="fan-gallery-stage">
+          {images.map((src, idx) => {
           const offset = getOffset(idx);
           if (Math.abs(offset) > 3) return null;
           const cfg = getCfg(offset);
           const isCenter = offset === 0;
           const isVisible = Math.abs(offset) <= 2;
+          const shiftX = cfg.x * fanScale;
           return (
             <div key={idx} className="fan-gallery-card"
               onClick={() => { if (isCenter) setLightbox(idx); else if (isVisible) setCenter(idx); }}
               style={{
                 position: 'absolute',
-                width: '158px', height: '210px',
+                left: '50%',
+                top: '50%',
+                width: cardW,
+                height: cardH,
                 borderRadius: '18px', overflow: 'hidden',
                 cursor: isVisible ? 'pointer' : 'default',
-                transform: `translateX(${cfg.x}px) rotate(${cfg.rotate}deg) scale(${cfg.scale})`,
+                transform: `translate(calc(-50% + ${shiftX}px), -50%) rotate(${cfg.rotate}deg) scale(${cfg.scale})`,
                 zIndex: cfg.z,
                 opacity: cfg.opacity,
                 border: '3px solid rgba(255,255,255,0.95)',
@@ -1430,11 +1447,10 @@ const FanGallery = () => {
             </div>
           );
         })}
-
+          </div>
         </div>
 
-        <button className="fan-gallery-nav fan-gallery-nav-prev" onClick={() => setCenter(c => (c + 1) % totalImages)}>‹</button>
-        <button className="fan-gallery-nav fan-gallery-nav-next" onClick={() => setCenter(c => (c - 1 + totalImages) % totalImages)}>›</button>
+        <button type="button" className="fan-gallery-nav fan-gallery-nav-next" aria-label="תמונה הבאה" onClick={() => setCenter(c => (c - 1 + totalImages) % totalImages)}>›</button>
       </div>
 
       <p style={{ textAlign: 'center', color: 'rgba(161,23,56,0.38)', fontSize: '0.67rem', letterSpacing: '0.18em', marginBottom: '0.25rem' }}>{center + 1} / {totalImages}</p>
@@ -2780,11 +2796,28 @@ export default function App({ initialView = 'portfolio' }) {
         }
         .admin-sidebar-nav { display: none; }
 
-        .fan-gallery-nav {
+        .fan-gallery-wrap {
+          display: grid;
+          grid-template-columns: auto 1fr auto;
+          align-items: center;
+          gap: 10px;
+          width: 100%;
+          max-width: 560px;
+          margin: 0 auto 1.25rem;
+        }
+        .fan-gallery-viewport {
+          position: relative;
+          width: 100%;
+          min-width: 0;
+        }
+        .fan-gallery-stage {
           position: absolute;
-          top: 50%;
-          transform: translateY(-50%);
-          z-index: 20;
+          inset: 0;
+        }
+        .fan-gallery-nav {
+          position: static;
+          transform: none;
+          flex-shrink: 0;
           background: rgba(255,255,255,0.72);
           backdrop-filter: blur(8px);
           -webkit-backdrop-filter: blur(8px);
@@ -2800,9 +2833,6 @@ export default function App({ initialView = 'portfolio' }) {
           font-size: 1.4rem;
           box-shadow: 0 4px 14px rgba(161,23,56,0.15);
         }
-        .fan-gallery-nav-prev { right: 0; }
-        .fan-gallery-nav-next { left: 0; }
-        .fan-gallery-stage { position: relative; width: 100%; height: 100%; }
 
         @media (min-width: 768px) {
           .booking-shell { max-width: 680px !important; padding-left: 2rem !important; padding-right: 2rem !important; }
@@ -2810,59 +2840,21 @@ export default function App({ initialView = 'portfolio' }) {
 
           .portfolio-content { max-width: 720px !important; padding-left: 2rem !important; padding-right: 2rem !important; }
           .portfolio-hero { padding-left: 2rem !important; padding-right: 2rem !important; }
-          .fan-gallery-wrap { height: 340px !important; }
+          .fan-gallery-wrap { max-width: 640px; }
         }
 
         @media (min-width: 1024px) {
           .portfolio-page { overflow-x: clip; }
-          .portfolio-hero { max-width: 900px; margin: 0 auto; }
-          .portfolio-content { max-width: 900px !important; padding-left: 2.5rem !important; padding-right: 2.5rem !important; }
+          .portfolio-hero { max-width: 960px; margin: 0 auto; }
+          .portfolio-content { max-width: 960px !important; padding-left: 2.5rem !important; padding-right: 2.5rem !important; }
           .portfolio-gallery-section { margin-bottom: 3rem !important; }
-          .fan-gallery-wrap {
-            height: 430px !important;
-            max-width: 820px;
-            margin-left: auto !important;
-            margin-right: auto !important;
-          }
-          .fan-gallery-stage {
-            position: relative;
-            width: 100%;
-            height: 100%;
-            transform: scale(1.55);
-            transform-origin: center center;
-          }
-          .fan-gallery-card {
-            width: 158px !important;
-            height: 210px !important;
-          }
-          .fan-gallery-nav {
-            position: absolute;
-            top: 50%;
-            transform: translateY(-50%);
-            z-index: 20;
-            background: rgba(255,255,255,0.82);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            border: 1px solid rgba(255,255,255,0.85);
-            border-radius: 50%;
-            width: 44px;
-            height: 44px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: #A11738;
-            font-size: 1.5rem;
-            box-shadow: 0 4px 14px rgba(161,23,56,0.15);
-          }
-          .fan-gallery-nav-prev { right: 0; }
-          .fan-gallery-nav-next { left: 0; }
-          .portfolio-reviews-section { max-width: 680px; margin-left: auto !important; margin-right: auto !important; }
-          .portfolio-social-card { max-width: 400px !important; margin-left: auto !important; margin-right: auto !important; }
-          .portfolio-bottom-stack { display: flex; flex-direction: column; align-items: center; gap: 0; }
+          .fan-gallery-wrap { max-width: 760px; gap: 16px; }
+          .fan-gallery-nav { width: 44px; height: 44px; font-size: 1.5rem; }
+          .portfolio-reviews-section { max-width: 720px; margin-left: auto !important; margin-right: auto !important; }
+          .portfolio-social-card { max-width: 420px !important; margin-left: auto !important; margin-right: auto !important; }
+          .portfolio-bottom-stack { display: flex; flex-direction: column; align-items: center; gap: 0; width: 100%; }
 
           .booking-shell { max-width: 820px !important; }
-          .fan-gallery-wrap { height: 380px !important; }
 
           .admin-body { display: flex; flex: 1; min-height: 0; overflow: hidden; }
           .admin-overview-actions { flex-direction: row !important; }
@@ -3014,11 +3006,10 @@ export default function App({ initialView = 'portfolio' }) {
         }
 
         @media (min-width: 1280px) {
-          .portfolio-content { max-width: 1040px !important; }
-          .portfolio-hero { max-width: 1040px; }
-          .fan-gallery-wrap { max-width: 920px; height: 460px !important; }
-          .fan-gallery-stage { transform: scale(1.7); }
-          .portfolio-reviews-section { max-width: 760px; }
+          .portfolio-content { max-width: 1080px !important; }
+          .portfolio-hero { max-width: 1080px; }
+          .fan-gallery-wrap { max-width: 860px; }
+          .portfolio-reviews-section { max-width: 780px; }
           .booking-shell { max-width: 820px !important; }
           .admin-inner { padding: 1.75rem 2.5rem !important; }
           .admin-gallery-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important; }
