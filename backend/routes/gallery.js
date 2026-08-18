@@ -46,6 +46,8 @@ router.get('/file/:id', async (req, res) => {
     if (!result.rows.length) return res.status(404).json({ error: 'Not found' });
     const row = result.rows[0];
     res.set('Content-Type', row.mime || 'image/jpeg');
+    res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+    res.set('Access-Control-Allow-Origin', '*');
     res.set('Cache-Control', 'public, max-age=86400, stale-while-revalidate=604800');
     res.send(row.data);
   } catch (err) {

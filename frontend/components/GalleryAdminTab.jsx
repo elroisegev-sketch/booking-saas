@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 
 const BACKEND = process.env.NEXT_PUBLIC_API_URL || 'https://booking-saas-production-b9fd.up.railway.app';
+const gallerySrc = (item) => `/gallery-file/${item.id}`;
 
 const card = {
   background: 'rgba(255,255,255,0.6)',
@@ -24,6 +25,7 @@ export default function GalleryAdminTab({ showToast }) {
   const [items, setItems] = useState([]);
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
+  const [preview, setPreview] = useState(null);
 
   const load = () => {
     const token = localStorage.getItem('token');
@@ -67,6 +69,7 @@ export default function GalleryAdminTab({ showToast }) {
       headers: { Authorization: 'Bearer ' + token },
     });
     setItems((prev) => prev.filter((x) => x.id !== id));
+    if (preview && preview.id === id) setPreview(null);
     showToast('התמונה נמחקה');
   };
 
@@ -103,11 +106,42 @@ export default function GalleryAdminTab({ showToast }) {
 
   return (
     <div>
+      {preview && (
+        <div
+          onClick={() => setPreview(null)}
+          style={{
+            position: 'fixed', inset: 0, zIndex: 200,
+            background: 'rgba(0,0,0,0.88)', backdropFilter: 'blur(20px)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '1rem',
+          }}
+        >
+          <img
+            src={gallerySrc(preview)}
+            alt={`תמונה ${preview.index}`}
+            style={{ maxWidth: '92vw', maxHeight: '88vh', borderRadius: '20px', boxShadow: '0 32px 80px rgba(0,0,0,0.6)' }}
+          />
+          <button
+            type="button"
+            onClick={() => setPreview(null)}
+            style={{
+              position: 'absolute', top: '1.5rem', left: '1.5rem',
+              background: 'rgba(255,255,255,0.15)', border: 'none', borderRadius: '50%',
+              width: '40px', height: '40px', color: 'white', fontSize: '1.2rem', cursor: 'pointer',
+            }}
+          >
+            ✕
+          </button>
+        </div>
+      )}
+
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem', gap: '12px', flexWrap: 'wrap' }}>
         <div>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#A11738', margin: 0 }}>גלריה 📸</h1>
           <p style={{ color: '#9ca3af', fontSize: '0.875rem', margin: '6px 0 0', lineHeight: 1.6 }}>
-            התמונות שמופיעות בדף הפתיחה. העלי חדשות, מחקי מה שלא מתאים, וסדרי עם החיצים.
+            התמונות שמופיעות בדף הפתיחה. לחצי על תמונה לתצוגה גדולה, סדרי עם החיצים, ומחקי מה שלא מתאים.
+          </p>
+          <p style={{ color: '#b45309', fontSize: '0.78rem', margin: '8px 0 0', lineHeight: 1.5, background: 'rgba(254,243,199,0.5)', padding: '8px 12px', borderRadius: '12px' }}>
+            💡 התמונות הישנות מהאתר לא מופיעות כאן — רק מה שהעלית. ברגע שיש תמונה אחת לפחות, היא מחליפה את הגלריה הישנה בדף הבית.
           </p>
         </div>
         <label style={{
@@ -127,17 +161,54 @@ export default function GalleryAdminTab({ showToast }) {
           <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🖼️</div>
           <p style={{ fontWeight: 700, color: '#A11738', margin: '0 0 8px' }}>עדיין אין תמונות בניהול שלך</p>
           <p style={{ color: '#9ca3af', fontSize: '0.85rem', margin: 0, lineHeight: 1.6 }}>
-            כרגע מוצגות התמונות הישנות מהאתר. ברגע שתעלי תמונה כאן — הגלריה תעבור לשליטה שלך.
+            כרגע מוצגות התמונות הישנות מהאתר. העלי תמונות כאן כדי לשלוט בגלריה בעצמך.
           </p>
         </div>
       ) : (
         <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {items.map((item, idx) => (
             <div key={item.id} style={{ ...card, padding: '12px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <img src={item.url} alt="" style={{ width: 72, height: 72, borderRadius: '16px', objectFit: 'cover', flexShrink: 0, border: '2px solid rgba(247,193,195,0.5)' }} />
+              <button
+                type="button"
+                onClick={() => setPreview({ id: item.id, index: idx + 1 })}
+                style={{
+                  padding: 0, border: 'none', background: 'none', cursor: 'pointer', flexShrink: 0, position: 'relative',
+                }}
+              >
+                <img
+                  src={gallerySrc(item)}
+                  alt={`תמונה ${idx + 1}`}
+                  loading="lazy"
+                  style={{
+                    width: 112, height: 112, borderRadius: '16px', objectFit: 'cover',
+                    border: '2px solid rgba(247,193,195,0.5)', display: 'block',
+                    boxShadow: '0 4px 16px rgba(161,23,56,0.12)',
+                  }}
+                />
+                <span style={{
+                  position: 'absolute', bottom: '6px', right: '6px',
+                  background: 'rgba(161,23,56,0.85)', color: 'white',
+                  fontSize: '0.65rem', fontWeight: 800, padding: '2px 7px', borderRadius: '999px',
+                }}>
+                  #{idx + 1}
+                </span>
+              </button>
               <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ margin: 0, fontWeight: 800, color: '#A11738', fontSize: '0.9rem' }}>תמונה {idx + 1}</p>
-                <p style={{ margin: '4px 0 0', color: '#9ca3af', fontSize: '0.75rem' }}>ככל שמספר קטן יותר — מופיעה קודם בגלריה</p>
+                <p style={{ margin: 0, fontWeight: 800, color: '#A11738', fontSize: '0.95rem' }}>תמונה {idx + 1}</p>
+                <p style={{ margin: '4px 0 0', color: '#9ca3af', fontSize: '0.75rem', lineHeight: 1.5 }}>
+                  ככל שמספר קטן יותר — מופיעה קודם בגלריה
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setPreview({ id: item.id, index: idx + 1 })}
+                  style={{
+                    marginTop: '8px', padding: '6px 12px', borderRadius: '999px',
+                    background: 'rgba(253,236,229,0.8)', border: '1px solid rgba(247,193,195,0.5)',
+                    color: '#A11738', fontWeight: 700, fontSize: '0.75rem', cursor: 'pointer',
+                  }}
+                >
+                  🔍 תצוגה גדולה
+                </button>
               </div>
               <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
                 <button type="button" disabled={idx === 0} onClick={() => move(idx, -1)} style={{ padding: '6px 10px', borderRadius: '10px', border: 'none', background: '#F7C1C3', color: '#A11738', fontWeight: 700, cursor: idx === 0 ? 'not-allowed' : 'pointer', opacity: idx === 0 ? 0.4 : 1 }}>↑</button>

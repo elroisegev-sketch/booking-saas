@@ -1376,7 +1376,7 @@ const FanGallery = () => {
     fetch(`${API_URL}/api/gallery/public/lior-segev`)
       .then((r) => r.json())
       .then((data) => {
-        if (Array.isArray(data) && data.length) setGalleryUrls(data.map((x) => x.url));
+        if (Array.isArray(data) && data.length) setGalleryUrls(data.map((x) => `/gallery-file/${x.id}`));
       })
       .catch(() => {});
   }, []);

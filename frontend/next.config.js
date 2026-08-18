@@ -16,6 +16,15 @@ const nextConfig = {
       },
     ];
   },
+  async rewrites() {
+    const api = process.env.NEXT_PUBLIC_API_URL || 'https://booking-saas-production-b9fd.up.railway.app';
+    return [
+      {
+        source: '/gallery-file/:id',
+        destination: `${api}/api/gallery/file/:id`,
+      },
+    ];
+  },
   async headers() {
     return [
       {
