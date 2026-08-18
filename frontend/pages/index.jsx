@@ -692,7 +692,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
         </button>
       </div>
 
-      <div style={{ maxWidth: '520px', margin: '0 auto', padding: '2rem 1.5rem' }}>
+      <div className="booking-shell" style={{ maxWidth: '520px', margin: '0 auto', padding: '2rem 1.5rem' }}>
 
         {/* Step 1 - Services */}
         {step === 1 && dataLoading && (
@@ -728,7 +728,7 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
             {cats.map(cat => (
               <div key={cat} style={{ marginBottom: '1.5rem' }}>
                 <p style={{ display: 'inline-flex', fontWeight: 500, color: '#A11738', fontSize: '0.78rem', letterSpacing: '0.08em', marginBottom: '0.75rem', background: 'rgba(247,193,195,0.3)', backdropFilter: 'blur(8px)', padding: '3px 12px', borderRadius: '999px', border: '1px solid rgba(247,193,195,0.3)' }}>{cat}</p>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+                <div className="booking-services-grid" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
                   {displayServices.filter(s => s.category === cat).map(svc => {
                     const isSelected = selectedServices.find(s => s.id === svc.id);
                     return (
@@ -1395,7 +1395,7 @@ const FanGallery = () => {
         </div>
       )}
 
-      <div style={{ position: 'relative', height: '285px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.25rem' }}>
+      <div className="fan-gallery-wrap" style={{ position: 'relative', height: '285px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.25rem' }}>
         {images.map((src, idx) => {
           const offset = getOffset(idx);
           if (Math.abs(offset) > 3) return null;
@@ -1601,7 +1601,7 @@ const PortfolioPage = ({ onBook }) => {
       </div>
 
       {/* ── CONTENT ── */}
-      <div style={{ maxWidth: '480px', margin: '0 auto', padding: '0 1.25rem 6rem' }}>
+      <div className="portfolio-content" style={{ maxWidth: '480px', margin: '0 auto', padding: '0 1.25rem 6rem' }}>
 
         {/* Divider */}
         <div className="reveal-sec" style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '1.25rem', padding: '2.5rem 0 2.25rem' }}>
@@ -1618,6 +1618,7 @@ const PortfolioPage = ({ onBook }) => {
           <FanGallery />
         </div>
 
+        <div className="portfolio-bottom-grid">
         <div className="reveal-sec" style={{ marginBottom: '2.5rem' }}>
           <h2 style={{ fontFamily: "'Varela Round', sans-serif", fontSize: '1.9rem', fontWeight: 300, color: '#3d0c16', textAlign: 'center', marginBottom: '1.25rem' }}>
             מה הלקוחות כותבות
@@ -1665,6 +1666,7 @@ const PortfolioPage = ({ onBook }) => {
               </svg>
             </a>
           </div>
+        </div>
         </div>
 
         <div style={{ textAlign: 'center' }}>
@@ -1908,8 +1910,23 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
   const mainStyle = { flex: 1, overflowY: 'auto', fontFamily: 'Varela Round, sans-serif', background: 'linear-gradient(135deg, #fff5f7 0%, #fce8f3 40%, #f3eeff 80%, #fff5f7 100%)', paddingBottom: '80px' };
   const card = { background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.8)', borderRadius: '24px', boxShadow: '0 8px 32px rgba(161,23,56,0.07), inset 0 1px 0 rgba(255,255,255,0.9)' };
 
+  const renderNavButton = (item, layout) => (
+    <button
+      key={item.id}
+      type="button"
+      onClick={() => setTab(item.id)}
+      className={`admin-nav-item${tab === item.id ? ' is-active' : ''}${layout === 'side' ? ' admin-nav-item--side' : ''}`}
+    >
+      <Icon name={item.icon} className="w-5 h-5" />
+      <span>{item.label}</span>
+      {item.id === 'pending' && pendingAppts.length > 0 && (
+        <span className="admin-nav-badge">{pendingAppts.length}</span>
+      )}
+    </button>
+  );
+
   return (
-    <div dir="rtl" style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
+    <div dir="rtl" className="admin-shell" style={{ display: 'flex', flexDirection: 'column', height: '100vh', overflow: 'hidden' }}>
       {toast && <div style={{ position: 'fixed', top: '1rem', left: '50%', transform: 'translateX(-50%)', zIndex: 50, background: 'rgba(161,23,56,0.88)', backdropFilter: 'blur(12px)', WebkitBackdropFilter: 'blur(12px)', color: 'white', padding: '0.75rem 1.25rem', borderRadius: '999px', fontWeight: 700, fontSize: '0.875rem', fontFamily: 'Varela Round, sans-serif', boxShadow: '0 8px 24px rgba(161,23,56,0.32)' }}>{toast}</div>}
 
       {viewImage && (
@@ -1919,7 +1936,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
       )}
 
       {/* Top Header */}
-      <div style={{ background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.7)', padding: '0.875rem 1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
+      <div className="admin-top-header" style={{ background: 'rgba(255,255,255,0.5)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderBottom: '1px solid rgba(255,255,255,0.7)', padding: '0.875rem 1.25rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexShrink: 0 }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <img src="/symbol.png" alt="LS" style={{ width: '28px', height: '28px', objectFit: 'contain' }} />
           <span style={{ fontWeight: 900, color: '#A11738', fontSize: '0.9rem', fontFamily: 'Varela Round, sans-serif' }}>ליאור שגב</span>
@@ -1930,9 +1947,15 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
         </div>
       </div>
 
+      <div className="admin-body">
+      {/* Sidebar — desktop only */}
+      <aside className="admin-sidebar-nav" aria-label="ניווט ראשי">
+        {navItems.map((item) => renderNavButton(item, 'side'))}
+      </aside>
+
       {/* Main */}
-      <div style={mainStyle}>
-        <div style={{ maxWidth: '900px', margin: '0 auto', padding: '1rem' }}>
+      <div className="admin-main" style={mainStyle}>
+        <div className="admin-inner" style={{ maxWidth: '900px', margin: '0 auto', padding: '1rem' }}>
 
           {/* OVERVIEW */}
           {tab === 'overview' && (
@@ -1943,7 +1966,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                   <button onClick={enablePush} style={{ marginTop: "8px", fontSize: "0.75rem", padding: "4px 12px", borderRadius: "8px", background: "#F7C1C3", color: "#A11738", border: "none", cursor: "pointer", fontWeight: 700 }}>🔔 הפעל התראות</button>
                   <p style={{ color: '#9ca3af', fontSize: '0.875rem', marginTop: '4px' }}>הנה מה שקורה היום</p>
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', flexShrink: 0 }}>
+                <div className="admin-overview-actions" style={{ display: 'flex', flexDirection: 'column', gap: '8px', flexShrink: 0 }}>
                   <button onClick={() => setTab('booking')} style={{ display: 'flex', alignItems: 'center', gap: '8px', padding: '0.625rem 1rem', borderRadius: '12px', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: '#F7C1C3', fontWeight: 700, fontSize: '0.875rem', border: 'none', cursor: 'pointer', fontFamily: 'Varela Round, sans-serif' }}>
                     <Icon name="link" className="w-4 h-4" /> דף הזמנות
                   </button>
@@ -2013,7 +2036,9 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                   <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>✅</div>
                   <p style={{ fontWeight: 700 }}>אין תורים ממתינים</p>
                 </div>
-              ) : pendingAppts.map(appt => (
+              ) : (
+              <div className="admin-pending-grid">
+              {pendingAppts.map(appt => (
                 <div key={appt.id} style={{ ...card, padding: '1.25rem', marginBottom: '1rem' }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '0.75rem' }}>
                     <div>
@@ -2044,6 +2069,8 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                   </div>
                 </div>
               ))}
+              </div>
+              )}
             </div>
           )}
 
@@ -2521,7 +2548,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                   <p style={{ color: '#9ca3af', fontSize: '0.875rem', margin: '2px 0 0' }}>authentic-wisdom-production.up.railway.app</p>
                 </div>
               </div>
-              <div style={{ border: '2px solid #f0f0f0', borderRadius: '16px', overflow: 'hidden' }}>
+              <div className="admin-booking-preview" style={{ border: '2px solid #f0f0f0', borderRadius: '16px', overflow: 'hidden' }}>
                 <BookingPage onBack={() => setTab('overview')} onAppointmentBooked={(appt) => setAppointments(prev => [...prev, appt])} />
               </div>
             </div>
@@ -2529,19 +2556,11 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
 
         </div>
       </div>
+      </div>
 
-      {/* Bottom Navigation */}
+      {/* Bottom Navigation — mobile only */}
       <div className="admin-bottom-nav" style={{ position: 'fixed', bottom: 0, right: 0, left: 0, background: 'rgba(255,255,255,0.65)', backdropFilter: 'blur(28px)', WebkitBackdropFilter: 'blur(28px)', borderTop: '1px solid rgba(255,255,255,0.8)', display: 'flex', justifyContent: 'space-around', padding: '8px 0 12px', zIndex: 50, fontFamily: 'Varela Round, sans-serif' }}>
-        {navItems.map(item => (
-          <button key={item.id} onClick={() => setTab(item.id)}
-            style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '3px', padding: '6px 10px', background: 'none', border: 'none', cursor: 'pointer', color: tab === item.id ? '#A11738' : '#9ca3af', fontFamily: 'Varela Round, sans-serif', position: 'relative' }}>
-            <Icon name={item.icon} className="w-5 h-5" />
-            <span style={{ fontSize: '0.65rem', fontWeight: tab === item.id ? 900 : 500 }}>{item.label}</span>
-            {item.id === 'pending' && pendingAppts.length > 0 && (
-              <span style={{ position: 'absolute', top: '2px', right: '4px', background: '#EC6A83', color: 'white', fontSize: '0.55rem', fontWeight: 900, padding: '1px 5px', borderRadius: '999px' }}>{pendingAppts.length}</span>
-            )}
-          </button>
-        ))}
+        {navItems.map((item) => renderNavButton(item, 'bottom'))}
       </div>
     </div>
   );
@@ -2730,6 +2749,122 @@ export default function App({ initialView = 'portfolio' }) {
         .sp3 { animation: sparkle-3 3.5s ease-in-out infinite 0.8s; color: #c4a35a; }
         .sp4 { animation: sparkle-4 4s ease-in-out infinite 0.2s; color: #EC6A83; }
         .sp5 { animation: sparkle-5 2.8s ease-in-out infinite 1s; color: #c4a35a; }
+
+        .admin-nav-item {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 3px;
+          padding: 6px 10px;
+          background: none;
+          border: none;
+          cursor: pointer;
+          color: #9ca3af;
+          font-family: 'Varela Round', sans-serif;
+          position: relative;
+        }
+        .admin-nav-item.is-active { color: #A11738; }
+        .admin-nav-item span { font-size: 0.65rem; font-weight: 500; }
+        .admin-nav-item.is-active span { font-weight: 900; }
+        .admin-nav-badge {
+          position: absolute;
+          top: 2px;
+          right: 4px;
+          background: #EC6A83;
+          color: white;
+          font-size: 0.55rem;
+          font-weight: 900;
+          padding: 1px 5px;
+          border-radius: 999px;
+        }
+        .admin-sidebar-nav { display: none; }
+
+        @media (min-width: 768px) {
+          .portfolio-content { max-width: 720px !important; padding-left: 2rem !important; padding-right: 2rem !important; }
+          .booking-shell { max-width: 680px !important; padding-left: 2rem !important; padding-right: 2rem !important; }
+          .booking-services-grid { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px !important; }
+          .portfolio-bottom-grid { display: grid; grid-template-columns: 1.2fr 0.8fr; gap: 1.5rem; align-items: start; }
+          .portfolio-bottom-grid > .reveal-sec { margin-bottom: 0 !important; }
+          .fan-gallery-wrap { height: 340px !important; }
+        }
+
+        @media (min-width: 1024px) {
+          .portfolio-content { max-width: 980px !important; }
+          .booking-shell { max-width: 820px !important; }
+          .fan-gallery-wrap { height: 380px !important; }
+
+          .admin-body { display: flex; flex: 1; min-height: 0; overflow: hidden; }
+          .admin-overview-actions { flex-direction: row !important; }
+          .admin-sidebar-nav {
+            display: flex;
+            flex-direction: column;
+            width: 220px;
+            flex-shrink: 0;
+            padding: 1rem 0.75rem;
+            gap: 4px;
+            background: rgba(255,255,255,0.45);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-left: 1px solid rgba(255,255,255,0.75);
+            overflow-y: auto;
+          }
+          .admin-main { padding-bottom: 1.5rem !important; flex: 1; min-width: 0; }
+          .admin-inner { max-width: none !important; padding: 1.5rem 2rem !important; }
+          .admin-bottom-nav { display: none !important; }
+          .admin-top-header { padding: 1rem 2rem !important; }
+
+          .admin-nav-item--side {
+            display: flex !important;
+            flex-direction: row !important;
+            align-items: center !important;
+            gap: 10px !important;
+            width: 100%;
+            padding: 0.75rem 1rem !important;
+            border: none;
+            border-radius: 14px;
+            background: transparent;
+            cursor: pointer;
+            color: #6b7280;
+            font-family: 'Varela Round', sans-serif;
+            font-size: 0.875rem;
+            font-weight: 600;
+            text-align: right;
+            position: relative;
+          }
+          .admin-nav-item--side.is-active {
+            background: rgba(252,231,243,0.85);
+            color: #A11738;
+            font-weight: 800;
+            box-shadow: inset 0 0 0 1px rgba(247,193,195,0.5);
+          }
+          .admin-nav-item--side span { font-size: 0.875rem !important; font-weight: inherit !important; }
+          .admin-nav-badge {
+            position: absolute;
+            top: 8px;
+            left: 10px;
+            background: #EC6A83;
+            color: white;
+            font-size: 0.6rem;
+            font-weight: 900;
+            padding: 1px 6px;
+            border-radius: 999px;
+          }
+          .admin-nav-item--side .admin-nav-badge { position: static; margin-right: auto; }
+
+          .admin-stats-grid { grid-template-columns: repeat(3, 1fr) !important; }
+          .admin-calendar-grid { grid-template-columns: 1.1fr 0.9fr !important; gap: 1.5rem !important; }
+          .admin-pending-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+          .admin-pending-grid > div { margin-bottom: 0 !important; }
+          .admin-booking-preview { max-width: 820px !important; margin: 0 auto; }
+          .admin-gallery-grid { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px !important; }
+          .admin-gallery-grid > div { margin: 0 !important; }
+        }
+
+        @media (min-width: 1280px) {
+          .portfolio-content { max-width: 1100px !important; }
+          .admin-inner { padding: 1.75rem 2.5rem !important; }
+          .admin-gallery-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+        }
 
         @media (max-width: 480px) {
           .admin-stats-grid > div { padding: 0.875rem !important; }

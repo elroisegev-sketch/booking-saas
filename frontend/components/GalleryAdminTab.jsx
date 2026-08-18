@@ -162,7 +162,7 @@ export default function GalleryAdminTab({ showToast }) {
           </p>
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
+        <div className="admin-gallery-grid" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
           {items.map((item, idx) => (
             <div key={item.id} style={{ ...card, padding: '12px', display: 'flex', alignItems: 'center', gap: '12px' }}>
               <button
