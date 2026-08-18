@@ -2856,14 +2856,143 @@ export default function App({ initialView = 'portfolio' }) {
           .admin-pending-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
           .admin-pending-grid > div { margin-bottom: 0 !important; }
           .admin-booking-preview { max-width: 820px !important; margin: 0 auto; }
-          .admin-gallery-grid { display: grid !important; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px !important; }
-          .admin-gallery-grid > div { margin: 0 !important; }
+
+          .admin-gallery-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+          }
+          .admin-gallery-count {
+            color: #9ca3af;
+            font-size: 0.8rem;
+            margin: 0 0 1rem;
+          }
+          .admin-gallery-grid {
+            display: grid !important;
+            grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
+            gap: 14px !important;
+          }
+          .admin-gallery-item {
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            padding: 10px !important;
+            margin: 0 !important;
+          }
+          .gallery-thumb {
+            padding: 0;
+            border: none;
+            background: none;
+            cursor: pointer;
+            position: relative;
+            width: 100%;
+          }
+          .gallery-thumb img {
+            width: 100%;
+            height: 200px;
+            border-radius: 16px;
+            object-fit: cover;
+            display: block;
+            border: 2px solid rgba(247,193,195,0.5);
+            box-shadow: 0 4px 16px rgba(161,23,56,0.1);
+          }
+          .gallery-badge {
+            position: absolute;
+            bottom: 8px;
+            right: 8px;
+            background: rgba(161,23,56,0.88);
+            color: white;
+            font-size: 0.7rem;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 999px;
+          }
+          .gallery-item-info { display: none; }
+          .gallery-item-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            width: 100%;
+          }
+          .gallery-order-btns { display: flex; gap: 6px; }
+          .gallery-order-btns button {
+            padding: 6px 12px;
+            border-radius: 10px;
+            border: none;
+            background: #F7C1C3;
+            color: #A11738;
+            font-weight: 700;
+            cursor: pointer;
+          }
+          .gallery-order-btns button:disabled { opacity: 0.35; cursor: not-allowed; }
+          .gallery-delete-btn {
+            padding: 6px 12px;
+            border-radius: 10px;
+            border: none;
+            background: #fee2e2;
+            color: #991b1b;
+            font-weight: 700;
+            font-size: 0.8rem;
+            cursor: pointer;
+          }
         }
 
         @media (min-width: 1280px) {
           .portfolio-content { max-width: 1100px !important; }
           .admin-inner { padding: 1.75rem 2.5rem !important; }
-          .admin-gallery-grid { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+          .admin-gallery-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)) !important; }
+          .gallery-thumb img { height: 220px; }
+        }
+
+        @media (max-width: 1023px) {
+          .admin-gallery-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 12px;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+          }
+          .admin-gallery-grid {
+            display: flex !important;
+            flex-direction: column;
+            gap: 12px !important;
+          }
+          .admin-gallery-item {
+            flex-direction: row !important;
+            align-items: center !important;
+            gap: 12px;
+            padding: 12px !important;
+          }
+          .gallery-thumb img {
+            width: 112px !important;
+            height: 112px !important;
+          }
+          .gallery-item-info { display: block; flex: 1; min-width: 0; }
+          .gallery-item-title { margin: 0; font-weight: 800; color: #A11738; font-size: 0.95rem; }
+          .gallery-item-hint { margin: 4px 0 0; color: #9ca3af; font-size: 0.75rem; line-height: 1.5; }
+          .gallery-preview-link {
+            margin-top: 8px;
+            padding: 6px 12px;
+            border-radius: 999px;
+            background: rgba(253,236,229,0.8);
+            border: 1px solid rgba(247,193,195,0.5);
+            color: #A11738;
+            font-weight: 700;
+            font-size: 0.75rem;
+            cursor: pointer;
+          }
+          .gallery-item-actions {
+            flex-direction: column;
+            margin-top: 0;
+            width: auto;
+          }
+          .admin-gallery-count { display: none; }
         }
 
         @media (max-width: 480px) {

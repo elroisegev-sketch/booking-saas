@@ -105,7 +105,7 @@ export default function GalleryAdminTab({ showToast }) {
   };
 
   return (
-    <div>
+    <div className="admin-gallery-tab">
       {preview && (
         <div
           onClick={() => setPreview(null)}
@@ -134,17 +134,18 @@ export default function GalleryAdminTab({ showToast }) {
         </div>
       )}
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1.25rem', gap: '12px', flexWrap: 'wrap' }}>
+      <div className="admin-gallery-header">
         <div>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#A11738', margin: 0 }}>גלריה 📸</h1>
           <p style={{ color: '#9ca3af', fontSize: '0.875rem', margin: '6px 0 0', lineHeight: 1.6 }}>
             כל התמונות שמופיעות ללקוחות — כאן מוסיפים, מסדרים ומוחקים. לחצי על תמונה לתצוגה גדולה.
           </p>
         </div>
-        <label style={{
+        <label className="admin-gallery-upload-btn" style={{
           display: 'inline-flex', alignItems: 'center', gap: '8px', padding: '0.75rem 1.1rem',
           borderRadius: '999px', background: uploading ? '#d1d5db' : 'linear-gradient(135deg,#A11738,#EC6A83)',
           color: 'white', fontWeight: 700, fontSize: '0.875rem', cursor: uploading ? 'not-allowed' : 'pointer',
+          flexShrink: 0,
         }}>
           {uploading ? 'מעלה...' : '+ תמונה חדשה'}
           <input type="file" accept="image/jpeg,image/png,image/webp" onChange={onPick} disabled={uploading} style={{ display: 'none' }} />
@@ -162,59 +163,47 @@ export default function GalleryAdminTab({ showToast }) {
           </p>
         </div>
       ) : (
-        <div className="admin-gallery-grid" style={{ display: 'flex', flexDirection: 'column', gap: '12px' }}>
-          {items.map((item, idx) => (
-            <div key={item.id} style={{ ...card, padding: '12px', display: 'flex', alignItems: 'center', gap: '12px' }}>
-              <button
-                type="button"
-                onClick={() => setPreview({ id: item.id, index: idx + 1 })}
-                style={{
-                  padding: 0, border: 'none', background: 'none', cursor: 'pointer', flexShrink: 0, position: 'relative',
-                }}
-              >
-                <img
-                  src={gallerySrc(item)}
-                  alt={`תמונה ${idx + 1}`}
-                  loading="lazy"
-                  style={{
-                    width: 112, height: 112, borderRadius: '16px', objectFit: 'cover',
-                    border: '2px solid rgba(247,193,195,0.5)', display: 'block',
-                    boxShadow: '0 4px 16px rgba(161,23,56,0.12)',
-                  }}
-                />
-                <span style={{
-                  position: 'absolute', bottom: '6px', right: '6px',
-                  background: 'rgba(161,23,56,0.85)', color: 'white',
-                  fontSize: '0.65rem', fontWeight: 800, padding: '2px 7px', borderRadius: '999px',
-                }}>
-                  #{idx + 1}
-                </span>
-              </button>
-              <div style={{ flex: 1, minWidth: 0 }}>
-                <p style={{ margin: 0, fontWeight: 800, color: '#A11738', fontSize: '0.95rem' }}>תמונה {idx + 1}</p>
-                <p style={{ margin: '4px 0 0', color: '#9ca3af', fontSize: '0.75rem', lineHeight: 1.5 }}>
-                  ככל שמספר קטן יותר — מופיעה קודם בגלריה
-                </p>
+        <>
+          <p className="admin-gallery-count">{items.length} תמונות · מספר קטן = מופיעה קודם</p>
+          <div className="admin-gallery-grid">
+            {items.map((item, idx) => (
+              <div key={item.id} className="admin-gallery-item" style={card}>
                 <button
                   type="button"
+                  className="gallery-thumb"
                   onClick={() => setPreview({ id: item.id, index: idx + 1 })}
-                  style={{
-                    marginTop: '8px', padding: '6px 12px', borderRadius: '999px',
-                    background: 'rgba(253,236,229,0.8)', border: '1px solid rgba(247,193,195,0.5)',
-                    color: '#A11738', fontWeight: 700, fontSize: '0.75rem', cursor: 'pointer',
-                  }}
                 >
-                  🔍 תצוגה גדולה
+                  <img
+                    src={gallerySrc(item)}
+                    alt={`תמונה ${idx + 1}`}
+                    loading="lazy"
+                  />
+                  <span className="gallery-badge">#{idx + 1}</span>
                 </button>
+
+                <div className="gallery-item-info">
+                  <p className="gallery-item-title">תמונה {idx + 1}</p>
+                  <p className="gallery-item-hint">ככל שמספר קטן יותר — מופיעה קודם בגלריה</p>
+                  <button
+                    type="button"
+                    className="gallery-preview-link"
+                    onClick={() => setPreview({ id: item.id, index: idx + 1 })}
+                  >
+                    🔍 תצוגה גדולה
+                  </button>
+                </div>
+
+                <div className="gallery-item-actions">
+                  <div className="gallery-order-btns">
+                    <button type="button" disabled={idx === 0} onClick={() => move(idx, -1)} title="הזזי למעלה">↑</button>
+                    <button type="button" disabled={idx === items.length - 1} onClick={() => move(idx, 1)} title="הזזי למטה">↓</button>
+                  </div>
+                  <button type="button" className="gallery-delete-btn" onClick={() => remove(item.id)}>מחק</button>
+                </div>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px' }}>
-                <button type="button" disabled={idx === 0} onClick={() => move(idx, -1)} style={{ padding: '6px 10px', borderRadius: '10px', border: 'none', background: '#F7C1C3', color: '#A11738', fontWeight: 700, cursor: idx === 0 ? 'not-allowed' : 'pointer', opacity: idx === 0 ? 0.4 : 1 }}>↑</button>
-                <button type="button" disabled={idx === items.length - 1} onClick={() => move(idx, 1)} style={{ padding: '6px 10px', borderRadius: '10px', border: 'none', background: '#F7C1C3', color: '#A11738', fontWeight: 700, cursor: idx === items.length - 1 ? 'not-allowed' : 'pointer', opacity: idx === items.length - 1 ? 0.4 : 1 }}>↓</button>
-              </div>
-              <button type="button" onClick={() => remove(item.id)} style={{ padding: '8px 12px', borderRadius: '12px', border: 'none', background: '#fee2e2', color: '#991b1b', fontWeight: 700, fontSize: '0.8rem', cursor: 'pointer' }}>מחק</button>
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        </>
       )}
     </div>
   );
