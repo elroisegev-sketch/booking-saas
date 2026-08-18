@@ -100,6 +100,10 @@ require('./db').query(`
 `).catch(err => console.error('gallery_images migration error:', err));
 require('./db').query(`CREATE INDEX IF NOT EXISTS idx_gallery_business ON gallery_images(business_id, sort_order)`).catch(() => {});
 
+const db = require('./db');
+const { seedLegacyGalleryIfNeeded } = require('./lib/seedGallery');
+seedLegacyGalleryIfNeeded(db).catch((err) => console.error('gallery seed error:', err));
+
 app.get('/health', (_, res) => res.json({ status: 'ok', service: 'BookSlot API' }));
 
 // Auto-migrate notes column on appointments

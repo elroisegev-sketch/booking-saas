@@ -1331,34 +1331,6 @@ const EditAppointmentModal = ({ appt, services, onSave, onClose }) => {
 // ── FAN GALLERY ───────────────────────────────────────────────
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'https://booking-saas-production-b9fd.up.railway.app';
 
-const FALLBACK_GALLERY_IMAGES = [
-  ...Array.from({ length: 21 }, (_, i) => `/gallery/1 - ${i + 1}.jpeg`),
-  '/gallery/26C7B032-40D9-43E1-9BCF-8DBB8B14284E.JPG',
-  '/gallery/7F27DFF2-0FDA-4E72-93BE-D0A6093C84F1.JPG',
-  '/gallery/FullSizeRender 2.JPG',
-  '/gallery/FullSizeRender.JPG',
-  '/gallery/IMG_0331.JPG',
-  '/gallery/IMG_0926.jpg',
-  '/gallery/IMG_1216.jpg',
-  '/gallery/IMG_1318.JPG',
-  '/gallery/IMG_2511.JPG',
-  '/gallery/IMG_4191.JPG',
-  '/gallery/IMG_4209 2.JPG',
-  '/gallery/IMG_4211.JPG',
-  '/gallery/IMG_4212.JPG',
-  '/gallery/IMG_4414.JPG',
-  '/gallery/IMG_4416.JPG',
-  '/gallery/IMG_4455.JPG',
-  '/gallery/IMG_4464 2.JPG',
-  '/gallery/IMG_4484 2.JPG',
-  '/gallery/IMG_4822 2.JPG',
-  '/gallery/IMG_6254 2.JPG',
-  '/gallery/IMG_7816.JPG',
-  '/gallery/IMG_8406.JPG',
-  '/gallery/IMG_9674.JPG',
-  '/gallery/לק פיגוז -1 .png',
-];
-
 const FAN_CONFIG = {
   '-2': { x: -105, rotate: -26, scale: 0.70, z: 1, opacity: 0.52 },
   '-1': { x: -54,  rotate: -13, scale: 0.84, z: 3, opacity: 0.80 },
@@ -1368,7 +1340,7 @@ const FAN_CONFIG = {
 };
 
 const FanGallery = () => {
-  const [galleryUrls, setGalleryUrls] = useState(null);
+  const [images, setImages] = useState(null);
   const [center, setCenter] = useState(0);
   const [lightbox, setLightbox] = useState(null);
 
@@ -1376,17 +1348,33 @@ const FanGallery = () => {
     fetch(`${API_URL}/api/gallery/public/lior-segev`)
       .then((r) => r.json())
       .then((data) => {
-        if (Array.isArray(data) && data.length) setGalleryUrls(data.map((x) => `/gallery-file/${x.id}`));
+        if (Array.isArray(data)) setImages(data.map((x) => `/gallery-file/${x.id}`));
+        else setImages([]);
       })
-      .catch(() => {});
+      .catch(() => setImages([]));
   }, []);
 
-  const images = galleryUrls && galleryUrls.length ? galleryUrls : FALLBACK_GALLERY_IMAGES;
-  const totalImages = images.length;
+  const totalImages = images ? images.length : 0;
 
   useEffect(() => {
     setCenter((c) => (totalImages ? Math.min(c, totalImages - 1) : 0));
   }, [totalImages]);
+
+  if (images === null) {
+    return (
+      <div style={{ height: '285px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.25rem', color: 'rgba(161,23,56,0.45)', fontSize: '0.85rem' }}>
+        טוענת גלריה…
+      </div>
+    );
+  }
+
+  if (!totalImages) {
+    return (
+      <div style={{ height: '285px', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.25rem', color: 'rgba(161,23,56,0.45)', fontSize: '0.85rem' }}>
+        אין תמונות בגלריה
+      </div>
+    );
+  }
 
   const getOffset = (idx) => {
     let o = idx - center;

@@ -3,7 +3,7 @@ const db = require('../db');
 const auth = require('../middleware/auth');
 const router = express.Router();
 
-const MAX_IMAGES = 40;
+const MAX_IMAGES = 60;
 const MAX_BYTES = 1_800_000;
 const UUID_RE = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 

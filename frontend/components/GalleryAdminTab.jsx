@@ -138,10 +138,7 @@ export default function GalleryAdminTab({ showToast }) {
         <div>
           <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#A11738', margin: 0 }}>גלריה 📸</h1>
           <p style={{ color: '#9ca3af', fontSize: '0.875rem', margin: '6px 0 0', lineHeight: 1.6 }}>
-            התמונות שמופיעות בדף הפתיחה. לחצי על תמונה לתצוגה גדולה, סדרי עם החיצים, ומחקי מה שלא מתאים.
-          </p>
-          <p style={{ color: '#b45309', fontSize: '0.78rem', margin: '8px 0 0', lineHeight: 1.5, background: 'rgba(254,243,199,0.5)', padding: '8px 12px', borderRadius: '12px' }}>
-            💡 התמונות הישנות מהאתר לא מופיעות כאן — רק מה שהעלית. ברגע שיש תמונה אחת לפחות, היא מחליפה את הגלריה הישנה בדף הבית.
+            כל התמונות שמופיעות ללקוחות — כאן מוסיפים, מסדרים ומוחקים. לחצי על תמונה לתצוגה גדולה.
           </p>
         </div>
         <label style={{
@@ -159,9 +156,9 @@ export default function GalleryAdminTab({ showToast }) {
       ) : items.length === 0 ? (
         <div style={{ ...card, padding: '2rem', textAlign: 'center' }}>
           <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>🖼️</div>
-          <p style={{ fontWeight: 700, color: '#A11738', margin: '0 0 8px' }}>עדיין אין תמונות בניהול שלך</p>
+          <p style={{ fontWeight: 700, color: '#A11738', margin: '0 0 8px' }}>אין תמונות בגלריה</p>
           <p style={{ color: '#9ca3af', fontSize: '0.85rem', margin: 0, lineHeight: 1.6 }}>
-            כרגע מוצגות התמונות הישנות מהאתר. העלי תמונות כאן כדי לשלוט בגלריה בעצמך.
+            העלי תמונות חדשות — הן יופיעו ללקוחות בדף הפתיחה.
           </p>
         </div>
       ) : (
