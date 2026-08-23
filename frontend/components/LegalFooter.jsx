@@ -58,6 +58,7 @@ export default function LegalFooter() {
         <div>
           <h3 style={colTitle}>מידע חוקי</h3>
           <nav>
+            <FooterLink href="/ugc">תיק עבודות UGC</FooterLink>
             <FooterLink href="/blog">מדריכים</FooterLink>
             <FooterLink href="/terms">תקנון ותנאי שימוש</FooterLink>
             <FooterLink href="/privacy">מדיניות פרטיות</FooterLink>

@@ -7,6 +7,7 @@ import { site } from "../lib/site";
 // העמודים הסטטיים הקיימים באתר (ללא admin/maintenance/api)
 const STATIC_ROUTES = [
   { path: "/", changefreq: "weekly", priority: "1.0" },
+  { path: "/ugc", changefreq: "weekly", priority: "0.8" },
   { path: "/blog", changefreq: "weekly", priority: "0.8" },
   { path: "/accessibility", changefreq: "yearly", priority: "0.3" },
   { path: "/privacy", changefreq: "yearly", priority: "0.3" },

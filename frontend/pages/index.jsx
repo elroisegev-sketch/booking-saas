@@ -1615,6 +1615,9 @@ const PortfolioPage = ({ onBook }) => {
         <a href="/blog" style={{ display: 'inline-block', marginTop: '1.1rem', color: '#A11738', fontSize: '0.88rem', fontWeight: 600, textDecoration: 'none', opacity: 0.85 }}>
           מדריכים על לק ג'ל, מבנה אנטומי וגבות ←
         </a>
+        <a href="/ugc" style={{ display: 'block', marginTop: '0.55rem', color: '#A11738', fontSize: '0.88rem', fontWeight: 600, textDecoration: 'none', opacity: 0.85 }}>
+          למותגים: תיק עבודות UGC ←
+        </a>
       </div>
 
       {/* ── CONTENT ── */}
