@@ -26,6 +26,7 @@ const nextConfig = {
     ];
   },
   async headers() {
+    const isDev = process.env.NODE_ENV !== 'production';
     return [
       {
         source: '/(.*)',
@@ -38,12 +39,16 @@ const nextConfig = {
             key: 'Content-Security-Policy',
             value: [
               "default-src 'self'",
-              "script-src 'self' 'unsafe-inline'",
+              isDev
+                ? "script-src 'self' 'unsafe-inline' 'unsafe-eval'"
+                : "script-src 'self' 'unsafe-inline'",
               "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
               "font-src 'self' https://fonts.gstatic.com",
               "img-src 'self' data: blob: https:",
               "media-src 'self' blob: https:",
-              "connect-src 'self' https://booking-saas-production-b9fd.up.railway.app",
+              isDev
+                ? "connect-src 'self' ws: wss: http://localhost:* http://127.0.0.1:* https://booking-saas-production-b9fd.up.railway.app"
+                : "connect-src 'self' https://booking-saas-production-b9fd.up.railway.app",
               "frame-src 'self' https://www.tiktok.com https://www.instagram.com",
               "object-src 'none'",
               "base-uri 'self'",

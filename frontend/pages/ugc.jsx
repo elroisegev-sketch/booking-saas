@@ -1,6 +1,8 @@
+import { useMemo, useRef, useState } from "react";
 import Head from "next/head";
 import Link from "next/link";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/router";
 import LegalFooter from "../components/LegalFooter";
 import { site, whatsappLink } from "../lib/site";
 import { UGC_VIDEOS, resolveVideo } from "../lib/ugcVideos";
@@ -8,10 +10,59 @@ import { UGC_VIDEOS, resolveVideo } from "../lib/ugcVideos";
 const AccessibilityWidget = dynamic(() => import("../components/AccessibilityWidget"), {
   ssr: false,
 });
-
-const COLLAB_WA = whatsappLink(
-  "היי ליאור, ראיתי את תיק העבודות ואשמח לשתף פעולה על תוכן UGC"
+const UgcMotion = dynamic(() => import("../components/UgcMotion"), { ssr: false });
+const LiquidMetalButton = dynamic(
+  () => import("../components/ui/liquid-metal-button").then((m) => m.LiquidMetalButton),
+  { ssr: false }
 );
+
+const VIDEO_FILTERS = [
+  { id: "all", label: "הכל" },
+  { id: "ugc", label: "UGC" },
+  { id: "grwm", label: "GRWM" },
+  { id: "unboxing", label: "אנבוקסינג" },
+  { id: "vo", label: "Voice Over" },
+  { id: "fashion", label: "אופנה" },
+  { id: "lifestyle", label: "לייף סטייל" },
+];
+
+const BRANDS = [{ name: "sheek me", href: "https://www.instagram.com/liors_beauty" }];
+
+const PACKAGES = [
+  {
+    id: "story",
+    format: "סטורי טיים",
+    title: "סטורי טיים",
+    text: "רצף סטוריז קצרים. נראה כמו המלצה של חברה, לא כמו פרסומת.",
+  },
+  {
+    id: "reel",
+    format: "ריל",
+    title: "ריל",
+    text: "סרטון אחד מוכן לרילס או טיקטוק. צילום, עריכה וטקסט על המסך.",
+  },
+  {
+    id: "launch",
+    format: "חבילת השקה",
+    title: "חבילת השקה",
+    text: "ריל + סטורי טיים + Voice Over. מתאים להשקה או לקמפיין קצר.",
+  },
+];
+
+const BRIEF_FORMATS = ["סטורי טיים", "ריל", "חבילת השקה", "GRWM", "אנבוקסינג", "Voice Over"];
+const BRIEF_VIBES = ["נקי ויוקרתי", "ביתי ואותנטי", "אנרגטי", "רגוע · ASMR"];
+const BRIEF_WHEN = ["השבוע", "עד שבועיים", "גמיש"];
+
+function safeBrand(value) {
+  if (!value || typeof value !== "string") return "";
+  const text = value.trim().slice(0, 40);
+  return /^[\u0590-\u05FFa-zA-Z0-9 .'\-&]+$/.test(text) ? text : "";
+}
+
+function buildBriefMessage({ brand, format, vibe, when }) {
+  const who = brand ? ` מ${brand}` : "";
+  return `היי ליאור, ראיתי את תיק העבודות${who}. מחפשים ${format} באווירה ${vibe}, דדליין: ${when}. אשמח לשמוע על מחיר וזמינות.`;
+}
 
 const REASONS = [
   { title: "תוכן אותנטי", text: "נראה כמו חיים אמיתיים, לא כמו פרסומת." },
@@ -30,8 +81,67 @@ const NICHES = [
 
 const FORMATS = ["UGC", "GRWM", "סקירת מוצרים", "סטורי טיים", "וולוגים", "Voice Over"];
 
+const ico = {
+  fill: "none",
+  stroke: "currentColor",
+  strokeWidth: 1.6,
+  strokeLinecap: "round",
+  strokeLinejoin: "round",
+  viewBox: "0 0 24 24",
+  "aria-hidden": true,
+};
+
+function IconWhatsapp() {
+  return (
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+      <path d="M17.47 14.38c-.3-.15-1.76-.87-2.03-.97-.27-.1-.47-.15-.67.15-.2.3-.77.97-.94 1.16-.17.2-.35.22-.64.08-.3-.15-1.26-.46-2.4-1.48-.88-.79-1.48-1.76-1.65-2.06-.17-.3-.02-.46.13-.61.13-.13.3-.35.45-.52.15-.17.2-.3.3-.5.1-.2.05-.37-.03-.52-.07-.15-.67-1.61-.92-2.21-.24-.58-.49-.5-.67-.51h-.57c-.2 0-.52.07-.79.37-.27.3-1.04 1.02-1.04 2.48 0 1.46 1.06 2.88 1.21 3.08.15.2 2.1 3.2 5.08 4.49.71.3 1.26.49 1.69.62.71.23 1.36.2 1.87.12.57-.09 1.76-.72 2.01-1.41.25-.7.25-1.29.17-1.41-.07-.13-.27-.2-.57-.35zm-5.42 7.4h-.01a9.87 9.87 0 01-5.03-1.38l-.36-.21-3.74.98 1-3.65-.24-.37a9.86 9.86 0 01-1.51-5.26C2.16 5.34 6.59.9 12.05.9c2.64 0 5.12 1.03 6.99 2.9a9.83 9.83 0 012.89 6.99c0 5.45-4.44 9.88-9.88 9.88zm8.41-18.3A11.82 11.82 0 0012.05 0C5.5 0 .16 5.34.16 11.89c0 2.1.55 4.14 1.59 5.95L.06 24l6.3-1.65a11.88 11.88 0 005.69 1.45h.01c6.55 0 11.89-5.34 11.89-11.89 0-3.18-1.24-6.16-3.48-8.41z" />
+    </svg>
+  );
+}
+
+function IconInstagram() {
+  return (
+    <svg width="20" height="20" {...ico}>
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.4" cy="6.6" r="0.8" fill="currentColor" stroke="none" />
+    </svg>
+  );
+}
+
+function IconMail() {
+  return (
+    <svg width="20" height="20" {...ico}>
+      <rect x="3" y="5" width="18" height="14" rx="2" />
+      <path d="M3 7.5 12 13l9-5.5" />
+    </svg>
+  );
+}
+
+function IconPhone() {
+  return (
+    <svg width="20" height="20" {...ico}>
+      <path d="M6.4 3.8c.3-.4.9-.6 1.4-.4l2.1.8c.4.15.7.5.75.95l.3 2.2c.05.4-.1.8-.4 1.05L9.2 9.4a11.2 11.2 0 005.4 5.4l1-.95c.25-.3.65-.45 1.05-.4l2.2.3c.45.06.8.35.95.75l.8 2.1c.2.55 0 1.15-.4 1.45-1.2.9-3.15 1.45-6.1.15-4.15-1.85-7.5-5.2-9.35-9.35-1.3-2.95-.75-4.9.15-6.1z" />
+    </svg>
+  );
+}
+
 function PhoneCard({ item }) {
   const video = resolveVideo(item);
+  const playerRef = useRef(null);
+  const [playing, setPlaying] = useState(false);
+
+  const togglePlay = () => {
+    const el = playerRef.current;
+    if (!el) return;
+    if (el.paused) {
+      el.play();
+      setPlaying(true);
+    } else {
+      el.pause();
+      setPlaying(false);
+    }
+  };
 
   return (
     <article className="ugc-phone-card">
@@ -48,7 +158,23 @@ function PhoneCard({ item }) {
             />
           )}
           {video.kind === "file" && (
-            <video src={video.src} controls playsInline preload="metadata" />
+            <button type="button" className="ugc-video-btn" onClick={togglePlay} aria-label={playing ? `השהיית ${item.title}` : `הפעלת ${item.title}`}>
+              <video
+                ref={playerRef}
+                src={video.src}
+                playsInline
+                preload="metadata"
+                onEnded={() => setPlaying(false)}
+                onPause={() => setPlaying(false)}
+                onPlay={() => setPlaying(true)}
+              />
+              {!playing && (
+                <span className="ugc-play-overlay">
+                  <span className="ugc-play" aria-hidden="true">▶</span>
+                  <span>הפעלה</span>
+                </span>
+              )}
+            </button>
           )}
           {video.kind === "link" && (
             <a href={video.src} target="_blank" rel="noopener noreferrer" className="ugc-phone-empty">
@@ -71,8 +197,31 @@ function PhoneCard({ item }) {
 }
 
 export default function UgcPage() {
+  const router = useRouter();
+  const brandName = safeBrand(
+    Array.isArray(router.query.brand) ? router.query.brand[0] : router.query.brand
+  );
+  const [filter, setFilter] = useState("all");
+  const [brief, setBrief] = useState({ format: "", vibe: "", when: "" });
   const canonical = `${site.url}/ugc`;
-  const readyCount = UGC_VIDEOS.filter((v) => v.url).length;
+
+  const videos = useMemo(
+    () =>
+      filter === "all"
+        ? UGC_VIDEOS
+        : UGC_VIDEOS.filter((item) => (item.tags || []).includes(filter)),
+    [filter]
+  );
+
+  const briefReady = brief.format && brief.vibe && brief.when;
+  const briefHref = briefReady
+    ? whatsappLink(buildBriefMessage({ brand: brandName, ...brief }))
+    : "";
+
+  const pickPackage = (format) => {
+    setBrief((prev) => ({ ...prev, format }));
+    document.getElementById("brief")?.scrollIntoView({ behavior: "smooth", block: "start" });
+  };
 
   return (
     <>
@@ -94,26 +243,28 @@ export default function UgcPage() {
 
       <div className="ugc-root" dir="rtl">
         <header className="ugc-hero">
-          <p className="ugc-bsd">בס״ד</p>
-          <img src="/logo-pink.png" alt="ליאור שגב, היופי שלך" className="ugc-logo" />
-          <div className="ugc-photo-wrap">
-            <img src="/lior-profile.png" alt="ליאור שגב, יוצרת תוכן ביוטי ולייף סטייל" />
+          <p className="ugc-bsd ugc-hero-anim">בס״ד</p>
+          <img src="/logo-pink.png" alt="ליאור שגב, היופי שלך" className="ugc-logo ugc-hero-anim" />
+          <div className="ugc-photo-wrap ugc-hero-anim">
+            <img className="ugc-photo-img" src="/lior-profile.png" alt="ליאור שגב, יוצרת תוכן ביוטי ולייף סטייל" />
           </div>
-          <p className="ugc-kicker">יוצרת תוכן</p>
-          <h1>ליאור שגב</h1>
-          <p className="ugc-sub">וולוגים · ביוטי · לייף סטייל</p>
-          <p className="ugc-line">תוכן אותנטי שמייצר אמון</p>
-          <div className="ugc-pills" aria-label="תחומים">
+          <p className="ugc-kicker ugc-hero-anim">יוצרת תוכן</p>
+          <h1 className="ugc-hero-anim">ליאור שגב</h1>
+          <p className="ugc-sub ugc-hero-anim">וולוגים · ביוטי · לייף סטייל</p>
+          <p className="ugc-line ugc-hero-anim">
+            {brandName ? `חשבתי איך זה ייראה אצל ${brandName}` : "תוכן אותנטי שמייצר אמון"}
+          </p>
+          <div className="ugc-pills ugc-hero-anim" aria-label="תחומים">
             <span>ביוטי</span>
             <span>UGC</span>
             <span>לייף סטייל</span>
           </div>
-          <a href="#contact" className="ugc-btn">בואו ניצור תוכן יחד</a>
-          <a href="#portfolio" className="ugc-ghost">לתיק העבודות</a>
+          <a href="#contact" className="ugc-btn ugc-hero-anim">בואו ניצור תוכן יחד</a>
+          <a href="#portfolio" className="ugc-ghost ugc-hero-anim">לתיק העבודות</a>
         </header>
 
         <main id="main-content">
-          <section className="ugc-section">
+          <section className="ugc-section ugc-reveal">
             <p className="ugc-label">קצת עליי</p>
             <h2>היי, אני ליאור.</h2>
             <p className="ugc-lead">
@@ -125,9 +276,17 @@ export default function UgcPage() {
               <span>מגבעת שמואל</span>
               <span>@liors_beauty</span>
             </div>
+            <div className="ugc-brands" aria-label="שת״פים">
+              <p className="ugc-brands-label">שת״פ אחרון</p>
+              {BRANDS.map((b) => (
+                <a key={b.name} className="ugc-brand" href={b.href} target="_blank" rel="noopener noreferrer">
+                  {b.name}
+                </a>
+              ))}
+            </div>
           </section>
 
-          <section className="ugc-section">
+          <section className="ugc-section ugc-reveal">
             <p className="ugc-label">תחומי התוכן שלי</p>
             <h2>מה אני מצלמת</h2>
             <div className="ugc-formats">
@@ -145,7 +304,7 @@ export default function UgcPage() {
             </div>
           </section>
 
-          <section className="ugc-section">
+          <section className="ugc-section ugc-reveal">
             <p className="ugc-label">סיבות לעבוד איתי</p>
             <h2>למה מותגים סוגרים איתי</h2>
             <div className="ugc-reasons">
@@ -159,57 +318,156 @@ export default function UgcPage() {
           </section>
 
           <section className="ugc-section" id="portfolio">
+            <div className="ugc-reveal">
             <p className="ugc-label">תיק עבודות</p>
             <h2>סרטונים לדוגמה</h2>
             <p className="ugc-note">
-              {readyCount === 0
-                ? "הסרטונים עולים לכאן ממש בקרוב. בינתיים אפשר לראות את הסגנון באינסטגרם."
-                : "לחצי על הטלפון לצפייה. רוב הקישורים לטיקטוק — כדאי להעיף מבט גם באינסטגרם."}
+              בוחרים סוג תוכן, ואז לוחצים על הטלפון להפעלה.
             </p>
+            <div className="ugc-filters" role="tablist" aria-label="סינון סרטונים">
+              {VIDEO_FILTERS.map((item) => (
+                <button
+                  key={item.id}
+                  type="button"
+                  role="tab"
+                  aria-selected={filter === item.id}
+                  className={`ugc-chip${filter === item.id ? " is-on" : ""}`}
+                  onClick={() => setFilter(item.id)}
+                >
+                  {item.label}
+                </button>
+              ))}
+            </div>
+            </div>
             <div className="ugc-phones">
-              {UGC_VIDEOS.map((item) => (
+              {videos.map((item) => (
                 <PhoneCard key={item.id} item={item} />
               ))}
             </div>
-            <a
-              href="https://www.instagram.com/liors_beauty"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="ugc-ghost"
-            >
-              לאינסטגרם @liors_beauty
-            </a>
+            {videos.length === 0 && (
+              <p className="ugc-empty">אין עדיין סרטון בקטגוריה הזו.</p>
+            )}
           </section>
 
-          <section className="ugc-section ugc-cta" id="contact">
-            <p className="ugc-label">יצירת קשר</p>
-            <h2>בואו ניצור תוכן יחד</h2>
-            <p className="ugc-lead">מחכה לשמוע מכם.</p>
-            <a href={COLLAB_WA} target="_blank" rel="noopener noreferrer" className="ugc-btn">
-              וואטסאפ לשת״פ
-            </a>
-            <div className="ugc-contacts">
-              <a href="https://www.instagram.com/liors_beauty" target="_blank" rel="noopener noreferrer">
-                אינסטגרם · @liors_beauty
-              </a>
-              <a href="mailto:liordanino58@gmail.com">
-                liordanino58@gmail.com
-              </a>
-              <a href={`tel:+${site.whatsapp}`} dir="ltr">
-                {site.phoneDisplay}
-              </a>
+          <section className="ugc-section ugc-reveal" id="packages">
+            <p className="ugc-label">איך עובדים</p>
+            <h2>תפריט קצר</h2>
+            <p className="ugc-note">בלי PDF. בוחרים חבילה, שולחים בריף, מקבלים הצעה.</p>
+            <div className="ugc-packs">
+              {PACKAGES.map((pack) => (
+                <button
+                  key={pack.id}
+                  type="button"
+                  className="ugc-pack"
+                  onClick={() => pickPackage(pack.format)}
+                >
+                  <h3>{pack.title}</h3>
+                  <p>{pack.text}</p>
+                  <span>לבנות בריף</span>
+                </button>
+              ))}
             </div>
-            <Link href="/" className="ugc-home">
-              לאתר קביעת התורים
-            </Link>
+            <p className="ugc-rights">הסרטונים שלכם — כולל שימוש ממומן, לפי סיכום מראש.</p>
+          </section>
+
+          <section className="ugc-section ugc-cta ugc-reveal" id="contact">
+            <div className="ugc-cta-card" id="brief">
+              <span className="ugc-sparkle" aria-hidden="true">✦</span>
+              <p className="ugc-label">בריף קצר</p>
+              <h2>בואו ניצור תוכן יחד</h2>
+              <p className="ugc-lead">
+                {brandName
+                  ? `שלוש לחיצות, וההודעה ל${brandName} כבר כתובה.`
+                  : "שלוש לחיצות, וההודעה לוואטסאפ כבר כתובה."}
+              </p>
+              <div className="ugc-brief">
+                <p className="ugc-brief-q">איזה פורמט?</p>
+                <div className="ugc-filters">
+                  {BRIEF_FORMATS.map((label) => (
+                    <button
+                      key={label}
+                      type="button"
+                      className={`ugc-chip${brief.format === label ? " is-on" : ""}`}
+                      onClick={() => setBrief((prev) => ({ ...prev, format: label }))}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+                <p className="ugc-brief-q">איזו אווירה?</p>
+                <div className="ugc-filters">
+                  {BRIEF_VIBES.map((label) => (
+                    <button
+                      key={label}
+                      type="button"
+                      className={`ugc-chip${brief.vibe === label ? " is-on" : ""}`}
+                      onClick={() => setBrief((prev) => ({ ...prev, vibe: label }))}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+                <p className="ugc-brief-q">מתי צריך?</p>
+                <div className="ugc-filters">
+                  {BRIEF_WHEN.map((label) => (
+                    <button
+                      key={label}
+                      type="button"
+                      className={`ugc-chip${brief.when === label ? " is-on" : ""}`}
+                      onClick={() => setBrief((prev) => ({ ...prev, when: label }))}
+                    >
+                      {label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div className={`ugc-metal-wrap${briefReady ? "" : " is-wait"}`}>
+                <LiquidMetalButton
+                  label={briefReady ? "שליחת בריף בוואטסאפ" : "בוחרים שלושה סעיפים"}
+                  onClick={() => {
+                    if (!briefHref) return;
+                    window.open(briefHref, "_blank", "noopener,noreferrer");
+                  }}
+                />
+              </div>
+              <div className="ugc-contacts">
+                <a href="https://www.instagram.com/liors_beauty" target="_blank" rel="noopener noreferrer" className="ugc-contact">
+                  <span className="ugc-ico" aria-hidden="true"><IconInstagram /></span>
+                  <span>
+                    <small>אינסטגרם</small>
+                    @liors_beauty
+                  </span>
+                </a>
+                <a href="mailto:liordanino58@gmail.com" className="ugc-contact">
+                  <span className="ugc-ico" aria-hidden="true"><IconMail /></span>
+                  <span>
+                    <small>מייל</small>
+                    liordanino58@gmail.com
+                  </span>
+                </a>
+                <a href={`tel:+${site.whatsapp}`} className="ugc-contact">
+                  <span className="ugc-ico" aria-hidden="true"><IconPhone /></span>
+                  <span>
+                    <small>טלפון</small>
+                    <b dir="ltr">{site.phoneDisplay}</b>
+                  </span>
+                </a>
+              </div>
+              <Link href="/" className="ugc-home">
+                לאתר קביעת התורים
+              </Link>
+            </div>
           </section>
         </main>
       </div>
 
       <LegalFooter />
+      <UgcMotion />
       <AccessibilityWidget />
 
       <style jsx global>{`
+        .lenis.lenis-smooth { scroll-behavior: auto !important; }
+
         .ugc-root {
           --brand: #a11738;
           --brand-2: #ec6a83;
@@ -221,8 +479,22 @@ export default function UgcPage() {
           background: linear-gradient(160deg, #fdece5 0%, #f7c1c3 42%, #ec6a83 100%);
           min-height: 100vh;
           -webkit-font-smoothing: antialiased;
+          position: relative;
         }
         .ugc-root * { box-sizing: border-box; }
+        .ugc-root::after {
+          content: "";
+          position: fixed;
+          inset: 0;
+          pointer-events: none;
+          z-index: 40;
+          opacity: 0.045;
+          background:
+            radial-gradient(circle at 20% 20%, rgba(45,10,30,0.08) 0.6px, transparent 0.8px),
+            radial-gradient(circle at 80% 40%, rgba(45,10,30,0.06) 0.5px, transparent 0.7px);
+          background-size: 3px 3px, 4px 4px;
+        }
+
         .ugc-hero, .ugc-section {
           max-width: 720px;
           margin: 0 auto;
@@ -231,6 +503,7 @@ export default function UgcPage() {
         .ugc-hero {
           text-align: center;
           padding: 28px 20px 48px;
+          transform-origin: 50% 0;
         }
         .ugc-bsd {
           margin: 0 0 10px;
@@ -251,7 +524,7 @@ export default function UgcPage() {
           border: 4px solid rgba(161, 23, 56, 0.22);
           box-shadow: 0 14px 40px rgba(161, 23, 56, 0.24);
         }
-        .ugc-photo-wrap img {
+        .ugc-photo-img {
           width: 100%;
           height: 100%;
           object-fit: cover;
@@ -345,6 +618,114 @@ export default function UgcPage() {
         }
         .ugc-note { font-size: 0.92rem; margin-bottom: 22px; }
         .ugc-meta { margin: 20px 0 0; }
+        .ugc-brands {
+          margin: 22px 0 0;
+        }
+        .ugc-brands-label {
+          margin: 0 0 8px;
+          color: var(--soft);
+          font-size: 0.72rem;
+          letter-spacing: 0.16em;
+        }
+        .ugc-brand {
+          display: inline-flex;
+          align-items: center;
+          justify-content: center;
+          min-height: 42px;
+          padding: 0 18px;
+          border-radius: 999px;
+          text-decoration: none;
+          color: var(--brand);
+          background: rgba(255,255,255,0.72);
+          border: 1px solid rgba(255,255,255,0.92);
+          font-weight: 700;
+          letter-spacing: 0.04em;
+        }
+        .ugc-filters {
+          display: flex;
+          flex-wrap: wrap;
+          justify-content: center;
+          gap: 8px;
+          margin: 0 0 8px;
+        }
+        .ugc-chip {
+          min-height: 38px;
+          padding: 0 14px;
+          border-radius: 999px;
+          border: 1px solid rgba(255,255,255,0.9);
+          background: rgba(255,255,255,0.72);
+          color: var(--brand);
+          font: inherit;
+          font-size: 0.82rem;
+          cursor: pointer;
+        }
+        .ugc-chip.is-on {
+          background: linear-gradient(135deg, #a11738, #ec6a83);
+          border-color: transparent;
+          color: #fff;
+        }
+        .ugc-empty {
+          margin: 8px 0 0;
+          color: var(--soft);
+        }
+        .ugc-packs {
+          display: grid;
+          gap: 12px;
+          margin-top: 8px;
+          text-align: right;
+        }
+        .ugc-pack {
+          display: block;
+          width: 100%;
+          text-align: right;
+          background: rgba(255,255,255,0.68);
+          backdrop-filter: blur(16px);
+          -webkit-backdrop-filter: blur(16px);
+          border: 1px solid rgba(255,255,255,0.88);
+          border-radius: 22px;
+          padding: 18px 18px 16px;
+          box-shadow: 0 8px 28px rgba(161, 23, 56, 0.08);
+          color: inherit;
+          font: inherit;
+          cursor: pointer;
+        }
+        .ugc-pack h3 {
+          margin: 0 0 4px;
+          color: var(--brand);
+          font-size: 1.05rem;
+        }
+        .ugc-pack p {
+          margin: 0 0 10px;
+          color: var(--soft);
+          line-height: 1.6;
+          font-size: 0.92rem;
+        }
+        .ugc-pack span {
+          color: var(--brand);
+          font-size: 0.82rem;
+          font-weight: 700;
+        }
+        .ugc-rights {
+          margin: 16px auto 0;
+          max-width: 420px;
+          color: #3d0c16;
+          font-size: 0.88rem;
+          line-height: 1.65;
+          opacity: 0.78;
+        }
+        .ugc-brief {
+          margin: 18px 0 8px;
+          text-align: center;
+        }
+        .ugc-brief-q {
+          margin: 14px 0 8px;
+          color: var(--brand);
+          font-size: 0.82rem;
+          font-weight: 700;
+        }
+        .ugc-metal-wrap.is-wait {
+          opacity: 0.55;
+        }
         .ugc-formats { margin: 8px 0 18px; }
         .ugc-niches, .ugc-reasons {
           display: grid;
@@ -420,7 +801,31 @@ export default function UgcPage() {
           height: 100%;
           border: 0;
           display: block;
+          object-fit: cover;
           background: #1a0612;
+        }
+        .ugc-video-btn {
+          position: relative;
+          display: block;
+          width: 100%;
+          height: 100%;
+          padding: 0;
+          border: 0;
+          background: #1a0612;
+          cursor: pointer;
+        }
+        .ugc-play-overlay {
+          position: absolute;
+          inset: 0;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          color: #fff;
+          background: rgba(45, 10, 30, 0.28);
+          font-size: 0.78rem;
+          font-weight: 700;
         }
         .ugc-phone-empty {
           height: 100%;
@@ -448,24 +853,86 @@ export default function UgcPage() {
         .ugc-cta {
           padding-bottom: 72px;
         }
+        .ugc-cta-card {
+          position: relative;
+          overflow: hidden;
+          background: rgba(255,255,255,0.72);
+          backdrop-filter: blur(22px);
+          -webkit-backdrop-filter: blur(22px);
+          border: 1px solid rgba(255,255,255,0.92);
+          border-radius: 32px;
+          padding: 36px 22px 28px;
+          box-shadow: 0 18px 48px rgba(161, 23, 56, 0.12), inset 0 1px 0 rgba(255,255,255,1);
+        }
+        .ugc-sparkle {
+          display: block;
+          color: #c4a35a;
+          font-size: 1.05rem;
+          margin-bottom: 8px;
+          opacity: 0.8;
+        }
+        .ugc-cta .ugc-btn {
+          width: 100%;
+          max-width: 320px;
+          gap: 10px;
+          margin: 8px auto 0;
+        }
+        .ugc-metal-wrap {
+          display: flex;
+          justify-content: center;
+          margin: 12px 0 4px;
+        }
         .ugc-contacts {
           display: flex;
           flex-direction: column;
           gap: 10px;
-          margin: 22px 0 18px;
+          margin: 22px 0 16px;
         }
-        .ugc-contacts a {
-          color: var(--brand);
+        .ugc-contact {
+          display: flex;
+          align-items: center;
+          gap: 12px;
+          text-align: right;
           text-decoration: none;
+          color: var(--brand);
+          background: rgba(255,245,247,0.7);
+          border: 1px solid rgba(247,193,195,0.45);
+          border-radius: 18px;
+          padding: 12px 14px;
+        }
+        .ugc-contact small {
+          display: block;
+          color: var(--soft);
+          font-size: 0.72rem;
+          margin-bottom: 2px;
+        }
+        .ugc-contact span:last-child {
           font-weight: 700;
+          font-size: 0.95rem;
+        }
+        .ugc-contact b { font-weight: 700; }
+        .ugc-ico {
+          flex: none;
+          width: 42px;
+          height: 42px;
+          border-radius: 50%;
+          display: grid;
+          place-items: center;
+          color: var(--brand);
+          background: linear-gradient(150deg, #fde3ea, #f8eefc);
+          box-shadow: 0 6px 16px rgba(161, 23, 56, 0.12);
         }
         .ugc-home {
+          display: inline-block;
           color: var(--soft);
           font-size: 0.88rem;
         }
         @media (min-width: 700px) {
           .ugc-niches, .ugc-reasons {
             grid-template-columns: 1fr 1fr;
+          }
+          .ugc-packs {
+            grid-template-columns: repeat(3, minmax(0, 1fr));
           }
           .ugc-phones {
             grid-template-columns: repeat(3, minmax(0, 1fr));
