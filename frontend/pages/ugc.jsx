@@ -1,6 +1,5 @@
 import { useMemo, useRef, useState } from "react";
 import Head from "next/head";
-import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
 import LegalFooter from "../components/LegalFooter";
@@ -28,29 +27,8 @@ const VIDEO_FILTERS = [
 
 const BRANDS = [{ name: "sheek me", href: "https://www.instagram.com/liors_beauty" }];
 
-const PACKAGES = [
-  {
-    id: "story",
-    format: "סטורי טיים",
-    title: "סטורי טיים",
-    text: "רצף סטוריז קצרים. נראה כמו המלצה של חברה, לא כמו פרסומת.",
-  },
-  {
-    id: "reel",
-    format: "ריל",
-    title: "ריל",
-    text: "סרטון אחד מוכן לרילס או טיקטוק. צילום, עריכה וטקסט על המסך.",
-  },
-  {
-    id: "launch",
-    format: "חבילת השקה",
-    title: "חבילת השקה",
-    text: "ריל + סטורי טיים + Voice Over. מתאים להשקה או לקמפיין קצר.",
-  },
-];
-
-const BRIEF_FORMATS = ["סטורי טיים", "ריל", "חבילת השקה", "GRWM", "אנבוקסינג", "Voice Over"];
-const BRIEF_VIBES = ["נקי ויוקרתי", "ביתי ואותנטי", "אנרגטי", "רגוע · ASMR"];
+const BRIEF_FORMATS = ["סטורי טיים", "ריל", "GRWM", "אנבוקסינג", "Voice Over"];
+const BRIEF_VIBES = ["נקי", "ביתי", "עם אנרגיה", "שקט, כזה ASMR"];
 const BRIEF_WHEN = ["השבוע", "עד שבועיים", "גמיש"];
 
 function safeBrand(value) {
@@ -60,16 +38,16 @@ function safeBrand(value) {
 }
 
 function buildBriefMessage({ brand, format, vibe, when }) {
-  const who = brand ? ` מ${brand}` : "";
-  return `היי ליאור, ראיתי את תיק העבודות${who}. מחפשים ${format} באווירה ${vibe}, דדליין: ${when}. אשמח לשמוע על מחיר וזמינות.`;
+  const who = brand ? ` (${brand})` : "";
+  return `היי ליאור, ראיתי את האתר${who}. אנחנו על ${format}, אווירה ${vibe}, זמן: ${when}. נשמע?`;
 }
 
 const REASONS = [
-  { title: "תוכן אותנטי", text: "נראה כמו חיים אמיתיים, לא כמו פרסומת." },
-  { title: "צילום איכותי", text: "תאורה, קומפוזיציה ופריים שמכבדים את המוצר." },
-  { title: "עריכה מקצועית", text: "קצב, טקסט וסאונד שמותאמים לרשת." },
-  { title: "זמינות גבוהה", text: "אפשר לסגור שת״פ בלי לחכות חודשים." },
-  { title: "עמידה בזמנים", text: "מה שסוגרים — זה מה שנמסר." },
+  { title: "זה נראה אמיתי", text: "לא מביימים אותי. ככה אני באמת מדברת ומצלמת." },
+  { title: "הפריים חשוב לי", text: "תאורה, זווית, שהמוצר פשוט ייראה טוב." },
+  { title: "מוכן לרשת", text: "עריכה, טקסט וסאונד. אפשר לשים ישר בסטורי." },
+  { title: "אפשר לסגור מהר", text: "בלי לחכות חודשיים לתור." },
+  { title: "מה שסוגרים, זה מה שמגיע", text: "אמרנו תאריך, מקבלים בזמן." },
 ];
 
 const NICHES = [
@@ -179,7 +157,7 @@ function PhoneCard({ item }) {
           {video.kind === "link" && (
             <a href={video.src} target="_blank" rel="noopener noreferrer" className="ugc-phone-empty">
               <span className="ugc-play" aria-hidden="true">▶</span>
-              <span>לצפייה בפלטפורמה</span>
+              <span>לפתוח ולראות</span>
             </a>
           )}
           {video.kind === "empty" && (
@@ -218,25 +196,20 @@ export default function UgcPage() {
     ? whatsappLink(buildBriefMessage({ brand: brandName, ...brief }))
     : "";
 
-  const pickPackage = (format) => {
-    setBrief((prev) => ({ ...prev, format }));
-    document.getElementById("brief")?.scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
   return (
     <>
       <Head>
         <title>ליאור שגב | יוצרת תוכן UGC · ביוטי · לייף סטייל</title>
         <meta
           name="description"
-          content="ליאור שגב — יוצרת תוכן אותנטי בביוטי, לייף סטייל ווולוגים. תיק עבודות UGC לשיתופי פעולה עם מותגים."
+          content="ליאור שגב. מצלמת ביוטי, לייף סטייל ווולוגים. סרטונים לשת״פ עם מותגים."
         />
         <link rel="canonical" href={canonical} />
         <link rel="alternate" hrefLang="he-IL" href={canonical} />
         <meta property="og:type" content="website" />
         <meta property="og:locale" content="he_IL" />
         <meta property="og:title" content="ליאור שגב | יוצרת תוכן UGC" />
-        <meta property="og:description" content="תוכן אותנטי שמייצר אמון. ביוטי, לייף סטייל ווולוגים." />
+        <meta property="og:description" content="ביוטי, לייף סטייל ווולוגים. כזה שנראה אמיתי." />
         <meta property="og:url" content={canonical} />
         <meta property="og:image" content={`${site.url}/lior-profile.png`} />
       </Head>
@@ -252,15 +225,15 @@ export default function UgcPage() {
           <h1 className="ugc-hero-anim">ליאור שגב</h1>
           <p className="ugc-sub ugc-hero-anim">וולוגים · ביוטי · לייף סטייל</p>
           <p className="ugc-line ugc-hero-anim">
-            {brandName ? `חשבתי איך זה ייראה אצל ${brandName}` : "תוכן אותנטי שמייצר אמון"}
+            {brandName ? `חשבתי איך זה ייראה אצל ${brandName}` : "כזה שנראה אמיתי"}
           </p>
           <div className="ugc-pills ugc-hero-anim" aria-label="תחומים">
             <span>ביוטי</span>
             <span>UGC</span>
             <span>לייף סטייל</span>
           </div>
-          <a href="#contact" className="ugc-btn ugc-hero-anim">בואו ניצור תוכן יחד</a>
-          <a href="#portfolio" className="ugc-ghost ugc-hero-anim">לתיק העבודות</a>
+          <a href="#contact" className="ugc-btn ugc-hero-anim">יש רעיון? כתבו לי</a>
+          <a href="#portfolio" className="ugc-ghost ugc-hero-anim">לסרטונים</a>
         </header>
 
         <main id="main-content">
@@ -268,8 +241,7 @@ export default function UgcPage() {
             <p className="ugc-label">קצת עליי</p>
             <h2>היי, אני ליאור.</h2>
             <p className="ugc-lead">
-              יוצרת תוכן בלייף סטייל ובביוטי. אני מצלמת תוכן אותנטי ואסתטי,
-              כזה שמאפשר למותגים להתחבר לקהל בצורה טבעית — בלי להרגיש מכירה.
+              אני מצלמת ביוטי ולייף סטייל. כזה שנראה כמו החיים שלי, לא כמו קמפיין.
             </p>
             <div className="ugc-meta">
               <span>בת 21</span>
@@ -287,7 +259,7 @@ export default function UgcPage() {
           </section>
 
           <section className="ugc-section ugc-reveal">
-            <p className="ugc-label">תחומי התוכן שלי</p>
+            <p className="ugc-label">מה יש אצלי</p>
             <h2>מה אני מצלמת</h2>
             <div className="ugc-formats">
               {FORMATS.map((f) => (
@@ -305,8 +277,8 @@ export default function UgcPage() {
           </section>
 
           <section className="ugc-section ugc-reveal">
-            <p className="ugc-label">סיבות לעבוד איתי</p>
-            <h2>למה מותגים סוגרים איתי</h2>
+            <p className="ugc-label">למה איתי</p>
+            <h2>בקטנה, ככה אני עובדת</h2>
             <div className="ugc-reasons">
               {REASONS.map((r) => (
                 <article key={r.title} className="ugc-card">
@@ -319,10 +291,10 @@ export default function UgcPage() {
 
           <section className="ugc-section" id="portfolio">
             <div className="ugc-reveal">
-            <p className="ugc-label">תיק עבודות</p>
-            <h2>סרטונים לדוגמה</h2>
+            <p className="ugc-label">הסרטונים</p>
+            <h2>ככה זה נראה</h2>
             <p className="ugc-note">
-              בוחרים סוג תוכן, ואז לוחצים על הטלפון להפעלה.
+              לחצי על הטלפון ותשמעי.
             </p>
             <div className="ugc-filters" role="tablist" aria-label="סינון סרטונים">
               {VIDEO_FILTERS.map((item) => (
@@ -345,40 +317,19 @@ export default function UgcPage() {
               ))}
             </div>
             {videos.length === 0 && (
-              <p className="ugc-empty">אין עדיין סרטון בקטגוריה הזו.</p>
+              <p className="ugc-empty">אין פה עדיין מזה.</p>
             )}
-          </section>
-
-          <section className="ugc-section ugc-reveal" id="packages">
-            <p className="ugc-label">איך עובדים</p>
-            <h2>תפריט קצר</h2>
-            <p className="ugc-note">בלי PDF. בוחרים חבילה, שולחים בריף, מקבלים הצעה.</p>
-            <div className="ugc-packs">
-              {PACKAGES.map((pack) => (
-                <button
-                  key={pack.id}
-                  type="button"
-                  className="ugc-pack"
-                  onClick={() => pickPackage(pack.format)}
-                >
-                  <h3>{pack.title}</h3>
-                  <p>{pack.text}</p>
-                  <span>לבנות בריף</span>
-                </button>
-              ))}
-            </div>
-            <p className="ugc-rights">הסרטונים שלכם — כולל שימוש ממומן, לפי סיכום מראש.</p>
           </section>
 
           <section className="ugc-section ugc-cta ugc-reveal" id="contact">
             <div className="ugc-cta-card" id="brief">
               <span className="ugc-sparkle" aria-hidden="true">✦</span>
-              <p className="ugc-label">בריף קצר</p>
-              <h2>בואו ניצור תוכן יחד</h2>
+              <p className="ugc-label">נשמע?</p>
+              <h2>יש רעיון לשת״פ?</h2>
               <p className="ugc-lead">
                 {brandName
-                  ? `שלוש לחיצות, וההודעה ל${brandName} כבר כתובה.`
-                  : "שלוש לחיצות, וההודעה לוואטסאפ כבר כתובה."}
+                  ? `תגידו מה ${brandName} צריכים, ואני אקבל את זה ישר לוואטסאפ.`
+                  : "תגידו מה אתם צריכים, ואני אקבל את זה ישר לוואטסאפ."}
               </p>
               <div className="ugc-brief">
                 <p className="ugc-brief-q">איזה פורמט?</p>
@@ -423,7 +374,7 @@ export default function UgcPage() {
               </div>
               <div className={`ugc-metal-wrap${briefReady ? "" : " is-wait"}`}>
                 <LiquidMetalButton
-                  label={briefReady ? "שליחת בריף בוואטסאפ" : "בוחרים שלושה סעיפים"}
+                  label={briefReady ? "שלחו לי בוואטסאפ" : "בחרו את השלושה ואפשר לשלוח"}
                   onClick={() => {
                     if (!briefHref) return;
                     window.open(briefHref, "_blank", "noopener,noreferrer");
@@ -453,9 +404,6 @@ export default function UgcPage() {
                   </span>
                 </a>
               </div>
-              <Link href="/" className="ugc-home">
-                לאתר קביעת התורים
-              </Link>
             </div>
           </section>
         </main>
@@ -668,51 +616,6 @@ export default function UgcPage() {
           margin: 8px 0 0;
           color: var(--soft);
         }
-        .ugc-packs {
-          display: grid;
-          gap: 12px;
-          margin-top: 8px;
-          text-align: right;
-        }
-        .ugc-pack {
-          display: block;
-          width: 100%;
-          text-align: right;
-          background: rgba(255,255,255,0.68);
-          backdrop-filter: blur(16px);
-          -webkit-backdrop-filter: blur(16px);
-          border: 1px solid rgba(255,255,255,0.88);
-          border-radius: 22px;
-          padding: 18px 18px 16px;
-          box-shadow: 0 8px 28px rgba(161, 23, 56, 0.08);
-          color: inherit;
-          font: inherit;
-          cursor: pointer;
-        }
-        .ugc-pack h3 {
-          margin: 0 0 4px;
-          color: var(--brand);
-          font-size: 1.05rem;
-        }
-        .ugc-pack p {
-          margin: 0 0 10px;
-          color: var(--soft);
-          line-height: 1.6;
-          font-size: 0.92rem;
-        }
-        .ugc-pack span {
-          color: var(--brand);
-          font-size: 0.82rem;
-          font-weight: 700;
-        }
-        .ugc-rights {
-          margin: 16px auto 0;
-          max-width: 420px;
-          color: #3d0c16;
-          font-size: 0.88rem;
-          line-height: 1.65;
-          opacity: 0.78;
-        }
         .ugc-brief {
           margin: 18px 0 8px;
           text-align: center;
@@ -922,17 +825,9 @@ export default function UgcPage() {
           background: linear-gradient(150deg, #fde3ea, #f8eefc);
           box-shadow: 0 6px 16px rgba(161, 23, 56, 0.12);
         }
-        .ugc-home {
-          display: inline-block;
-          color: var(--soft);
-          font-size: 0.88rem;
-        }
         @media (min-width: 700px) {
           .ugc-niches, .ugc-reasons {
             grid-template-columns: 1fr 1fr;
-          }
-          .ugc-packs {
-            grid-template-columns: repeat(3, minmax(0, 1fr));
           }
           .ugc-phones {
             grid-template-columns: repeat(3, minmax(0, 1fr));
