@@ -1,18 +1,18 @@
-// תיק עבודות UGC — קבצים מקומיים מתיקיית "סרטוני  - ugc".
+// תיק עבודות UGC — שמות לפי מה שמופיע בסרטון.
 // אפשר גם להחליף לקישור טיקטוק/אינסטגרם בשדה url.
 
 export const UGC_VIDEOS = [
-  { id: "inspiration", title: "השראה", category: "השראה", tags: ["lifestyle"], url: "/ugc/01.mp4" },
-  { id: "unboxing", title: "אנבוקסינג", category: "אנבוקסינג", tags: ["unboxing"], url: "/ugc/02.mp4" },
-  { id: "fashion", title: "אופנה", category: "אופנה", tags: ["fashion"], url: "/ugc/03.mp4" },
-  { id: "day-vo", title: "יום בחיי + Voice Over", category: "וולוגים", tags: ["vo", "lifestyle"], url: "/ugc/04.mp4" },
-  { id: "recipes", title: "מתכונים", category: "לייף סטייל", tags: ["lifestyle"], url: "/ugc/05.mp4" },
-  { id: "review", title: "סקירת מוצר", category: "UGC", tags: ["ugc"], url: "/ugc/06.mp4" },
-  { id: "beautycare-asmr", title: "אנבוקסינג ביוטיקייר", category: "אנבוקסינג", tags: ["unboxing"], url: "/ugc/07.mp4" },
-  { id: "sheek-me", title: "שת״פ sheek me", category: "UGC", tags: ["ugc", "fashion"], url: "/ugc/08.mp4" },
-  { id: "asmr-unbox", title: "אנבוקסינג ASMR", category: "אנבוקסינג", tags: ["unboxing"], url: "/ugc/09.mp4" },
-  { id: "grwm-makeup", title: "GRWM איפור", category: "GRWM", tags: ["grwm"], url: "/ugc/10.mp4" },
-  { id: "fashion-2", title: "אופנה", category: "אופנה", tags: ["fashion"], url: "/ugc/11.mp4" },
+  { id: "day-manicurist", title: "יום בחיי מניקוריסטית", url: "/ugc/01.mp4" },
+  { id: "pesach-look", title: "לוק צנוע לפסח", url: "/ugc/02.mp4" },
+  { id: "manicure-haul", title: "הול למניקור", url: "/ugc/03.mp4" },
+  { id: "peel-lipstick", title: "אודם מתקלף", url: "/ugc/04.mp4" },
+  { id: "shabbat-dessert", title: "קינוח לשבת", url: "/ugc/05.mp4" },
+  { id: "etcasia", title: "שת״פ ETCASIA", url: "/ugc/06.mp4" },
+  { id: "beautycare", title: "אנבוקסינג Beautycare", url: "/ugc/07.mp4" },
+  { id: "asmr-unbox", title: "אנבוקסינג ASMR", url: "/ugc/08.mp4" },
+  { id: "modest-look", title: "לוק צנוע", url: "/ugc/09.mp4" },
+  { id: "tie-tutorial", title: "מדריך קשירה", url: "/ugc/10.mp4" },
+  { id: "grwm-makeup", title: "GRWM איפור", url: "/ugc/11.mp4" },
 ];
 
 export function resolveVideo(item) {

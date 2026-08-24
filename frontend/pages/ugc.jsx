@@ -1,4 +1,4 @@
-import { useMemo, useRef, useState } from "react";
+import { useRef, useState } from "react";
 import Head from "next/head";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
@@ -15,17 +15,7 @@ const LiquidMetalButton = dynamic(
   { ssr: false }
 );
 
-const VIDEO_FILTERS = [
-  { id: "all", label: "הכל" },
-  { id: "ugc", label: "UGC" },
-  { id: "grwm", label: "GRWM" },
-  { id: "unboxing", label: "אנבוקסינג" },
-  { id: "vo", label: "Voice Over" },
-  { id: "fashion", label: "אופנה" },
-  { id: "lifestyle", label: "לייף סטייל" },
-];
-
-const BRANDS = [{ name: "sheek me", href: "https://www.instagram.com/liors_beauty" }];
+const BRANDS = [{ name: "ETCASIA", href: "https://www.instagram.com/liors_beauty" }];
 
 const BRIEF_FORMATS = ["סטורי טיים", "ריל", "GRWM", "אנבוקסינג", "Voice Over"];
 const BRIEF_VIBES = ["נקי", "ביתי", "אנרגטי", "רגוע"];
@@ -169,7 +159,6 @@ function PhoneCard({ item }) {
         </div>
       </div>
       <h3>{item.title}</h3>
-      <p>{item.category}</p>
     </article>
   );
 }
@@ -179,17 +168,8 @@ export default function UgcPage() {
   const brandName = safeBrand(
     Array.isArray(router.query.brand) ? router.query.brand[0] : router.query.brand
   );
-  const [filter, setFilter] = useState("all");
   const [brief, setBrief] = useState({ format: "", vibe: "", when: "" });
   const canonical = `${site.url}/ugc`;
-
-  const videos = useMemo(
-    () =>
-      filter === "all"
-        ? UGC_VIDEOS
-        : UGC_VIDEOS.filter((item) => (item.tags || []).includes(filter)),
-    [filter]
-  );
 
   const briefReady = brief.format && brief.vibe && brief.when;
   const briefHref = briefReady
@@ -227,13 +207,15 @@ export default function UgcPage() {
           <p className="ugc-line ugc-hero-anim">
             {brandName ? `חשבתי איך זה ייראה אצל ${brandName}` : "מצלמת ביוטי ולייף סטייל"}
           </p>
-          <div className="ugc-pills ugc-hero-anim" aria-label="תחומים">
-            <span>ביוטי</span>
-            <span>UGC</span>
-            <span>לייף סטייל</span>
-          </div>
           <a href="#contact" className="ugc-btn ugc-hero-anim">דברו איתי</a>
-          <a href="#portfolio" className="ugc-ghost ugc-hero-anim">לעבודות</a>
+          <a href="#portfolio" className="ugc-works ugc-hero-anim">
+            <span className="ugc-ghost">לעבודות</span>
+            <span className="ugc-down" aria-hidden="true">
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </span>
+          </a>
         </header>
 
         <main id="main-content">
@@ -291,34 +273,17 @@ export default function UgcPage() {
 
           <section className="ugc-section" id="portfolio">
             <div className="ugc-reveal">
-            <p className="ugc-label">עבודות</p>
-            <h2>סרטונים</h2>
+            <p className="ugc-label">תיק עבודות</p>
+            <h2>דוגמאות לסרטונים</h2>
             <p className="ugc-note">
               לחצי על הטלפון להפעלה.
             </p>
-            <div className="ugc-filters" role="tablist" aria-label="סינון סרטונים">
-              {VIDEO_FILTERS.map((item) => (
-                <button
-                  key={item.id}
-                  type="button"
-                  role="tab"
-                  aria-selected={filter === item.id}
-                  className={`ugc-chip${filter === item.id ? " is-on" : ""}`}
-                  onClick={() => setFilter(item.id)}
-                >
-                  {item.label}
-                </button>
-              ))}
-            </div>
             </div>
             <div className="ugc-phones">
-              {videos.map((item) => (
+              {UGC_VIDEOS.map((item) => (
                 <PhoneCard key={item.id} item={item} />
               ))}
             </div>
-            {videos.length === 0 && (
-              <p className="ugc-empty">אין סרטונים בקטגוריה הזו.</p>
-            )}
           </section>
 
           <section className="ugc-section ugc-cta ugc-reveal" id="contact">
@@ -541,7 +506,31 @@ export default function UgcPage() {
           background: rgba(255,255,255,0.45);
           border: 1px solid rgba(255,255,255,0.8);
         }
-        .ugc-hero .ugc-ghost { display: block; max-width: 280px; margin: 12px auto 0; }
+        .ugc-works {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 6px;
+          margin: 14px auto 0;
+          width: min(280px, 100%);
+          text-decoration: none;
+          color: var(--brand);
+        }
+        .ugc-works .ugc-ghost {
+          display: flex;
+          width: 100%;
+          margin: 0;
+        }
+        .ugc-down {
+          display: grid;
+          place-items: center;
+          color: var(--brand);
+          animation: ugc-bounce 1.35s ease-in-out infinite;
+        }
+        @keyframes ugc-bounce {
+          0%, 100% { transform: translateY(0); opacity: 0.45; }
+          50% { transform: translateY(8px); opacity: 1; }
+        }
         .ugc-section {
           padding: 8px 20px 42px;
           text-align: center;
@@ -612,10 +601,6 @@ export default function UgcPage() {
           border-color: transparent;
           color: #fff;
         }
-        .ugc-empty {
-          margin: 8px 0 0;
-          color: var(--soft);
-        }
         .ugc-brief {
           margin: 18px 0 8px;
           text-align: center;
@@ -666,11 +651,6 @@ export default function UgcPage() {
           margin: 10px 0 2px;
           color: var(--brand);
           font-size: 0.92rem;
-        }
-        .ugc-phone-card p {
-          margin: 0;
-          color: var(--soft);
-          font-size: 0.75rem;
         }
         .ugc-phone {
           position: relative;
