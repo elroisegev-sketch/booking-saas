@@ -2180,7 +2180,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                   {['start_time', 'end_time'].map((field, fi) => (
                     <select key={field} value={blockForm[field]} onChange={e => setBlockForm(f => ({ ...f, [field]: e.target.value }))}
                       style={{ flex: 1, padding: '8px 10px', borderRadius: '10px', border: '1.5px solid #e5e7eb', fontSize: '0.875rem', background: 'white' }}>
-                      {Array.from({ length: 33 }, (_, k) => { const tot = k * 30; const h = String(6 + Math.floor(tot / 60)).padStart(2, '0'); const m = tot % 60 === 0 ? '00' : '30'; return `${h}:${m}`; }).map(t => <option key={t} value={t}>{t}</option>)}
+                      {Array.from({ length: 65 }, (_, k) => { const tot = k * 15; const h = String(6 + Math.floor(tot / 60)).padStart(2, '0'); const m = String(tot % 60).padStart(2, '0'); return `${h}:${m}`; }).map(t => <option key={t} value={t}>{t}</option>)}
                     </select>
                   )).reduce((acc, el, idx) => idx === 0 ? [el] : [...acc, <span key="s" style={{ color: '#9ca3af' }}>עד</span>, el], [])}
                 </div>
@@ -2399,7 +2399,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                               } catch(err) { showToast('שגיאה בשמירה'); }
                             }}
                             style={{ padding: '6px 10px', borderRadius: '8px', border: '1.5px solid #e5e7eb', fontSize: '0.875rem', cursor: 'pointer', background: 'white' }}>
-                            {Array.from({ length: 33 }, (_, k) => { const tot = k * 30; const h = String(6 + Math.floor(tot / 60)).padStart(2, '0'); const m = tot % 60 === 0 ? '00' : '30'; return `${h}:${m}`; }).map(t => <option key={t} value={t}>{t}</option>)}
+                            {Array.from({ length: 65 }, (_, k) => { const tot = k * 15; const h = String(6 + Math.floor(tot / 60)).padStart(2, '0'); const m = String(tot % 60).padStart(2, '0'); return `${h}:${m}`; }).map(t => <option key={t} value={t}>{t}</option>)}
                           </select>
                         )).reduce((acc, el, idx) => idx === 0 ? [el] : [...acc, <span key="s" style={{ color: '#9ca3af', fontSize: '0.875rem' }}>עד</span>, el], [])}
                       </div>

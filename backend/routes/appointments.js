@@ -256,7 +256,7 @@ router.get('/slots/:slug/:serviceId/:date', async (req, res) => {
     const { start_time, end_time } = availResult.rows[0];
     const bookedResult = await db.query(`SELECT appointment_time, end_time FROM appointments WHERE business_id=$1 AND status != 'cancelled' AND DATE(appointment_time) = $2::date`, [businessId, date]);
     const blockedResult = await db.query(`SELECT start_time, end_time FROM blocked_slots WHERE business_id=$1 AND date=$2::date`, [businessId, date]);
-    const INTERVAL = 30;
+    const INTERVAL = 15;
     const [sh, sm] = start_time.split(':').map(Number);
     const [eh, em] = end_time.split(':').map(Number);
     const refDate = new Date(`${date}T12:00:00Z`);
