@@ -104,6 +104,25 @@ const WHATSAPP_LINK = (name, services, date, time, total) =>
 const fmtTime = (iso) => new Date(iso).toLocaleTimeString('he-IL', { hour: '2-digit', minute: '2-digit' });
 const fmtDate = (iso) => new Date(iso).toLocaleDateString('he-IL', { weekday: 'short', month: 'short', day: 'numeric' });
 const fmtPrice = (n) => parseFloat(n || 0) === 0 ? 'משתנה' : `₪${parseFloat(n).toFixed(0)}`;
+const CRM_MONTH_NAMES = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
+const israelTodayParts = () => {
+  const parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Jerusalem', year: 'numeric', month: '2-digit', day: '2-digit' }).formatToParts(new Date());
+  const get = (t) => Number(parts.find((p) => p.type === t).value);
+  return { y: get('year'), m: get('month'), d: get('day') };
+};
+const currentCrmMonth = () => {
+  const { y, m, d } = israelTodayParts();
+  if (d < 10) {
+    const prev = new Date(y, m - 2, 1);
+    return `${prev.getFullYear()}-${String(prev.getMonth() + 1).padStart(2, '0')}`;
+  }
+  return `${y}-${String(m).padStart(2, '0')}`;
+};
+const crmCycleRangeLabel = (month) => {
+  const [, m] = month.split('-').map(Number);
+  const endMonth = m === 12 ? 1 : m + 1;
+  return `10 ב${CRM_MONTH_NAMES[m - 1]} – 9 ב${CRM_MONTH_NAMES[endMonth - 1]}`;
+};
 
 const toICSDate = (iso) => {
   const d = new Date(iso);
@@ -1718,7 +1737,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
   const [showBlockModal, setShowBlockModal] = useState(false);
   const [blockForm, setBlockForm] = useState({ start_time: '09:00', end_time: '10:00', reason: '' });
   const [editAppt, setEditAppt] = useState(null);
-  const [crmMonth, setCrmMonth] = useState(() => { const n = new Date(); return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}`; });
+  const [crmMonth, setCrmMonth] = useState(() => currentCrmMonth());
   const [crmData, setCrmData] = useState(null);
   const [crmLoading, setCrmLoading] = useState(false);
   const [crmExpenses, setCrmExpenses] = useState([]);
@@ -2413,12 +2432,12 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
 
           {/* CRM */}
           {tab === 'crm' && (() => {
-            const monthNames = ['ינואר','פברואר','מרץ','אפריל','מאי','יוני','יולי','אוגוסט','ספטמבר','אוקטובר','נובמבר','דצמבר'];
             const [y, m] = crmMonth.split('-').map(Number);
-            const monthLabel = `${monthNames[m-1]} ${y}`;
+            const monthLabel = `${CRM_MONTH_NAMES[m-1]} ${y}`;
+            const cycleRangeLabel = crmCycleRangeLabel(crmMonth);
             const prevMonth = () => { const d = new Date(y, m-2, 1); setCrmMonth(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`); };
             const nextMonth = () => { const d = new Date(y, m, 1); setCrmMonth(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`); };
-            const isCurrentMonth = crmMonth === (() => { const n = new Date(); return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}`; })();
+            const isCurrentMonth = crmMonth === currentCrmMonth();
             const totalExpenses = crmExpenses.reduce((s, e) => s + parseFloat(e.amount || 0), 0);
             const profit = (crmData ? parseFloat(crmData.totalRevenue || 0) : 0) - totalExpenses;
             const exportCSV = () => {
@@ -2466,7 +2485,10 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                   <h1 style={{ fontSize: '1.5rem', fontWeight: 900, color: '#A11738', margin: 0 }}>CRM 📊</h1>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <button onClick={prevMonth} style={{ padding: '6px 10px', borderRadius: '10px', border: '1px solid rgba(247,193,195,0.6)', background: 'rgba(255,255,255,0.7)', cursor: 'pointer', fontWeight: 700, color: '#A11738', fontSize: '1rem' }}>›</button>
-                    <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#374151', minWidth: '90px', textAlign: 'center' }}>{monthLabel}</span>
+                    <span style={{ minWidth: '110px', textAlign: 'center' }}>
+                      <span style={{ display: 'block', fontSize: '0.85rem', fontWeight: 700, color: '#374151' }}>{monthLabel}</span>
+                      <span style={{ display: 'block', fontSize: '0.65rem', fontWeight: 600, color: '#9ca3af' }}>{cycleRangeLabel}</span>
+                    </span>
                     <button onClick={nextMonth} disabled={isCurrentMonth} style={{ padding: '6px 10px', borderRadius: '10px', border: '1px solid rgba(247,193,195,0.6)', background: isCurrentMonth ? 'rgba(240,240,240,0.5)' : 'rgba(255,255,255,0.7)', cursor: isCurrentMonth ? 'not-allowed' : 'pointer', fontWeight: 700, color: isCurrentMonth ? '#d1d5db' : '#A11738', fontSize: '1rem' }}>‹</button>
                   </div>
                 </div>
@@ -2488,7 +2510,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                     ))}
                   </div>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.75rem' }}>
-                    <span style={{ fontSize: '0.78rem', color: '#9ca3af' }}>{crmData.count} טיפולים החודש</span>
+                    <span style={{ fontSize: '0.78rem', color: '#9ca3af' }}>{crmData.count} טיפולים בתקופה</span>
                     <button onClick={exportCSV} disabled={!crmData.appointments?.length} style={{ padding: '0.45rem 1rem', borderRadius: '999px', background: crmData.appointments?.length ? 'linear-gradient(135deg,#A11738,#EC6A83)' : 'rgba(209,213,219,0.5)', color: crmData.appointments?.length ? 'white' : '#9ca3af', fontWeight: 700, fontSize: '0.78rem', border: 'none', cursor: crmData.appointments?.length ? 'pointer' : 'not-allowed', boxShadow: crmData.appointments?.length ? '0 4px 12px rgba(161,23,56,0.2)' : 'none', fontFamily: 'Varela Round, sans-serif' }}>
                       ייצוא CSV ⬇️
                     </button>
@@ -2497,7 +2519,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                   {/* לקוחות */}
                   {crmData.appointments?.length === 0 && (
                     <div style={{ ...card, padding: '2rem', textAlign: 'center', marginBottom: '1rem' }}>
-                      <p style={{ color: '#9ca3af', margin: 0 }}>אין תורים לחודש זה</p>
+                      <p style={{ color: '#9ca3af', margin: 0 }}>אין תורים לתקופה זו</p>
                     </div>
                   )}
                   {crmData.appointments?.map((a, i) => (
@@ -2520,7 +2542,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
 
                   {/* הוצאות */}
                   <div style={{ marginTop: '1.5rem' }}>
-                    <h2 style={{ fontSize: '1rem', fontWeight: 900, color: '#A11738', marginBottom: '0.75rem' }}>הוצאות החודש 💸</h2>
+                    <h2 style={{ fontSize: '1rem', fontWeight: 900, color: '#A11738', marginBottom: '0.75rem' }}>הוצאות התקופה 💸</h2>
                     <div style={{ ...card, padding: '1rem', marginBottom: '0.75rem' }}>
                       <div style={{ display: 'flex', gap: '8px', marginBottom: crmExpenses.length ? '0.75rem' : 0 }}>
                         <input

@@ -200,11 +200,22 @@ router.get('/customers', auth, async (req, res) => {
   } catch (err) { res.status(500).json({ error: 'Server error' }); }
 });
 
+// Household CRM cycle: 10th of the month → 9th of the next month (Israel)
+function crmCycleBounds(month) {
+  const [y, m] = month.split('-').map(Number);
+  const start = `${y}-${String(m).padStart(2, '0')}-10`;
+  const endY = m === 12 ? y + 1 : y;
+  const endM = m === 12 ? 1 : m + 1;
+  const end = `${endY}-${String(endM).padStart(2, '0')}-10`;
+  return { start, end };
+}
+
 // GET /api/appointments/crm?month=YYYY-MM
 router.get('/crm', auth, async (req, res) => {
   const { month } = req.query;
   if (!month || !/^\d{4}-\d{2}$/.test(month))
     return res.status(400).json({ error: 'month param required (YYYY-MM)' });
+  const { start, end } = crmCycleBounds(month);
   try {
     const [apptResult, expResult] = await Promise.all([
       db.query(
@@ -219,9 +230,10 @@ router.get('/crm', auth, async (req, res) => {
          LEFT JOIN services s ON a.service_id = s.id
          WHERE a.business_id = $1
            AND a.status != 'cancelled'
-           AND TO_CHAR(a.appointment_time AT TIME ZONE 'Asia/Jerusalem', 'YYYY-MM') = $2
+           AND a.appointment_time >= ($2::timestamp AT TIME ZONE 'Asia/Jerusalem')
+           AND a.appointment_time < ($3::timestamp AT TIME ZONE 'Asia/Jerusalem')
          ORDER BY a.appointment_time ASC`,
-        [req.user.id, month]
+        [req.user.id, start, end]
       ),
       db.query(
         `SELECT COALESCE(SUM(amount),0) AS total FROM expenses WHERE business_id=$1 AND month=$2`,
