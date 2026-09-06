@@ -23,8 +23,31 @@ CREATE TABLE services (
   price NUMERIC(10,2) NOT NULL DEFAULT 0,
   category VARCHAR(100) DEFAULT 'כללי',
   is_active BOOLEAN DEFAULT TRUE,
+  recommended_return_days_min INTEGER,
+  recommended_return_days_max INTEGER,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
+
+-- Customers (CRM identity)
+CREATE TABLE IF NOT EXISTS customers (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  business_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+  name VARCHAR(255) NOT NULL,
+  phone VARCHAR(50),
+  phone_normalized VARCHAR(20),
+  email VARCHAR(255),
+  birthday DATE,
+  source VARCHAR(40),
+  source_detail VARCHAR(255),
+  notes TEXT,
+  preferences JSONB NOT NULL DEFAULT '{}',
+  is_vip BOOLEAN NOT NULL DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+CREATE UNIQUE INDEX IF NOT EXISTS customers_business_phone_normalized_uidx
+  ON customers (business_id, phone_normalized)
+  WHERE phone_normalized IS NOT NULL;
 
 -- Availability (working hours per day of week)
 CREATE TABLE availability (
@@ -49,6 +72,9 @@ CREATE TABLE appointments (
   end_time TIMESTAMPTZ NOT NULL,
   status VARCHAR(50) DEFAULT 'pending' CHECK (status IN ('pending','confirmed','cancelled','completed')),
   notes TEXT,
+  service_names_text TEXT,
+  total_price NUMERIC,
+  customer_id UUID REFERENCES customers(id) ON DELETE SET NULL,
   created_at TIMESTAMPTZ DEFAULT NOW(),
   -- Prevent double booking via exclusion constraint
   EXCLUDE USING gist (

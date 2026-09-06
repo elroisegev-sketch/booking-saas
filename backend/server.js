@@ -86,6 +86,7 @@ app.use('/api/availability', require('./routes/availability'));
 app.use('/api/blocked-slots', require('./routes/blocked_slots'));
 app.use('/api/push', require('./routes/push').router);
 app.use('/api/expenses', require('./routes/expenses'));
+app.use('/api/customers', require('./routes/customers'));
 
 // Gallery table + seed flag on users
 require('./db').query(`
@@ -128,6 +129,8 @@ require('./db').query(`
 // Allow manual appointments without service_id (make it nullable)
 require('./db').query(`ALTER TABLE appointments ALTER COLUMN service_id DROP NOT NULL`).catch(() => {});
 
+const { applyCustomerSchema, backfillCustomers } = require('./lib/customerMigration');
+
 // Auto-migrate blocked_slots table
 require('./db').query(`
   CREATE TABLE IF NOT EXISTS blocked_slots (
@@ -147,18 +150,30 @@ if (!process.env.JWT_SECRET || process.env.JWT_SECRET.length < 32) {
 }
 
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, async () => {
-  console.log(`🗓  BookSlot API running on http://localhost:${PORT}`);
-  // Validate DB schema on startup – catches SQL column-name bugs before they hit users
+(async () => {
   try {
-    await require('./db').query(`
-      SELECT a.id, a.total_price, a.service_names_text,
-             COALESCE(s.name, a.service_names_text, 'test') AS service_name,
-             COALESCE(a.total_price, s.price, 0) AS price
-      FROM appointments a LEFT JOIN services s ON a.service_id = s.id LIMIT 1
-    `);
-    console.log('✅ DB schema validation passed');
+    await applyCustomerSchema(db);
+    const report = await backfillCustomers(db);
+    console.log('✅ customers migration', {
+      created: report.customers_created,
+      linked: report.appointments_linked,
+      unlinked: report.after && report.after.unlinked,
+    });
   } catch (err) {
-    console.error('🚨 DB SCHEMA VALIDATION FAILED:', err.message);
+    console.error('customers migration error:', err.message);
   }
-});
+  app.listen(PORT, async () => {
+    console.log(`🗓  BookSlot API running on http://localhost:${PORT}`);
+    try {
+      await db.query(`
+        SELECT a.id, a.total_price, a.service_names_text, a.customer_id,
+               COALESCE(s.name, a.service_names_text, 'test') AS service_name,
+               COALESCE(a.total_price, s.price, 0) AS price
+        FROM appointments a LEFT JOIN services s ON a.service_id = s.id LIMIT 1
+      `);
+      console.log('✅ DB schema validation passed');
+    } catch (err) {
+      console.error('🚨 DB SCHEMA VALIDATION FAILED:', err.message);
+    }
+  });
+})();

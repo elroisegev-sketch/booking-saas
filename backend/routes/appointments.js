@@ -3,6 +3,8 @@ const rateLimit = require('express-rate-limit');
 const db = require('../db');
 const auth = require('../middleware/auth');
 const { sendPush } = require('./push');
+const { PHONE_RE, normalizePhone } = require('../lib/phone');
+const { findOrCreateCustomer } = require('../lib/customers');
 const router = express.Router();
 
 // ── Hebrew natural-language appointment parser ─────────────────
@@ -139,7 +141,6 @@ const bookingLimiter = rateLimit({
 });
 
 // ── Validation helpers ────────────────────────────────────────
-const PHONE_RE = /^0[2-9]\d{7,8}$/;
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const ALLOWED_STATUSES = ['confirmed', 'cancelled', 'completed', 'pending'];
 
@@ -311,8 +312,9 @@ router.post('/', bookingLimiter, async (req, res) => {
     return res.status(400).json({ error: 'Missing required fields' });
   if (typeof customer_name !== 'string' || customer_name.trim().length < 2 || customer_name.trim().length > 100)
     return res.status(400).json({ error: 'שם לא תקין (2-100 תווים)' });
-  const cleanPhone = customer_phone.replace(/\D/g, '').replace(/^972/, '0');
-  if (!PHONE_RE.test(cleanPhone))
+  const parsedPhone = normalizePhone(customer_phone);
+  const cleanPhone = parsedPhone.normalized;
+  if (!parsedPhone.valid)
     return res.status(400).json({ error: 'מספר טלפון לא תקין' });
   if (customer_email && !EMAIL_RE.test(customer_email))
     return res.status(400).json({ error: 'כתובת אימייל לא תקינה' });
@@ -338,7 +340,12 @@ router.post('/', bookingLimiter, async (req, res) => {
     if (conflictResult.rows.length > 0) return res.status(409).json({ error: 'This time slot is no longer available.' });
     const displayNames = service_names || service.name;
     const displayPrice = parseFloat(total_price) || parseFloat(service.price);
-    const result = await db.query(`INSERT INTO appointments (business_id, service_id, customer_name, customer_phone, customer_email, appointment_time, end_time, status, service_names_text, total_price) VALUES ($1,$2,$3,$4,$5,$6,$7,'pending',$8,$9) RETURNING *`, [businessId, service_id, customer_name.trim(), cleanPhone, customer_email?.trim() || null, startTime.toISOString(), endTime.toISOString(), displayNames, displayPrice]);
+    const customer = await findOrCreateCustomer(db, businessId, {
+      name: customer_name.trim(),
+      phone: cleanPhone,
+      email: customer_email?.trim() || null,
+    });
+    const result = await db.query(`INSERT INTO appointments (business_id, service_id, customer_id, customer_name, customer_phone, customer_email, appointment_time, end_time, status, service_names_text, total_price) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,'pending',$9,$10) RETURNING *`, [businessId, service_id, customer ? customer.id : null, customer_name.trim(), cleanPhone, customer_email?.trim() || null, startTime.toISOString(), endTime.toISOString(), displayNames, displayPrice]);
     const israelTime = new Date(startTime.toLocaleString('en-US', { timeZone: 'Asia/Jerusalem' }));
     const dateHeb = israelTime.toLocaleDateString('he-IL', { weekday: 'long', day: 'numeric', month: 'long' });
     const timeHeb = `${String(israelTime.getHours()).padStart(2,'0')}:${String(israelTime.getMinutes()).padStart(2,'0')}`;
@@ -393,10 +400,22 @@ router.patch('/:id', auth, async (req, res) => {
 
     const newName = customer_name?.trim() || appt.customer_name;
     const newPhone = customer_phone ? customer_phone.replace(/[-\s]/g, '') : appt.customer_phone;
+    const parsed = normalizePhone(newPhone);
+    let customerId = appt.customer_id || null;
+    if (parsed.valid) {
+      const customer = await findOrCreateCustomer(db, req.user.id, {
+        name: newName,
+        phone: parsed.normalized,
+        email: appt.customer_email,
+      }, { updateName: true });
+      customerId = customer ? customer.id : null;
+    } else if (customer_phone && String(customer_phone).trim() && !parsed.valid) {
+      customerId = null;
+    }
 
     const result = await db.query(
-      `UPDATE appointments SET appointment_time=$1, end_time=$2, service_id=$3, service_names_text=$4, customer_name=$5, customer_phone=$6 WHERE id=$7 AND business_id=$8 RETURNING *`,
-      [newStart.toISOString(), newEnd.toISOString(), newServiceId, serviceNamesText, newName, newPhone, req.params.id, req.user.id]
+      `UPDATE appointments SET appointment_time=$1, end_time=$2, service_id=$3, service_names_text=$4, customer_name=$5, customer_phone=$6, customer_id=$7 WHERE id=$8 AND business_id=$9 RETURNING *`,
+      [newStart.toISOString(), newEnd.toISOString(), newServiceId, serviceNamesText, newName, parsed.valid ? parsed.normalized : newPhone, customerId, req.params.id, req.user.id]
     );
     res.json(result.rows[0]);
   } catch (err) {
@@ -407,27 +426,47 @@ router.patch('/:id', auth, async (req, res) => {
 
 // POST /api/appointments/manual — admin manual booking (no service_id required)
 router.post('/manual', auth, async (req, res) => {
-  const { customer_name, service_name, appointment_time, price, deposit, notes } = req.body;
+  const { customer_name, customer_phone, service_name, appointment_time, price, notes } = req.body;
   if (!customer_name || !appointment_time) return res.status(400).json({ error: 'Missing required fields' });
   if (typeof customer_name !== 'string' || customer_name.trim().length < 2) return res.status(400).json({ error: 'שם לא תקין' });
   if (!isValidISODate(appointment_time)) return res.status(400).json({ error: 'תאריך לא תקין' });
   try {
+    const startTime = new Date(appointment_time);
+    const endTime = new Date(startTime.getTime() + 60 * 60000);
+    const conflict = await db.query(
+      `SELECT id FROM appointments WHERE business_id=$1 AND status!='cancelled' AND tstzrange(appointment_time,end_time,'[)') && tstzrange($2::timestamptz,$3::timestamptz,'[)')`,
+      [req.user.id, startTime.toISOString(), endTime.toISOString()]
+    );
+    if (conflict.rows.length) return res.status(409).json({ error: 'השעה הזו תפוסה' });
+
+    const parsed = normalizePhone(customer_phone);
+    const customer = parsed.valid
+      ? await findOrCreateCustomer(db, req.user.id, { name: customer_name.trim(), phone: parsed.normalized }, { updateName: false })
+      : null;
+    const storedPhone = parsed.valid ? parsed.normalized : (customer_phone ? String(customer_phone).trim() : '');
+
     const result = await db.query(
-      `INSERT INTO appointments (business_id, customer_name, service_name, appointment_time, end_time, status, price, notes)
-       VALUES ($1,$2,$3,$4,$5,'confirmed',$6,$7) RETURNING *`,
+      `INSERT INTO appointments (business_id, customer_id, customer_name, customer_phone, service_names_text, appointment_time, end_time, status, total_price, notes)
+       VALUES ($1,$2,$3,$4,$5,$6,$7,'confirmed',$8,$9) RETURNING *`,
       [
         req.user.id,
+        customer ? customer.id : null,
         customer_name.trim(),
+        storedPhone,
         service_name || 'טיפול',
-        new Date(appointment_time).toISOString(),
-        new Date(new Date(appointment_time).getTime() + 60 * 60000).toISOString(),
+        startTime.toISOString(),
+        endTime.toISOString(),
         parseFloat(price) || 0,
         notes || null,
       ]
     );
     notifyBusiness(req.user.id);
     res.status(201).json(result.rows[0]);
-  } catch (err) { console.error(err); res.status(500).json({ error: 'Server error' }); }
+  } catch (err) {
+    if (err.code === '23P01') return res.status(409).json({ error: 'השעה הזו תפוסה' });
+    console.error(err);
+    res.status(500).json({ error: 'Server error' });
+  }
 });
 
 // PATCH /api/appointments/:id/status
@@ -462,7 +501,7 @@ router.post('/quick-add', auth, async (req, res) => {
   try {
     // Check conflict
     const conflict = await db.query(
-      `SELECT customer_name, service_name, appointment_time FROM appointments
+      `SELECT customer_name, COALESCE(service_names_text, 'טיפול') AS service_name, appointment_time FROM appointments
        WHERE business_id=$1 AND status!='cancelled'
          AND appointment_time < $2 AND (appointment_time + interval '60 minutes') > $3`,
       [req.user.id, apptEnd.toISOString(), apptTime.toISOString()]
@@ -494,9 +533,9 @@ router.post('/quick-add', auth, async (req, res) => {
 
     // Create
     const result = await db.query(
-      `INSERT INTO appointments (business_id, customer_name, service_name, appointment_time, end_time, status, price)
-       VALUES ($1,$2,$3,$4,$5,'confirmed',0) RETURNING *`,
-      [req.user.id, parsed.customer_name, parsed.service_name, apptTime.toISOString(), apptEnd.toISOString()]
+      `INSERT INTO appointments (business_id, customer_name, customer_phone, service_names_text, appointment_time, end_time, status, total_price)
+       VALUES ($1,$2,$3,$4,$5,$6,'confirmed',0) RETURNING *`,
+      [req.user.id, parsed.customer_name, '', parsed.service_name, apptTime.toISOString(), apptEnd.toISOString()]
     );
     notifyBusiness(req.user.id);
     res.status(201).json({ appointment: result.rows[0], parsed });

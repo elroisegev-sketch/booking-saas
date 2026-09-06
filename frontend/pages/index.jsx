@@ -3,6 +3,7 @@ import Head from 'next/head';
 import AccessibilityWidget from '../components/AccessibilityWidget';
 import LegalFooter from '../components/LegalFooter';
 import GalleryAdminTab from '../components/GalleryAdminTab';
+import CustomersTab from '../components/admin/customers/CustomersTab';
 import { site } from '../lib/site';
 
 const MOCK_USER = { id: '1', email: 'lior@beauty.com', business_name: 'ליאור שגב – היופי שלך', slug: 'lior-segev' };
@@ -1196,7 +1197,14 @@ const BookingPage = ({ onBack, onAppointmentBooked }) => {
 
 // ── SERVICE MODAL ─────────────────────────────────────────────
 const ServiceModal = ({ service, onSave, onClose }) => {
-  const [form, setForm] = useState({ name: (service ? service.name : '') || '', duration: (service ? service.duration : 0) || 30, price: (service ? service.price : 0) || 0, category: (service ? service.category : '') || "לק ג'ל 💅" });
+  const [form, setForm] = useState({
+    name: (service ? service.name : '') || '',
+    duration: (service ? service.duration : 0) || 30,
+    price: (service ? service.price : 0) || 0,
+    category: (service ? service.category : '') || "לק ג'ל 💅",
+    recommended_return_days_min: service?.recommended_return_days_min ?? '',
+    recommended_return_days_max: service?.recommended_return_days_max ?? '',
+  });
   return (
     <div style={{ position: 'fixed', inset: 0, zIndex: 50, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(161,23,56,0.2)', backdropFilter: 'blur(16px)', WebkitBackdropFilter: 'blur(16px)', fontFamily: 'Varela Round, sans-serif' }}>
       <div dir="rtl" style={{ background: 'rgba(255,255,255,0.8)', backdropFilter: 'blur(32px)', WebkitBackdropFilter: 'blur(32px)', border: '1px solid rgba(255,255,255,0.9)', borderRadius: '28px', padding: '1.5rem', width: '100%', maxWidth: '420px', margin: '1rem', boxShadow: '0 8px 32px rgba(161,23,56,0.08), inset 0 1px 0 rgba(255,255,255,0.9)' }}>
@@ -1227,6 +1235,18 @@ const ServiceModal = ({ service, onSave, onClose }) => {
             <label htmlFor="svc-price" style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>מחיר (₪)</label>
             <input id="svc-price" type="number" style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '14px', border: '1.5px solid rgba(247,193,195,0.5)', outline: 'none', fontSize: '0.875rem', boxSizing: 'border-box', background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(8px)' }}
               value={form.price} onChange={e => setForm({ ...form, price: parseFloat(e.target.value) })} />
+          </div>
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '12px', marginBottom: '1.25rem' }}>
+          <div>
+            <label htmlFor="svc-return-min" style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>חזרה מ־ (ימים)</label>
+            <input id="svc-return-min" type="number" min="1" max="365" placeholder="21" style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '14px', border: '1.5px solid rgba(247,193,195,0.5)', outline: 'none', fontSize: '0.875rem', boxSizing: 'border-box', background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(8px)' }}
+              value={form.recommended_return_days_min} onChange={e => setForm({ ...form, recommended_return_days_min: e.target.value })} />
+          </div>
+          <div>
+            <label htmlFor="svc-return-max" style={{ display: 'block', fontWeight: 700, fontSize: '0.875rem', color: '#374151', marginBottom: '4px' }}>חזרה עד (ימים)</label>
+            <input id="svc-return-max" type="number" min="1" max="365" placeholder="28" style={{ width: '100%', padding: '0.75rem 1rem', borderRadius: '14px', border: '1.5px solid rgba(247,193,195,0.5)', outline: 'none', fontSize: '0.875rem', boxSizing: 'border-box', background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(8px)' }}
+              value={form.recommended_return_days_max} onChange={e => setForm({ ...form, recommended_return_days_max: e.target.value })} />
           </div>
         </div>
         <div style={{ display: 'flex', gap: '12px' }}>
@@ -1730,7 +1750,10 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
   const [quickText, setQuickText] = useState('');
   const [quickLoading, setQuickLoading] = useState(false);
   const [quickResult, setQuickResult] = useState(null);
-  const [newAppt, setNewAppt] = useState({ customer_name: '', service_name: '', date: '', time: '', deposit: '', price: '', rawText: '' });
+  const emptyNewAppt = { customer_name: '', customer_phone: '', service_name: '', date: '', time: '', deposit: '', price: '', rawText: '' };
+  const [newAppt, setNewAppt] = useState(emptyNewAppt);
+  const [customersFilter, setCustomersFilter] = useState('all');
+  const [rebookDueCount, setRebookDueCount] = useState(0);
   const [parsingAI, setParsingAI] = useState(false);
   const [noteModal, setNoteModal] = useState({ open: false, apptId: null, text: '' });
   const [blockedSlots, setBlockedSlots] = useState([]);
@@ -1768,6 +1791,16 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
     };
     return () => es.close();
   }, []);
+
+  useEffect(() => {
+    if (tab !== 'overview') return;
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    if (!token) return;
+    fetch(BACKEND + '/api/customers?filter=rebook_due', { headers: { 'Authorization': 'Bearer ' + token } })
+      .then((r) => r.json())
+      .then((data) => { if (Array.isArray(data)) setRebookDueCount(data.length); })
+      .catch(() => {});
+  }, [tab]);
 
   useEffect(() => {
     if (!("serviceWorker" in navigator) || !("PushManager" in window)) return;
@@ -1886,6 +1919,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
         body: JSON.stringify({
           customer_name: newAppt.customer_name,
+          customer_phone: newAppt.customer_phone,
           service_name: newAppt.service_name || 'טיפול',
           appointment_time: dt.toISOString(),
           price: parseFloat(newAppt.price) || 0,
@@ -1895,7 +1929,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
       if (!r.ok) { const errData = await r.json().catch(() => ({})); showToast((errData.error || 'שגיאה בשמירת התור') + ' ❌'); return; }
       const saved = await r.json();
       setAppointments(function(prev) { return prev.concat([saved]); });
-      setNewAppt({ customer_name: '', service_name: '', date: '', time: '', deposit: '', price: '', rawText: '' });
+      setNewAppt(emptyNewAppt);
       setShowAddAppt(false);
       showToast('התור נשמר ✅');
     } catch (e) {
@@ -1943,7 +1977,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
     { id: 'gallery', label: 'גלריה', icon: 'image' },
     { id: 'customers', label: 'לקוחות', icon: 'users' },
     { id: 'availability', label: 'שעות', icon: 'clock' },
-    { id: 'crm', label: 'CRM', icon: 'crm' },
+    { id: 'crm', label: 'כספים', icon: 'crm' },
   ];
 
   const card = { background: 'rgba(255,255,255,0.6)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', border: '1px solid rgba(255,255,255,0.8)', borderRadius: '24px', boxShadow: '0 8px 32px rgba(161,23,56,0.07), inset 0 1px 0 rgba(255,255,255,0.9)' };
@@ -1952,7 +1986,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
     <button
       key={item.id}
       type="button"
-      onClick={() => setTab(item.id)}
+      onClick={() => { if (item.id === 'customers') setCustomersFilter('all'); setTab(item.id); }}
       className={`admin-nav-item${tab === item.id ? ' is-active' : ''}${layout === 'side' ? ' admin-nav-item--side' : ''}`}
     >
       <Icon name={item.icon} className="w-5 h-5" />
@@ -2021,6 +2055,16 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                     <p style={{ fontWeight: 900, color: '#92400e', margin: 0 }}>{pendingAppts.length} תורים ממתינים לאישור!</p>
                     <button onClick={() => setTab('pending')} style={{ color: '#b45309', fontWeight: 700, fontSize: '0.875rem', background: 'none', border: 'none', cursor: 'pointer', padding: 0 }}>לחצי לאישור ←</button>
                   </div>
+                </div>
+              )}
+
+              {rebookDueCount > 0 && (
+                <div style={{ background: 'rgba(254,243,199,0.55)', border: '1px solid rgba(252,211,77,0.35)', borderRadius: '20px', padding: '1rem 1.25rem', marginBottom: '1.5rem', display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '12px' }}>
+                  <div>
+                    <p style={{ fontWeight: 900, color: '#92400e', margin: 0 }}>{rebookDueCount} לקוחות צריכות לחזור</p>
+                    <p style={{ margin: '2px 0 0', fontSize: '0.8rem', color: '#b45309' }}>עבר הזמן מהטיפול האחרון ואין תור הבא</p>
+                  </div>
+                  <button onClick={() => { setCustomersFilter('rebook_due'); setTab('customers'); }} style={{ flexShrink: 0, padding: '8px 12px', borderRadius: '999px', border: 'none', background: 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, cursor: 'pointer' }}>לקוחות</button>
                 </div>
               )}
 
@@ -2123,6 +2167,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '10px', marginBottom: '1rem' }}>
                   {[
                     { key: 'customer_name', label: 'שם לקוחה *', placeholder: 'דנה כהן', type: 'text' },
+                    { key: 'customer_phone', label: 'טלפון', placeholder: '0501234567', type: 'tel' },
                     { key: 'service_name',  label: 'שירות',       placeholder: 'לק גל',   type: 'text' },
                     { key: 'date',          label: 'תאריך *',     placeholder: '',         type: 'date' },
                     { key: 'time',          label: 'שעה *',       placeholder: '',         type: 'time' },
@@ -2142,7 +2187,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
                   ))}
                 </div>
                 <div style={{ display: 'flex', gap: '12px' }}>
-                  <button onClick={() => { setShowAddAppt(false); setNewAppt({ customer_name: '', service_name: '', date: '', time: '', deposit: '', price: '', rawText: '' }); setParsingAI(false); }} style={{ flex: 1, padding: '0.875rem', background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1.5px solid rgba(247,193,195,0.5)', borderRadius: '14px', color: '#A11738', fontWeight: 700, cursor: 'pointer' }}>ביטול</button>
+                  <button onClick={() => { setShowAddAppt(false); setNewAppt(emptyNewAppt); setParsingAI(false); }} style={{ flex: 1, padding: '0.875rem', background: 'rgba(255,255,255,0.7)', backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)', border: '1.5px solid rgba(247,193,195,0.5)', borderRadius: '14px', color: '#A11738', fontWeight: 700, cursor: 'pointer' }}>ביטול</button>
                   <button onClick={addManualAppt} disabled={!newAppt.customer_name || !newAppt.date || !newAppt.time} style={{ flex: 1, padding: '0.875rem', borderRadius: '999px', background: (!newAppt.customer_name || !newAppt.date || !newAppt.time) ? '#d1d5db' : 'linear-gradient(135deg,#A11738,#EC6A83)', color: 'white', fontWeight: 700, border: 'none', cursor: (!newAppt.customer_name || !newAppt.date || !newAppt.time) ? 'not-allowed' : 'pointer' }}>
                     שריין ביומן ✅
                   </button>
@@ -2350,35 +2395,19 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
 
           {/* CUSTOMERS */}
           {tab === 'customers' && (
-            <div>
-              <h1 style={{ fontSize: '1.75rem', fontWeight: 900, color: '#A11738', marginBottom: '1.5rem' }}>לקוחות 👥</h1>
-              {appointments.filter(a => a.status !== 'cancelled').length === 0 ? (
-                <div style={{ ...card, padding: '3rem', textAlign: 'center', color: '#9ca3af' }}>
-                  <div style={{ fontSize: '2.5rem', marginBottom: '0.5rem' }}>👥</div>
-                  <p style={{ fontWeight: 700 }}>אין לקוחות עדיין</p>
-                </div>
-              ) : (
-                <div style={card}>
-                  <div className="admin-customers-table" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', padding: '0.75rem 1.5rem', borderBottom: '1px solid #f0f0f0' }}>
-                    <span style={{ fontSize: '0.75rem', fontWeight: 900, color: '#9ca3af' }}>שם</span>
-                    <span style={{ fontSize: '0.75rem', fontWeight: 900, color: '#9ca3af' }}>טלפון</span>
-                    <span className="col-hide" style={{ fontSize: '0.75rem', fontWeight: 900, color: '#9ca3af' }}>ביקור אחרון</span>
-                    <span className="col-hide" style={{ fontSize: '0.75rem', fontWeight: 900, color: '#9ca3af' }}>תורים</span>
-                  </div>
-                  {[...new Map(appointments.filter(a => a.status !== 'cancelled').map(a => [a.customer_phone, a])).values()].map((appt, i) => (
-                    <div key={i} className="admin-customers-table" style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', padding: '1rem 1.5rem', alignItems: 'center', borderBottom: '1px solid #fafafa' }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <div style={{ width: '32px', height: '32px', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '0.875rem', fontWeight: 900, background: '#F7C1C3', color: '#A11738', flexShrink: 0 }}>{appt.customer_name[0]}</div>
-                        <span style={{ fontWeight: 700, color: '#A11738', fontSize: '0.875rem' }}>{appt.customer_name}</span>
-                      </div>
-                      <span style={{ color: '#6b7280', fontSize: '0.875rem' }}>{appt.customer_phone}</span>
-                      <span className="col-hide" style={{ color: '#6b7280', fontSize: '0.875rem' }}>{fmtDate(appt.appointment_time)}</span>
-                      <span className="col-hide" style={{ fontWeight: 900, color: '#EC6A83', fontSize: '0.875rem' }}>{appointments.filter(a => a.customer_phone === appt.customer_phone).length}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+            <CustomersTab
+              key={customersFilter}
+              showToast={showToast}
+              initialFilter={customersFilter}
+              onBookCustomer={(customer) => {
+                setNewAppt({
+                  ...emptyNewAppt,
+                  customer_name: customer.name || '',
+                  customer_phone: customer.phone || '',
+                });
+                setShowAddAppt(true);
+              }}
+            />
           )}
 
           {/* AVAILABILITY */}
@@ -2482,7 +2511,7 @@ const Dashboard = ({ user, onLogout, appointments, setAppointments }) => {
               <div>
                 {/* כותרת + ניווט חודשים */}
                 <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: '1.25rem' }}>
-                  <h1 style={{ fontSize: '1.5rem', fontWeight: 900, color: '#A11738', margin: 0 }}>CRM 📊</h1>
+                  <h1 style={{ fontSize: '1.5rem', fontWeight: 900, color: '#A11738', margin: 0 }}>כספים 📊</h1>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                     <button onClick={prevMonth} style={{ padding: '6px 10px', borderRadius: '10px', border: '1px solid rgba(247,193,195,0.6)', background: 'rgba(255,255,255,0.7)', cursor: 'pointer', fontWeight: 700, color: '#A11738', fontSize: '1rem' }}>›</button>
                     <span style={{ minWidth: '110px', textAlign: 'center' }}>
