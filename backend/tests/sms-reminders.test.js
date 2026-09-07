@@ -378,6 +378,167 @@ describe('sms recipient', () => {
   });
 });
 
+describe('missed send window', () => {
+  it('allows a reminder that is 30 minutes late', () => {
+    const now = jerusalem(2026, 10, 4, 19, 0);
+    const reminder = {
+      appointmentId: 'appt-late-30',
+      status: 'pending',
+      scheduledAt: jerusalem(2026, 10, 4, 18, 30),
+      phone: '0501234567',
+    };
+    const appointment = {
+      id: 'appt-late-30',
+      status: 'confirmed',
+      appointment_time: jerusalem(2026, 10, 5, 18, 30),
+      customer_phone: '0501234567',
+    };
+    assert.equal(
+      decideSend(reminder, appointment, now, { isShabbat: false, smsEnabled: true }).action,
+      'send'
+    );
+    const sends = [];
+    const sent = runWorkerTick([reminder], new Map([['appt-late-30', appointment]]), now, {
+      isShabbat: false,
+      smsEnabled: true,
+      send: (r) => sends.push(r),
+    });
+    assert.equal(sent.length, 1);
+    assert.equal(sends.length, 1);
+    assert.equal(reminder.status, 'sent');
+  });
+
+  it('skips a reminder that is 3 hours late and does not send it', () => {
+    const now = jerusalem(2026, 10, 4, 21, 30);
+    const reminder = {
+      appointmentId: 'appt-late-3h',
+      status: 'pending',
+      scheduledAt: jerusalem(2026, 10, 4, 18, 30),
+      phone: '0501234567',
+    };
+    const appointment = {
+      id: 'appt-late-3h',
+      status: 'confirmed',
+      appointment_time: jerusalem(2026, 10, 5, 18, 30),
+      customer_phone: '0501234567',
+    };
+    const decision = decideSend(reminder, appointment, now, { isShabbat: false, smsEnabled: true });
+    assert.equal(decision.action, 'skip');
+    assert.equal(decision.reason, 'missed_send_window');
+
+    const sends = [];
+    const sent = runWorkerTick([reminder], new Map([['appt-late-3h', appointment]]), now, {
+      isShabbat: false,
+      smsEnabled: true,
+      send: (r) => sends.push(r),
+    });
+    assert.deepEqual(sent, []);
+    assert.equal(sends.length, 0);
+    assert.equal(reminder.status, 'skipped');
+    assert.equal(reminder.error, 'missed_send_window');
+  });
+
+  it('does not send a pile of old reminders after restart', () => {
+    const now = jerusalem(2026, 10, 4, 22, 0);
+    const oldA = {
+      appointmentId: 'old-1',
+      dedupKey: 'old-1',
+      status: 'pending',
+      scheduledAt: jerusalem(2026, 10, 4, 10, 0),
+      phone: '0501111111',
+    };
+    const oldB = {
+      appointmentId: 'old-2',
+      dedupKey: 'old-2',
+      status: 'pending',
+      scheduledAt: jerusalem(2026, 10, 4, 12, 0),
+      phone: '0502222222',
+    };
+    const late30 = {
+      appointmentId: 'late-30',
+      dedupKey: 'late-30',
+      status: 'pending',
+      scheduledAt: jerusalem(2026, 10, 4, 21, 30),
+      phone: '0503333333',
+    };
+    const future = {
+      appointmentId: 'future-1',
+      dedupKey: 'future-1',
+      status: 'pending',
+      scheduledAt: jerusalem(2026, 10, 5, 12, 0),
+      phone: '0504444444',
+    };
+    const appointments = new Map([
+      ['old-1', { id: 'old-1', status: 'confirmed', appointment_time: jerusalem(2026, 10, 5, 10, 0), customer_phone: '0501111111' }],
+      ['old-2', { id: 'old-2', status: 'confirmed', appointment_time: jerusalem(2026, 10, 5, 12, 0), customer_phone: '0502222222' }],
+      ['late-30', { id: 'late-30', status: 'confirmed', appointment_time: jerusalem(2026, 10, 5, 21, 30), customer_phone: '0503333333' }],
+      ['future-1', { id: 'future-1', status: 'confirmed', appointment_time: jerusalem(2026, 10, 6, 12, 0), customer_phone: '0504444444' }],
+    ]);
+    const sends = [];
+    const sent = runWorkerTick([oldA, oldB, late30, future], appointments, now, {
+      isShabbat: false,
+      smsEnabled: true,
+      send: (r) => sends.push(r.dedupKey),
+    });
+    assert.deepEqual(sent, ['late-30']);
+    assert.equal(sends.length, 1);
+    assert.equal(oldA.status, 'skipped');
+    assert.equal(oldA.error, 'missed_send_window');
+    assert.equal(oldB.status, 'skipped');
+    assert.equal(oldB.error, 'missed_send_window');
+    assert.equal(late30.status, 'sent');
+    assert.equal(future.status, 'pending');
+  });
+
+  it('keeps future reminders pending', () => {
+    const now = jerusalem(2026, 10, 4, 18, 31);
+    const reminder = {
+      appointmentId: 'future-2',
+      status: 'pending',
+      scheduledAt: jerusalem(2026, 10, 9, 12, 15),
+      phone: '0501234567',
+    };
+    const appointment = {
+      id: 'future-2',
+      status: 'confirmed',
+      appointment_time: jerusalem(2026, 10, 10, 12, 15),
+      customer_phone: '0501234567',
+    };
+    const decision = decideSend(reminder, appointment, now, { isShabbat: false, smsEnabled: true });
+    assert.equal(decision.action, 'hold');
+    assert.equal(decision.reason, 'not_due');
+    const sends = [];
+    runWorkerTick([reminder], new Map([['future-2', appointment]]), now, {
+      isShabbat: false,
+      smsEnabled: true,
+      send: (r) => sends.push(r),
+    });
+    assert.equal(sends.length, 0);
+    assert.equal(reminder.status, 'pending');
+  });
+
+  it('still defers during Shabbat even if the original send time is more than 2 hours late', () => {
+    const reminder = {
+      appointmentId: 'appt-shabbat-late',
+      status: 'pending',
+      scheduledAt: jerusalem(2026, 10, 2, 16, 0),
+      phone: '0501234567',
+    };
+    const appointment = {
+      id: 'appt-shabbat-late',
+      status: 'confirmed',
+      appointment_time: jerusalem(2026, 10, 4, 16, 0),
+      customer_phone: '0501234567',
+    };
+    const saturdayAfternoon = jerusalem(2026, 10, 3, 16, 0);
+    const decision = decideSend(reminder, appointment, saturdayAfternoon, {
+      isShabbat: true,
+      smsEnabled: true,
+    });
+    assert.equal(decision.action, 'defer_shabbat');
+  });
+});
+
 describe('only confirmed appointments are sendable', () => {
   it('holds a pending booking and skips when SMS is disabled', () => {
     const reminder = {

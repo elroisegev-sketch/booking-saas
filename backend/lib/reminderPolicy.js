@@ -14,6 +14,32 @@ const CONSERVATIVE_SHABBAT = {
   saturdayEndMinute: 30,
 };
 
+const MISSED_SEND_WINDOW_MS = 2 * 60 * 60 * 1000;
+const MANUAL_OVERDUE_CANCEL_REASON = 'manual_overdue_safety';
+
+function reminderErrorOf(record) {
+  return (record && (record.error || record.reason)) || null;
+}
+
+function isOutsideSendWindow(scheduledAt, now) {
+  if (!scheduledAt) return false;
+  const scheduled = new Date(scheduledAt);
+  if (Number.isNaN(scheduled.getTime())) return false;
+  const t = now instanceof Date ? now : new Date(now);
+  return t.getTime() - scheduled.getTime() > MISSED_SEND_WINDOW_MS;
+}
+
+function sameSlotClosedReason(existing, nextKey) {
+  if (!existing) return null;
+  const key = existing.dedupKey || existing.dedup_key;
+  if (key !== nextKey) return null;
+  if (existing.status === 'sent') return 'already_sent';
+  const err = reminderErrorOf(existing);
+  if (existing.status === 'skipped' && err === 'missed_send_window') return 'missed_send_window';
+  if (existing.status === 'cancelled' && err === MANUAL_OVERDUE_CANCEL_REASON) return MANUAL_OVERDUE_CANCEL_REASON;
+  return null;
+}
+
 function reminderTimeStamp(appointmentTime) {
   const at = appointmentTime instanceof Date ? appointmentTime : new Date(appointmentTime);
   return Number.isNaN(at.getTime()) ? 'unknown' : at.toISOString();
@@ -117,8 +143,9 @@ function scheduleReminderRecord({ existing, appointment, scheduledAt, reason, er
   const appointmentTime = appointment.appointment_time || appointment.appointmentTime;
   const nextKey = reminderDedupKey(appointment.id, appointmentTime);
   const existingKey = existing && (existing.dedupKey || existing.dedup_key);
-  if (existing && existing.status === 'sent' && existingKey === nextKey) {
-    return { record: existing, changed: false, blocked: 'already_sent' };
+  const closed = sameSlotClosedReason(existing, nextKey);
+  if (closed) {
+    return { record: existing, changed: false, blocked: closed };
   }
 
   const next = {
@@ -171,6 +198,9 @@ function decideSend(reminder, appointment, now, { isShabbat, smsEnabled } = {}) 
   if (isShabbat) {
     return { action: 'defer_shabbat', reason: 'shabbat' };
   }
+  if (isOutsideSendWindow(scheduledAt, now)) {
+    return { action: 'skip', reason: 'missed_send_window' };
+  }
   const phone = reminder.phone || appointment.customer_phone || appointment.customerPhone;
   if (!phone) return { action: 'skip', reason: 'missing_phone' };
 
@@ -179,12 +209,16 @@ function decideSend(reminder, appointment, now, { isShabbat, smsEnabled } = {}) 
 
 module.exports = {
   CONSERVATIVE_SHABBAT,
+  MISSED_SEND_WINDOW_MS,
+  MANUAL_OVERDUE_CANCEL_REASON,
   reminderTimeStamp,
   reminderDedupKey,
   conservativeShabbatEnd,
   conservativeIsShabbat,
   isDuringShabbatWithTimes,
   resolveIsDuringShabbat,
+  isOutsideSendWindow,
+  sameSlotClosedReason,
   computeReminderSchedule,
   scheduleReminderRecord,
   decideSend,

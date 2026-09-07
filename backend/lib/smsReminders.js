@@ -12,6 +12,8 @@ const {
   decideSend,
   resolveIsDuringShabbat,
   conservativeShabbatEnd,
+  sameSlotClosedReason,
+  MISSED_SEND_WINDOW_MS,
 } = require('./reminderPolicy');
 const { isSmsEnabled, sendSms, getSmsCredentials } = require('./smsService');
 
@@ -147,14 +149,14 @@ async function syncReminderForAppointment(appointmentId, { database = db, getHav
 
   const existing = await loadReminder(appointment.id, appointment.appointment_time, database);
   const schedule = await resolveScheduleForAppointment(appointment, { getHavdalah });
-  const { record } = scheduleReminderRecord({
+  const { record, blocked } = scheduleReminderRecord({
     existing,
     appointment,
     scheduledAt: schedule.scheduledAt,
     reason: schedule.reason,
     error: schedule.error || null,
   });
-  if (!record || (existing && existing.status === 'sent')) return existing;
+  if (!record || blocked) return existing;
   return upsertReminder(record, database);
 }
 
@@ -188,7 +190,11 @@ async function backfillMissingReminders(database = db) {
   let created = 0;
   for (const row of result.rows) {
     const existing = await loadReminder(row.id, row.appointment_time, database);
-    if (existing && (existing.status === 'pending' || existing.status === 'sending' || existing.status === 'sent')) {
+    const closed = existing && sameSlotClosedReason(
+      existing,
+      reminderDedupKey(row.id, row.appointment_time)
+    );
+    if (existing && (existing.status === 'pending' || existing.status === 'sending' || existing.status === 'sent' || closed)) {
       continue;
     }
     await syncReminderForAppointment(row.id, { database }).catch((err) => {
@@ -207,6 +213,20 @@ async function reclaimStuckSending(database = db) {
      SET status = 'failed', error = 'stuck_sending', updated_at = NOW()
      WHERE status = 'sending' AND updated_at < NOW() - INTERVAL '5 minutes'`
   );
+}
+
+async function expireMissedSendWindow(database = db, now = new Date()) {
+  const cutoff = new Date(now.getTime() - MISSED_SEND_WINDOW_MS);
+  const result = await database.query(
+    `UPDATE sms_reminders
+     SET status = 'skipped', error = 'missed_send_window', updated_at = NOW()
+     WHERE status = 'pending'
+       AND scheduled_at IS NOT NULL
+       AND scheduled_at < $1
+     RETURNING id`,
+    [cutoff.toISOString()]
+  );
+  return result.rowCount || 0;
 }
 
 async function claimDueReminders(database, sql, params) {
@@ -237,8 +257,13 @@ async function processDueReminders({
   limit = 10,
 } = {}) {
   await reclaimStuckSending(database);
+  const isShabbatNow = await resolveIsDuringShabbat(now, { getShabbatWindow: getShabbatWindowFn });
+  let expired = 0;
+  if (!isShabbatNow) {
+    expired = await expireMissedSendWindow(database, now);
+  }
   if (!smsEnabled) {
-    return { processed: 0, sent: 0, held: true };
+    return { processed: 0, sent: 0, held: true, expired };
   }
 
   const claimSql = `WITH due AS (
@@ -361,6 +386,7 @@ module.exports = {
   syncReminderSafe,
   cancelReminderSafe,
   backfillMissingReminders,
+  expireMissedSendWindow,
   processDueReminders,
   smsRuntimeStatus,
   reminderDedupKey,
