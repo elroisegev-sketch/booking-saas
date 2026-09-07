@@ -4,6 +4,31 @@ const { httpsRequestJson } = require('./httpJson');
 const SEND_URL = 'https://api.sms4free.co.il/ApiSMS/v2/SendSMS';
 const MAX_MESSAGE_LENGTH = 1000;
 
+const PROVIDER_ERROR_CODES = {
+  0: 'SMS_PROVIDER_GENERAL_ERROR',
+  [-1]: 'SMS_INVALID_CREDENTIALS',
+  [-2]: 'SMS_INVALID_SENDER',
+  [-3]: 'SMS_NO_RECIPIENTS',
+  [-4]: 'SMS_INSUFFICIENT_BALANCE',
+  [-5]: 'SMS_INVALID_MESSAGE_CONTENT',
+  [-6]: 'SMS_SENDER_VERIFICATION_REQUIRED',
+};
+
+function interpretProviderStatus(status) {
+  const n = Number(status);
+  if (!Number.isFinite(n)) {
+    return { ok: false, code: 'SMS_PROVIDER_REJECTED', recipientsSent: null };
+  }
+  if (n > 0) {
+    return { ok: true, code: 'SMS_SENT', recipientsSent: n };
+  }
+  return {
+    ok: false,
+    code: PROVIDER_ERROR_CODES[n] || 'SMS_PROVIDER_REJECTED',
+    recipientsSent: null,
+  };
+}
+
 function isSmsEnabled() {
   return String(process.env.SMS_ENABLED || '').toLowerCase() === 'true';
 }
@@ -81,19 +106,22 @@ async function sendSms(phone, message, options) {
 
     const rawBody = result.body && typeof result.body === 'object' ? result.body : { raw: result.raw };
     const response = sanitizeProviderResponse(rawBody);
-    const ok = result.statusCode >= 200 && result.statusCode < 300 && Number(rawBody.status) === 0;
+    const interpreted = interpretProviderStatus(rawBody.status);
+    const ok = result.statusCode >= 200 && result.statusCode < 300 && interpreted.ok;
     if (!ok) {
       console.error('SMS provider rejected send', {
         httpStatus: result.statusCode,
         providerStatus: rawBody.status == null ? null : rawBody.status,
+        code: interpreted.code,
       });
     }
     return {
       ok,
-      code: ok ? 'SMS_SENT' : 'SMS_PROVIDER_REJECTED',
+      code: ok ? interpreted.code : (interpreted.ok ? 'SMS_PROVIDER_REJECTED' : interpreted.code),
       recipient,
       providerStatus: rawBody.status == null ? null : rawBody.status,
       providerMessage: response && response.message,
+      recipientsSent: interpreted.recipientsSent,
       response,
     };
   } catch (err) {
@@ -105,6 +133,7 @@ async function sendSms(phone, message, options) {
 module.exports = {
   SEND_URL,
   MAX_MESSAGE_LENGTH,
+  interpretProviderStatus,
   isSmsEnabled,
   isSmsConfigured,
   getSmsCredentials,
