@@ -87,6 +87,7 @@ app.use('/api/blocked-slots', require('./routes/blocked_slots'));
 app.use('/api/push', require('./routes/push').router);
 app.use('/api/expenses', require('./routes/expenses'));
 app.use('/api/customers', require('./routes/customers'));
+app.use('/api/sms', require('./routes/sms'));
 
 // Gallery table + seed flag on users
 require('./db').query(`
@@ -175,5 +176,7 @@ const PORT = process.env.PORT || 4000;
     } catch (err) {
       console.error('🚨 DB SCHEMA VALIDATION FAILED:', err.message);
     }
+    // SMS4FREE is available via /api/sms/test only. Automatic appointment
+    // reminders are not started until we explicitly enable that flow.
   });
 })();
