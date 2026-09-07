@@ -106,7 +106,13 @@ const db = require('./db');
 const { seedLegacyGalleryIfNeeded } = require('./lib/seedGallery');
 seedLegacyGalleryIfNeeded(db).catch((err) => console.error('gallery seed error:', err));
 
-app.get('/health', (_, res) => res.json({ status: 'ok', service: 'BookSlot API' }));
+app.get('/health', (_, res) => {
+  let smsWorker = false;
+  try {
+    smsWorker = require('./lib/smsWorker').isSmsWorkerRunning();
+  } catch { /* worker not loaded yet */ }
+  res.json({ status: 'ok', service: 'BookSlot API', smsWorker });
+});
 
 // Auto-migrate notes column on appointments
 require('./db').query(`ALTER TABLE appointments ADD COLUMN IF NOT EXISTS notes TEXT`).catch(() => {});
@@ -176,7 +182,11 @@ const PORT = process.env.PORT || 4000;
     } catch (err) {
       console.error('🚨 DB SCHEMA VALIDATION FAILED:', err.message);
     }
-    // SMS4FREE is available via /api/sms/test only. Automatic appointment
-    // reminders are not started until we explicitly enable that flow.
+    try {
+      const { initSmsReminders } = require('./lib/smsWorker');
+      await initSmsReminders(db);
+    } catch (err) {
+      console.error('SMS reminders init error:', err.message);
+    }
   });
 })();

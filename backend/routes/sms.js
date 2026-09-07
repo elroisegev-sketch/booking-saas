@@ -2,7 +2,8 @@ const express = require('express');
 const rateLimit = require('express-rate-limit');
 const auth = require('../middleware/auth');
 const { normalizePhone } = require('../lib/phone');
-const { sendSms, isSmsConfigured } = require('../lib/smsService');
+const { sendSms, isSmsConfigured, isSmsEnabled } = require('../lib/smsService');
+const { isSmsWorkerRunning } = require('../lib/smsWorker');
 
 const router = express.Router();
 
@@ -18,6 +19,8 @@ router.get('/status', auth, (req, res) => {
   res.json({
     configured: isSmsConfigured(),
     provider: 'sms4free',
+    smsEnabled: isSmsEnabled(),
+    workerRunning: isSmsWorkerRunning(),
   });
 });
 

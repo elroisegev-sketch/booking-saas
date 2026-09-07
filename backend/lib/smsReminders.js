@@ -39,12 +39,21 @@ async function loadAppointment(appointmentId, database = db) {
   return result.rows[0] || null;
 }
 
-async function loadReminder(appointmentId, database = db) {
+async function loadReminder(appointmentId, appointmentTime, database = db) {
   const result = await database.query(
     'SELECT * FROM sms_reminders WHERE dedup_key = $1',
-    [reminderDedupKey(appointmentId)]
+    [reminderDedupKey(appointmentId, appointmentTime)]
   );
   return result.rows[0] || null;
+}
+
+async function cancelUnsentForAppointment(appointmentId, reason, database = db) {
+  await database.query(
+    `UPDATE sms_reminders
+     SET status = 'cancelled', error = $2, updated_at = NOW()
+     WHERE appointment_id = $1 AND status IN ('pending', 'failed')`,
+    [appointmentId, reason || 'appointment_cancelled']
+  );
 }
 
 async function resolveScheduleForAppointment(appointment, { getHavdalah } = {}) {
@@ -115,20 +124,28 @@ async function upsertReminder(record, database = db) {
 async function syncReminderForAppointment(appointmentId, { database = db, getHavdalah } = {}) {
   const appointment = await loadAppointment(appointmentId, database);
   if (!appointment) return null;
-  const existing = await loadReminder(appointmentId, database);
 
   if (appointment.status !== 'confirmed') {
-    if (existing && existing.status !== 'sent') {
-      await database.query(
-        `UPDATE sms_reminders
-         SET status = 'cancelled', error = $2, updated_at = NOW()
-         WHERE dedup_key = $1 AND status <> 'sent'`,
-        [reminderDedupKey(appointmentId), appointment.status === 'cancelled' ? 'appointment_cancelled' : 'not_confirmed']
-      );
-    }
-    return existing;
+    const reason = appointment.status === 'cancelled'
+      ? 'appointment_cancelled'
+      : appointment.status === 'completed'
+        ? 'appointment_completed'
+        : 'not_confirmed';
+    await cancelUnsentForAppointment(appointment.id, reason, database);
+    return null;
   }
 
+  const currentKey = reminderDedupKey(appointment.id, appointment.appointment_time);
+  await database.query(
+    `UPDATE sms_reminders
+     SET status = 'cancelled', error = 'appointment_rescheduled', updated_at = NOW()
+     WHERE appointment_id = $1
+       AND dedup_key <> $2
+       AND status IN ('pending', 'failed')`,
+    [appointment.id, currentKey]
+  );
+
+  const existing = await loadReminder(appointment.id, appointment.appointment_time, database);
   const schedule = await resolveScheduleForAppointment(appointment, { getHavdalah });
   const { record } = scheduleReminderRecord({
     existing,
@@ -142,12 +159,7 @@ async function syncReminderForAppointment(appointmentId, { database = db, getHav
 }
 
 async function cancelReminderForAppointment(appointmentId, reason, database = db) {
-  await database.query(
-    `UPDATE sms_reminders
-     SET status = 'cancelled', error = $2, updated_at = NOW()
-     WHERE dedup_key = $1 AND status <> 'sent'`,
-    [reminderDedupKey(appointmentId), reason || 'appointment_cancelled']
-  );
+  await cancelUnsentForAppointment(appointmentId, reason, database);
 }
 
 function syncReminderSafe(appointmentId) {
@@ -166,20 +178,25 @@ function cancelReminderSafe(appointmentId, reason) {
 
 async function backfillMissingReminders(database = db) {
   const result = await database.query(
-    `SELECT a.id
+    `SELECT a.id, a.appointment_time
      FROM appointments a
      WHERE a.status = 'confirmed'
        AND a.appointment_time > NOW()
-       AND NOT EXISTS (
-         SELECT 1 FROM sms_reminders r
-         WHERE r.dedup_key = 'appointment:' || a.id::text || ':reminder'
-       )
-     LIMIT 50`
+     ORDER BY a.appointment_time ASC
+     LIMIT 100`
   );
+  let created = 0;
   for (const row of result.rows) {
-    await syncReminderSafe(row.id);
+    const existing = await loadReminder(row.id, row.appointment_time, database);
+    if (existing && (existing.status === 'pending' || existing.status === 'sending' || existing.status === 'sent')) {
+      continue;
+    }
+    await syncReminderForAppointment(row.id, { database }).catch((err) => {
+      console.error('sms reminder backfill error:', err.message);
+    });
+    created += 1;
   }
-  return result.rows.length;
+  return created;
 }
 
 async function reclaimStuckSending(database = db) {
@@ -190,6 +207,25 @@ async function reclaimStuckSending(database = db) {
      SET status = 'failed', error = 'stuck_sending', updated_at = NOW()
      WHERE status = 'sending' AND updated_at < NOW() - INTERVAL '5 minutes'`
   );
+}
+
+async function claimDueReminders(database, sql, params) {
+  const pool = database && database.pool;
+  if (!pool || typeof pool.connect !== 'function') {
+    return database.query(sql, params);
+  }
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const claimed = await client.query(sql, params);
+    await client.query('COMMIT');
+    return claimed;
+  } catch (err) {
+    try { await client.query('ROLLBACK'); } catch { /* ignore */ }
+    throw err;
+  } finally {
+    client.release();
+  }
 }
 
 async function processDueReminders({
@@ -205,8 +241,7 @@ async function processDueReminders({
     return { processed: 0, sent: 0, held: true };
   }
 
-  const claimed = await database.query(
-    `WITH due AS (
+  const claimSql = `WITH due AS (
        SELECT id FROM sms_reminders
        WHERE status = 'pending'
          AND scheduled_at IS NOT NULL
@@ -219,9 +254,9 @@ async function processDueReminders({
      SET status = 'sending', updated_at = NOW()
      FROM due
      WHERE r.id = due.id
-     RETURNING r.*`,
-    [now.toISOString(), limit]
-  );
+     RETURNING r.*`;
+  const claimParams = [now.toISOString(), limit];
+  const claimed = await claimDueReminders(database, claimSql, claimParams);
 
   let sent = 0;
   for (const reminder of claimed.rows) {
@@ -273,13 +308,18 @@ async function processDueReminders({
         appointmentTime: appointment.appointment_time,
         serviceName: appointment.service_name,
       });
-      const result = await send({ phone: reminder.phone || appointment.customer_phone, message });
+      const phone = reminder.phone || appointment.customer_phone;
+      const result = await send(phone, message);
+      const providerResponse = {
+        status: result.providerStatus == null ? null : result.providerStatus,
+        message: result.providerMessage == null ? null : result.providerMessage,
+      };
       if (!result.ok) {
         await database.query(
           `UPDATE sms_reminders
            SET status='failed', provider_response=$2, error=$3, updated_at=NOW()
            WHERE id=$1`,
-          [reminder.id, result.response || result, result.providerMessage || 'provider_rejected']
+          [reminder.id, providerResponse, result.code || result.error || 'provider_rejected']
         );
         continue;
       }
@@ -287,7 +327,7 @@ async function processDueReminders({
         `UPDATE sms_reminders
          SET status='sent', sent_at=NOW(), provider_response=$2, error=NULL, updated_at=NOW()
          WHERE id=$1`,
-        [reminder.id, result.response || result]
+        [reminder.id, providerResponse]
       );
       sent += 1;
     } catch (err) {

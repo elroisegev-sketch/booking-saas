@@ -138,7 +138,7 @@ describe('reschedule updates an unsent reminder', () => {
       scheduledAt: computeReminderSchedule(appointment.appointment_time).scheduledAt,
     });
     assert.equal(first.record.status, 'pending');
-    assert.equal(first.record.dedupKey, 'appointment:appt-1:reminder');
+    assert.equal(first.record.dedupKey, reminderDedupKey('appt-1', appointment.appointment_time));
 
     const moved = {
       ...appointment,
@@ -154,27 +154,55 @@ describe('reschedule updates an unsent reminder', () => {
     assert.match(second.record.message, /יום שלישי 6\.10 ב-16:00/);
   });
 
-  it('does not create a second send after the SMS already went out', () => {
+  it('does not create a second send for the same appointment time', () => {
+    const appointmentTime = jerusalem(2026, 10, 5, 18, 30);
     const existing = {
       status: 'sent',
       sentAt: jerusalem(2026, 10, 4, 18, 30),
       scheduledAt: jerusalem(2026, 10, 4, 18, 30),
-      dedupKey: reminderDedupKey('appt-1'),
+      dedupKey: reminderDedupKey('appt-1', appointmentTime),
     };
     const result = scheduleReminderRecord({
       existing,
       appointment: {
         id: 'appt-1',
         status: 'confirmed',
-        appointment_time: jerusalem(2026, 10, 7, 11, 0),
+        appointment_time: appointmentTime,
         customer_name: 'מיכל',
         service_name: 'לק גל',
       },
-      scheduledAt: jerusalem(2026, 10, 6, 11, 0),
+      scheduledAt: jerusalem(2026, 10, 4, 18, 30),
     });
     assert.equal(result.changed, false);
     assert.equal(result.blocked, 'already_sent');
     assert.equal(result.record.status, 'sent');
+  });
+
+  it('creates a new reminder after a sent one when the appointment time changes', () => {
+    const oldTime = jerusalem(2026, 10, 5, 18, 30);
+    const newTime = jerusalem(2026, 10, 7, 11, 0);
+    const existing = {
+      status: 'sent',
+      sentAt: jerusalem(2026, 10, 4, 18, 30),
+      scheduledAt: jerusalem(2026, 10, 4, 18, 30),
+      dedupKey: reminderDedupKey('appt-1', oldTime),
+    };
+    const result = scheduleReminderRecord({
+      existing,
+      appointment: {
+        id: 'appt-1',
+        status: 'confirmed',
+        appointment_time: newTime,
+        customer_name: 'מיכל',
+        customer_phone: '0501234567',
+        service_name: 'לק גל',
+      },
+      scheduledAt: computeReminderSchedule(newTime).scheduledAt,
+    });
+    assert.equal(result.changed, true);
+    assert.equal(result.record.status, 'pending');
+    assert.equal(result.record.dedupKey, reminderDedupKey('appt-1', newTime));
+    assert.notEqual(result.record.dedupKey, existing.dedupKey);
   });
 });
 
@@ -217,7 +245,7 @@ describe('restart does not double-send', () => {
   it('sends once, then a second worker tick is a no-op', () => {
     const reminder = {
       appointmentId: 'appt-3',
-      dedupKey: reminderDedupKey('appt-3'),
+      dedupKey: reminderDedupKey('appt-3', jerusalem(2026, 10, 5, 18, 30)),
       status: 'pending',
       scheduledAt: jerusalem(2026, 10, 4, 18, 30),
       phone: '0501234567',
@@ -241,7 +269,7 @@ describe('restart does not double-send', () => {
       smsEnabled: true,
       send,
     });
-    assert.deepEqual(first, ['appointment:appt-3:reminder']);
+    assert.deepEqual(first, [reminder.dedupKey]);
     assert.deepEqual(second, []);
     assert.equal(sends.length, 1);
     assert.equal(reminder.status, 'sent');

@@ -3,10 +3,14 @@ const {
   backfillMissingReminders,
   processDueReminders,
 } = require('./smsReminders');
-const { isSmsEnabled } = require('./smsProvider');
+const { isSmsEnabled } = require('./smsService');
 
 const DEFAULT_INTERVAL_MS = 30000;
 let timer = null;
+
+function isSmsWorkerRunning() {
+  return Boolean(timer);
+}
 
 function startSmsWorker({ intervalMs } = {}) {
   if (timer) return timer;
@@ -43,4 +47,4 @@ async function initSmsReminders(db) {
   startSmsWorker();
 }
 
-module.exports = { startSmsWorker, stopSmsWorker, initSmsReminders };
+module.exports = { startSmsWorker, stopSmsWorker, initSmsReminders, isSmsWorkerRunning };

@@ -14,8 +14,14 @@ const CONSERVATIVE_SHABBAT = {
   saturdayEndMinute: 30,
 };
 
-function reminderDedupKey(appointmentId) {
-  return `appointment:${appointmentId}:reminder`;
+function reminderTimeStamp(appointmentTime) {
+  const at = appointmentTime instanceof Date ? appointmentTime : new Date(appointmentTime);
+  return Number.isNaN(at.getTime()) ? 'unknown' : at.toISOString();
+}
+
+function reminderDedupKey(appointmentId, appointmentTime) {
+  if (appointmentTime == null) return `appointment:${appointmentId}:reminder`;
+  return `appointment:${appointmentId}:reminder:${reminderTimeStamp(appointmentTime)}`;
 }
 
 function conservativeShabbatEnd(saturdayIso) {
@@ -94,10 +100,6 @@ function computeReminderSchedule(appointmentTime, { havdalahAt, havdalahError } 
 }
 
 function scheduleReminderRecord({ existing, appointment, scheduledAt, reason, error }) {
-  if (existing && existing.status === 'sent') {
-    return { record: existing, changed: false, blocked: 'already_sent' };
-  }
-
   const status = appointment && appointment.status;
   if (!appointment || status === 'cancelled' || status === 'completed') {
     if (!existing) return { record: null, changed: false };
@@ -112,14 +114,21 @@ function scheduleReminderRecord({ existing, appointment, scheduledAt, reason, er
     return { record: existing || null, changed: false };
   }
 
+  const appointmentTime = appointment.appointment_time || appointment.appointmentTime;
+  const nextKey = reminderDedupKey(appointment.id, appointmentTime);
+  const existingKey = existing && (existing.dedupKey || existing.dedup_key);
+  if (existing && existing.status === 'sent' && existingKey === nextKey) {
+    return { record: existing, changed: false, blocked: 'already_sent' };
+  }
+
   const next = {
     appointmentId: appointment.id,
     businessId: appointment.business_id || appointment.businessId,
-    dedupKey: reminderDedupKey(appointment.id),
+    dedupKey: nextKey,
     phone: appointment.customer_phone || appointment.customerPhone || null,
     message: buildReminderMessage({
       customerName: appointment.customer_name || appointment.customerName,
-      appointmentTime: appointment.appointment_time || appointment.appointmentTime,
+      appointmentTime,
       serviceName: appointment.service_name || appointment.serviceName,
     }),
     scheduledAt,
@@ -127,7 +136,9 @@ function scheduleReminderRecord({ existing, appointment, scheduledAt, reason, er
     status: 'pending',
     reason: reason || null,
     error: error || null,
-    providerResponse: existing ? existing.providerResponse || existing.provider_response || null : null,
+    providerResponse: existing && existingKey === nextKey
+      ? existing.providerResponse || existing.provider_response || null
+      : null,
   };
 
   return { record: next, changed: true };
@@ -168,6 +179,7 @@ function decideSend(reminder, appointment, now, { isShabbat, smsEnabled } = {}) 
 
 module.exports = {
   CONSERVATIVE_SHABBAT,
+  reminderTimeStamp,
   reminderDedupKey,
   conservativeShabbatEnd,
   conservativeIsShabbat,

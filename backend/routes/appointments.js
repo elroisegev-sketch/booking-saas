@@ -5,6 +5,7 @@ const auth = require('../middleware/auth');
 const { sendPush } = require('./push');
 const { PHONE_RE, normalizePhone } = require('../lib/phone');
 const { findOrCreateCustomer } = require('../lib/customers');
+const { syncReminderSafe, cancelReminderSafe } = require('../lib/smsReminders');
 const router = express.Router();
 
 // ── Hebrew natural-language appointment parser ─────────────────
@@ -417,6 +418,7 @@ router.patch('/:id', auth, async (req, res) => {
       `UPDATE appointments SET appointment_time=$1, end_time=$2, service_id=$3, service_names_text=$4, customer_name=$5, customer_phone=$6, customer_id=$7 WHERE id=$8 AND business_id=$9 RETURNING *`,
       [newStart.toISOString(), newEnd.toISOString(), newServiceId, serviceNamesText, newName, parsed.valid ? parsed.normalized : newPhone, customerId, req.params.id, req.user.id]
     );
+    await syncReminderSafe(result.rows[0].id);
     res.json(result.rows[0]);
   } catch (err) {
     console.error('Edit appointment error:', err);
@@ -461,6 +463,7 @@ router.post('/manual', auth, async (req, res) => {
       ]
     );
     notifyBusiness(req.user.id);
+    await syncReminderSafe(result.rows[0].id);
     res.status(201).json(result.rows[0]);
   } catch (err) {
     if (err.code === '23P01') return res.status(409).json({ error: 'השעה הזו תפוסה' });
@@ -477,6 +480,8 @@ router.patch('/:id/status', auth, async (req, res) => {
   try {
     const result = await db.query('UPDATE appointments SET status=$1 WHERE id=$2 AND business_id=$3 RETURNING *', [status, req.params.id, req.user.id]);
     if (!result.rows.length) return res.status(404).json({ error: 'Appointment not found' });
+    if (status === 'confirmed') await syncReminderSafe(result.rows[0].id);
+    else await cancelReminderSafe(result.rows[0].id, status === 'cancelled' ? 'appointment_cancelled' : 'appointment_completed');
     res.json(result.rows[0]);
   } catch (err) { res.status(500).json({ error: 'Server error' }); }
 });
@@ -538,6 +543,7 @@ router.post('/quick-add', auth, async (req, res) => {
       [req.user.id, parsed.customer_name, '', parsed.service_name, apptTime.toISOString(), apptEnd.toISOString()]
     );
     notifyBusiness(req.user.id);
+    await syncReminderSafe(result.rows[0].id);
     res.status(201).json({ appointment: result.rows[0], parsed });
   } catch (err) {
     console.error('quick-add error:', err);
