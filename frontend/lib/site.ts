@@ -40,7 +40,7 @@ export const site = {
       "https://www.google.com/maps/search/?api=1&query=" +
       encodeURIComponent("ליאור שגב היופי שלך גבעת שמואל"),
   },
-  reviewCount: 7,
+  reviewCount: 10,
   ratingValue: "5.0",
 } as const;
 
