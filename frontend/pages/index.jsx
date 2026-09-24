@@ -1518,16 +1518,37 @@ const StarRow = () => (
 
 const ReviewsCarousel = () => {
   const [i, setI] = useState(0);
+  const [reviews, setReviews] = useState(GOOGLE_REVIEWS);
+  const [rating, setRating] = useState(site.ratingValue);
+  const [reviewCount, setReviewCount] = useState(site.reviewCount);
   const startX = useRef(null);
-  const n = GOOGLE_REVIEWS.length;
+  const n = reviews.length;
   const go = (dir) => setI((cur) => (cur + dir + n) % n);
+
+  useEffect(() => {
+    let cancelled = false;
+    const raw = process.env.NEXT_PUBLIC_API_URL || 'https://booking-saas-production-b9fd.up.railway.app';
+    const base = String(raw).replace(/\/$/, '');
+    const url = base.endsWith('/api') ? `${base}/reviews` : `${base}/api/reviews`;
+    fetch(url)
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data) => {
+        if (cancelled || !data || !Array.isArray(data.reviews) || data.reviews.length === 0) return;
+        setReviews(data.reviews);
+        if (data.rating) setRating(String(data.rating));
+        if (data.reviewCount) setReviewCount(data.reviewCount);
+        setI((cur) => (cur >= data.reviews.length ? 0 : cur));
+      })
+      .catch(() => {});
+    return () => { cancelled = true; };
+  }, []);
 
   return (
     <div>
       <div style={{ textAlign: 'center', marginBottom: '1.25rem' }}>
-        <p style={{ fontSize: '2.4rem', fontWeight: 800, color: '#A11738', margin: 0, lineHeight: 1 }}>{site.ratingValue}</p>
+        <p style={{ fontSize: '2.4rem', fontWeight: 800, color: '#A11738', margin: 0, lineHeight: 1 }}>{rating}</p>
         <StarRow />
-        <p style={{ color: '#A11738', opacity: 0.65, fontSize: '0.8rem', margin: '0.35rem 0 0' }}>{site.reviewCount} ביקורות בגוגל</p>
+        <p style={{ color: '#A11738', opacity: 0.65, fontSize: '0.8rem', margin: '0.35rem 0 0' }}>{reviewCount} ביקורות בגוגל</p>
       </div>
 
       <div
@@ -1560,7 +1581,7 @@ const ReviewsCarousel = () => {
             willChange: 'transform',
           }}
         >
-          {GOOGLE_REVIEWS.map((review) => (
+          {reviews.map((review) => (
             <div
               key={review.name}
               dir="rtl"
