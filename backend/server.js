@@ -88,7 +88,6 @@ app.use('/api/push', require('./routes/push').router);
 app.use('/api/expenses', require('./routes/expenses'));
 app.use('/api/customers', require('./routes/customers'));
 app.use('/api/sms', require('./routes/sms'));
-app.use('/api/reviews', require('./routes/reviews'));
 
 // Gallery table + seed flag on users
 require('./db').query(`
@@ -188,11 +187,6 @@ const PORT = process.env.PORT || 4000;
       await initSmsReminders(db);
     } catch (err) {
       console.error('SMS reminders init error:', err.message);
-    }
-    try {
-      require('./lib/googleReviews').startReviewsWorker(db);
-    } catch (err) {
-      console.error('google reviews worker error:', err.message);
     }
   });
 })();
